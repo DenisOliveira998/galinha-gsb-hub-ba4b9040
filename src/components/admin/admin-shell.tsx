@@ -7,12 +7,12 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
   const logout = useStore((s) => s.logout);
   const router = useRouter();
 
-  const nav = [
+  const nav: Array<{ to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }> = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/posts", label: "Anúncios", icon: FileText },
     { to: "/admin/blog", label: "Blog", icon: Newspaper },
     { to: "/admin/settings", label: "Configurações", icon: Settings },
-  ] as const;
+  ];
 
   return (
     <div className="flex min-h-screen bg-muted/40">
@@ -30,7 +30,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
           {nav.map((n) => (
             <Link
               key={n.to}
-              to={n.to}
+              to={n.to as string}
               activeOptions={n.exact ? { exact: true } : undefined}
               activeProps={{ className: "bg-sidebar-accent" }}
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm opacity-90 hover:bg-sidebar-accent"
