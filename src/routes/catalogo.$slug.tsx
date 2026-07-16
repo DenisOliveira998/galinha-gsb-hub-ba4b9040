@@ -1,6 +1,9 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { ShoppingBag, Zap } from "lucide-react";
+import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useStore, CATEGORY_LABELS } from "@/lib/mock-store";
+import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/catalogo/$slug")({
   component: PostDetail,
@@ -18,6 +21,8 @@ function PostDetail() {
   const { slug } = Route.useParams();
   const post = useStore((s) => s.posts.find((p) => p.slug === slug));
   const settings = useStore((s) => s.settings);
+  const addToCart = useShop((s) => s.addToCart);
+  const navigate = useNavigate();
   if (!post) throw notFound();
 
   return (
@@ -33,11 +38,35 @@ function PostDetail() {
             <h1 className="mt-2 font-display text-3xl md:text-4xl">{post.title}</h1>
             {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
             <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href={`https://wa.me/?text=Olá! Tenho interesse em: ${post.title}`} className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)]">
+            {post.status !== "SOLD" && post.price && (
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart(post);
+                    toast.success("Adicionado ao carrinho", { description: post.title });
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-3 text-sm font-semibold text-primary hover:bg-primary/15"
+                >
+                  <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart(post);
+                    navigate({ to: "/checkout" });
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
+                >
+                  <Zap className="h-4 w-4" /> Comprar agora
+                </button>
+              </div>
+            )}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href={`https://wa.me/?text=Olá! Tenho interesse em: ${post.title}`} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
                 Falar no WhatsApp
               </a>
-              <Link to="/contato" className="rounded-full border px-6 py-3 text-sm font-semibold">Ver contato ({settings.whatsapp})</Link>
+              <Link to="/contato" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">Ver contato ({settings.whatsapp})</Link>
             </div>
           </div>
         </div>
