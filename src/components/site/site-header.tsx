@@ -30,7 +30,7 @@ export function SiteHeader() {
       if (query.trim().length === 0 && !pathname.startsWith("/catalogo")) return;
       navigate({
         to: "/catalogo",
-        search: (prev) => ({ ...(prev as object), q: query || undefined }),
+        search: (prev: Record<string, unknown>) => ({ ...prev, q: query || undefined }),
       });
     }, 200);
     return () => clearTimeout(t);
@@ -57,7 +57,7 @@ export function SiteHeader() {
               e.preventDefault();
               navigate({
                 to: "/catalogo",
-                search: (prev) => ({ ...(prev as object), q: query || undefined }),
+                search: (prev: Record<string, unknown>) => ({ ...prev, q: query || undefined }),
               });
             }}
             className="ml-2 flex-1 max-w-md"
