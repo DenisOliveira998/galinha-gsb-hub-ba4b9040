@@ -13,12 +13,15 @@ import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
+import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContaIndexRouteImport } from './routes/conta.index'
 import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as ContaLoginRouteImport } from './routes/conta.login'
 import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -52,6 +55,11 @@ const CatalogoRoute = CatalogoRouteImport.update({
   path: '/catalogo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CarrinhoRoute = CarrinhoRouteImport.update({
+  id: '/carrinho',
+  path: '/carrinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
@@ -67,6 +75,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContaIndexRoute = ContaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ContaRoute,
+} as any)
 const CatalogoIndexRoute = CatalogoIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -81,6 +94,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const ContaLoginRoute = ContaLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => ContaRoute,
 } as any)
 const CatalogoSlugRoute = CatalogoSlugRouteImport.update({
   id: '/$slug',
@@ -147,8 +165,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
+  '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
-  '/conta': typeof ContaRoute
+  '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
@@ -157,9 +176,11 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/conta/login': typeof ContaLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/catalogo/': typeof CatalogoIndexRoute
+  '/conta/': typeof ContaIndexRoute
   '/admin/blog/$id': typeof AdminBlogIdRoute
   '/admin/blog/novo': typeof AdminBlogNovoRoute
   '/admin/posts/$id': typeof AdminPostsIdRoute
@@ -169,16 +190,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/conta': typeof ContaRoute
+  '/carrinho': typeof CarrinhoRoute
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/conta/login': typeof ContaLoginRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/catalogo': typeof CatalogoIndexRoute
+  '/conta': typeof ContaIndexRoute
   '/admin/blog/$id': typeof AdminBlogIdRoute
   '/admin/blog/novo': typeof AdminBlogNovoRoute
   '/admin/posts/$id': typeof AdminPostsIdRoute
@@ -191,8 +214,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
+  '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
-  '/conta': typeof ContaRoute
+  '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
@@ -201,9 +225,11 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/conta/login': typeof ContaLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/catalogo/': typeof CatalogoIndexRoute
+  '/conta/': typeof ContaIndexRoute
   '/admin/blog/$id': typeof AdminBlogIdRoute
   '/admin/blog/novo': typeof AdminBlogNovoRoute
   '/admin/posts/$id': typeof AdminPostsIdRoute
@@ -217,6 +243,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/blog'
+    | '/carrinho'
     | '/catalogo'
     | '/conta'
     | '/contato'
@@ -227,9 +254,11 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
+    | '/conta/login'
     | '/admin/'
     | '/blog/'
     | '/catalogo/'
+    | '/conta/'
     | '/admin/blog/$id'
     | '/admin/blog/novo'
     | '/admin/posts/$id'
@@ -239,16 +268,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/conta'
+    | '/carrinho'
     | '/contato'
     | '/sobre'
     | '/admin/login'
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
+    | '/conta/login'
     | '/admin'
     | '/blog'
     | '/catalogo'
+    | '/conta'
     | '/admin/blog/$id'
     | '/admin/blog/novo'
     | '/admin/posts/$id'
@@ -260,6 +291,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/blog'
+    | '/carrinho'
     | '/catalogo'
     | '/conta'
     | '/contato'
@@ -270,9 +302,11 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
+    | '/conta/login'
     | '/admin/'
     | '/blog/'
     | '/catalogo/'
+    | '/conta/'
     | '/admin/blog/$id'
     | '/admin/blog/novo'
     | '/admin/posts/$id'
@@ -285,8 +319,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
+  CarrinhoRoute: typeof CarrinhoRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
-  ContaRoute: typeof ContaRoute
+  ContaRoute: typeof ContaRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   SobreRoute: typeof SobreRoute
 }
@@ -321,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/carrinho': {
+      id: '/carrinho'
+      path: '/carrinho'
+      fullPath: '/carrinho'
+      preLoaderRoute: typeof CarrinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog': {
       id: '/blog'
       path: '/blog'
@@ -342,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/conta/': {
+      id: '/conta/'
+      path: '/'
+      fullPath: '/conta/'
+      preLoaderRoute: typeof ContaIndexRouteImport
+      parentRoute: typeof ContaRoute
+    }
     '/catalogo/': {
       id: '/catalogo/'
       path: '/'
@@ -362,6 +411,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/conta/login': {
+      id: '/conta/login'
+      path: '/login'
+      fullPath: '/conta/login'
+      preLoaderRoute: typeof ContaLoginRouteImport
+      parentRoute: typeof ContaRoute
     }
     '/catalogo/$slug': {
       id: '/catalogo/$slug'
@@ -526,12 +582,25 @@ const CatalogoRouteWithChildren = CatalogoRoute._addFileChildren(
   CatalogoRouteChildren,
 )
 
+interface ContaRouteChildren {
+  ContaLoginRoute: typeof ContaLoginRoute
+  ContaIndexRoute: typeof ContaIndexRoute
+}
+
+const ContaRouteChildren: ContaRouteChildren = {
+  ContaLoginRoute: ContaLoginRoute,
+  ContaIndexRoute: ContaIndexRoute,
+}
+
+const ContaRouteWithChildren = ContaRoute._addFileChildren(ContaRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
+  CarrinhoRoute: CarrinhoRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
-  ContaRoute: ContaRoute,
+  ContaRoute: ContaRouteWithChildren,
   ContatoRoute: ContatoRoute,
   SobreRoute: SobreRoute,
 }
