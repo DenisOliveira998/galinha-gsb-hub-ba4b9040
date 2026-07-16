@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import chicksImage from "@/assets/category-chicks.jpg";
 
 export type Category = "OVOS_FERTEIS" | "PINTINHOS" | "MATRIZES" | "REPRODUTORES";
 export type PostStatus = "DRAFT" | "PUBLISHED" | "SOLD";
@@ -45,7 +46,7 @@ export const CATEGORY_PLACEHOLDERS: Record<Category, string> = {
   OVOS_FERTEIS:
     "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=1200&q=80",
   PINTINHOS:
-    "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80",
+    chicksImage,
   MATRIZES:
     "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&q=80",
   REPRODUTORES:
@@ -120,8 +121,7 @@ const initialBlog: BlogPost[] = [
       "Guia rápido com temperatura, alimentação e manejo para receber pintinhos saudáveis.",
     content:
       "Nos primeiros dias, o cuidado com temperatura, ração e água é decisivo para a sobrevivência dos pintinhos. Mantenha o pinteiro entre 32 e 35 °C na primeira semana...",
-    coverImage:
-      "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80",
+    coverImage: chicksImage,
     published: true,
     createdAt: new Date().toISOString(),
   },
