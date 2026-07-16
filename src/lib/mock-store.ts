@@ -36,7 +36,7 @@ export interface SiteSettings {
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   OVOS_FERTEIS: "Ovos férteis",
-  PINTINHOS: "Pintinhos",
+  PINTINHOS: "Galinhas",
   MATRIZES: "Matrizes",
   REPRODUTORES: "Reprodutores",
 };
@@ -45,7 +45,7 @@ export const CATEGORY_PLACEHOLDERS: Record<Category, string> = {
   OVOS_FERTEIS:
     "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=1200&q=80",
   PINTINHOS:
-    "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=1200&q=80",
+    "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80",
   MATRIZES:
     "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&q=80",
   REPRODUTORES:
