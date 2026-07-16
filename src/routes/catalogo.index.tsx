@@ -1,16 +1,36 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { ShoppingBag, Zap } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useStore, CATEGORY_LABELS, type Category } from "@/lib/mock-store";
+import { useShop } from "@/lib/shop-store";
+
+type CatalogSearch = { q?: string };
 
 export const Route = createFileRoute("/catalogo/")({
+  validateSearch: (search: Record<string, unknown>): CatalogSearch => ({
+    q: typeof search.q === "string" ? search.q : undefined,
+  }),
   component: Catalog,
 });
 
 function Catalog() {
   const posts = useStore((s) => s.posts).filter((p) => p.status !== "DRAFT");
+  const addToCart = useShop((s) => s.addToCart);
+  const navigate = useNavigate();
+  const { q } = Route.useSearch();
   const [cat, setCat] = useState<Category | "ALL">("ALL");
-  const filtered = cat === "ALL" ? posts : posts.filter((p) => p.category === cat);
+
+  const filtered = useMemo(() => {
+    const term = (q ?? "").trim().toLowerCase();
+    return posts.filter((p) => {
+      if (cat !== "ALL" && p.category !== cat) return false;
+      if (!term) return true;
+      const haystack = `${p.title} ${p.description} ${CATEGORY_LABELS[p.category]}`.toLowerCase();
+      return haystack.includes(term);
+    });
+  }, [posts, cat, q]);
 
   return (
     <SiteLayout>
@@ -22,6 +42,22 @@ function Catalog() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-8">
+        {q && (
+          <p className="mb-4 text-sm text-muted-foreground">
+            Resultados para <span className="font-semibold text-foreground">"{q}"</span> —{" "}
+            <button
+              onClick={() =>
+                navigate({
+                  to: "/catalogo",
+                  search: (prev: Record<string, unknown>) => ({ ...prev, q: undefined }),
+                })
+              }
+              className="text-primary hover:underline"
+            >
+              limpar busca
+            </button>
+          </p>
+        )}
         <div className="flex flex-wrap gap-2">
           <FilterChip active={cat === "ALL"} onClick={() => setCat("ALL")}>Todos</FilterChip>
           {(Object.keys(CATEGORY_LABELS) as Category[]).map((c) => (
@@ -30,24 +66,52 @@ function Catalog() {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="mt-12 rounded-3xl bg-muted p-10 text-center text-muted-foreground">Nenhum anúncio nesta categoria no momento.</div>
+          <div className="mt-12 rounded-3xl bg-muted p-10 text-center text-muted-foreground">
+            {q ? "Nenhum anúncio encontrado para sua busca." : "Nenhum anúncio nesta categoria no momento."}
+          </div>
         ) : (
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {filtered.map((p) => (
-              <Link key={p.id} to="/catalogo/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
-                <div className="relative aspect-[4/3] overflow-hidden">
+              <article key={p.id} className="group flex flex-col overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+                <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   {p.status === "SOLD" && (
                     <span className="absolute left-3 top-3 rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-destructive-foreground">Vendido</span>
                   )}
-                </div>
-                <div className="p-5">
+                </Link>
+                <div className="flex flex-1 flex-col p-5">
                   <div className="text-xs font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[p.category]}</div>
-                  <h3 className="mt-2 font-display text-lg">{p.title}</h3>
+                  <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-2 font-display text-lg hover:text-primary">
+                    {p.title}
+                  </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
                   {p.price && <div className="mt-3 font-semibold">R$ {p.price.toFixed(2)}</div>}
+                  {p.status !== "SOLD" && (
+                    <div className="mt-4 flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          addToCart(p);
+                          toast.success("Adicionado ao carrinho", { description: p.title });
+                        }}
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/15"
+                      >
+                        <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          addToCart(p);
+                          navigate({ to: "/checkout" });
+                        }}
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
+                      >
+                        <Zap className="h-4 w-4" /> Comprar agora
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </Link>
+              </article>
             ))}
           </div>
         )}
