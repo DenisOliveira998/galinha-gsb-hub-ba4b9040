@@ -7,7 +7,7 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
   const [title, setTitle] = useState(initial?.title ?? "");
   const [excerpt, setExcerpt] = useState(initial?.excerpt ?? "");
   const [content, setContent] = useState(initial?.content ?? "");
-  const [coverImage, setCoverImage] = useState(initial?.coverImage ?? "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=1200&q=80");
+  const [coverImage, setCoverImage] = useState(initial?.coverImage ?? "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80");
   const [published, setPublished] = useState(initial?.published ?? false);
 
   return (
