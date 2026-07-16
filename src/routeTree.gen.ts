@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as ContaRouteImport } from './routes/conta'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -39,6 +40,11 @@ const SobreRoute = SobreRouteImport.update({
 const ContatoRoute = ContatoRouteImport.update({
   id: '/contato',
   path: '/contato',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContaRoute = ContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogoRoute = CatalogoRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/conta': typeof ContaRoute
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/conta': typeof ContaRoute
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/admin/login': typeof AdminLoginRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/conta': typeof ContaRoute
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/catalogo'
+    | '/conta'
     | '/contato'
     | '/sobre'
     | '/admin/blog'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/conta'
     | '/contato'
     | '/sobre'
     | '/admin/login'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/catalogo'
+    | '/conta'
     | '/contato'
     | '/sobre'
     | '/admin/blog'
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
   CatalogoRoute: typeof CatalogoRouteWithChildren
+  ContaRoute: typeof ContaRoute
   ContatoRoute: typeof ContatoRoute
   SobreRoute: typeof SobreRoute
 }
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/contato'
       fullPath: '/contato'
       preLoaderRoute: typeof ContatoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conta': {
+      id: '/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof ContaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogo': {
@@ -511,6 +531,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
   CatalogoRoute: CatalogoRouteWithChildren,
+  ContaRoute: ContaRoute,
   ContatoRoute: ContatoRoute,
   SobreRoute: SobreRoute,
 }
