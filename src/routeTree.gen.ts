@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as ContaRouteImport } from './routes/conta'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -22,6 +23,7 @@ import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ContaLoginRouteImport } from './routes/conta.login'
+import { Route as CheckoutConfirmadoRouteImport } from './routes/checkout.confirmado'
 import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -48,6 +50,11 @@ const ContatoRoute = ContatoRouteImport.update({
 const ContaRoute = ContaRouteImport.update({
   id: '/conta',
   path: '/conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogoRoute = CatalogoRouteImport.update({
@@ -99,6 +106,11 @@ const ContaLoginRoute = ContaLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => ContaRoute,
+} as any)
+const CheckoutConfirmadoRoute = CheckoutConfirmadoRouteImport.update({
+  id: '/confirmado',
+  path: '/confirmado',
+  getParentRoute: () => CheckoutRoute,
 } as any)
 const CatalogoSlugRoute = CatalogoSlugRouteImport.update({
   id: '/$slug',
@@ -167,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
@@ -176,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/checkout/confirmado': typeof CheckoutConfirmadoRoute
   '/conta/login': typeof ContaLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -191,12 +205,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/checkout/confirmado': typeof CheckoutConfirmadoRoute
   '/conta/login': typeof ContaLoginRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
@@ -216,6 +232,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
@@ -225,6 +242,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/checkout/confirmado': typeof CheckoutConfirmadoRoute
   '/conta/login': typeof ContaLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -245,6 +263,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/carrinho'
     | '/catalogo'
+    | '/checkout'
     | '/conta'
     | '/contato'
     | '/sobre'
@@ -254,6 +273,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
+    | '/checkout/confirmado'
     | '/conta/login'
     | '/admin/'
     | '/blog/'
@@ -269,12 +289,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/carrinho'
+    | '/checkout'
     | '/contato'
     | '/sobre'
     | '/admin/login'
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
+    | '/checkout/confirmado'
     | '/conta/login'
     | '/admin'
     | '/blog'
@@ -293,6 +315,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/carrinho'
     | '/catalogo'
+    | '/checkout'
     | '/conta'
     | '/contato'
     | '/sobre'
@@ -302,6 +325,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
+    | '/checkout/confirmado'
     | '/conta/login'
     | '/admin/'
     | '/blog/'
@@ -321,6 +345,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   CarrinhoRoute: typeof CarrinhoRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
+  CheckoutRoute: typeof CheckoutRouteWithChildren
   ContaRoute: typeof ContaRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   SobreRoute: typeof SobreRoute
@@ -347,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/conta'
       fullPath: '/conta'
       preLoaderRoute: typeof ContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogo': {
@@ -418,6 +450,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/conta/login'
       preLoaderRoute: typeof ContaLoginRouteImport
       parentRoute: typeof ContaRoute
+    }
+    '/checkout/confirmado': {
+      id: '/checkout/confirmado'
+      path: '/confirmado'
+      fullPath: '/checkout/confirmado'
+      preLoaderRoute: typeof CheckoutConfirmadoRouteImport
+      parentRoute: typeof CheckoutRoute
     }
     '/catalogo/$slug': {
       id: '/catalogo/$slug'
@@ -582,6 +621,18 @@ const CatalogoRouteWithChildren = CatalogoRoute._addFileChildren(
   CatalogoRouteChildren,
 )
 
+interface CheckoutRouteChildren {
+  CheckoutConfirmadoRoute: typeof CheckoutConfirmadoRoute
+}
+
+const CheckoutRouteChildren: CheckoutRouteChildren = {
+  CheckoutConfirmadoRoute: CheckoutConfirmadoRoute,
+}
+
+const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
+  CheckoutRouteChildren,
+)
+
 interface ContaRouteChildren {
   ContaLoginRoute: typeof ContaLoginRoute
   ContaIndexRoute: typeof ContaIndexRoute
@@ -600,6 +651,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   CarrinhoRoute: CarrinhoRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
+  CheckoutRoute: CheckoutRouteWithChildren,
   ContaRoute: ContaRouteWithChildren,
   ContatoRoute: ContatoRoute,
   SobreRoute: SobreRoute,
