@@ -15,9 +15,9 @@ function Home() {
   return (
     <SiteLayout>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
-        <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:px-8 md:py-24">
+      <section className="relative bg-primary-deep text-primary-foreground">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pt-16 pb-24 md:grid-cols-2 md:px-8 md:pt-24 md:pb-32">
           <div>
             <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40">
               Raça tradicional brasileira
@@ -43,11 +43,11 @@ function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative pb-8 md:pb-0">
             <div className="overflow-hidden rounded-[2rem] ring-4 ring-primary-glow/30 shadow-[var(--shadow-card)]">
               <img src={settings.heroImage} alt="Galinha Sertanejo Balão" className="aspect-[4/5] w-full object-cover" />
             </div>
-            <div className="absolute -bottom-6 -left-6 hidden rounded-2xl bg-accent-warm px-5 py-4 text-accent-warm-foreground shadow-[var(--shadow-card)] md:block">
+            <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm px-5 py-4 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-bottom-6 md:-left-6">
               <div className="font-display text-2xl font-semibold">+10 anos</div>
               <div className="text-xs">de tradição no plantel</div>
             </div>
@@ -56,7 +56,7 @@ function Home() {
       </section>
 
       {/* 3 diferenciais */}
-      <section className="mx-auto -mt-10 max-w-7xl px-4 md:px-8">
+      <section className="relative mx-auto mt-12 max-w-7xl px-4 md:-mt-10 md:px-8">
         <div className="grid gap-4 md:grid-cols-3">
           {[
             { icon: ShieldCheck, title: "Procedência garantida", desc: "Linhagem pura, seleção rigorosa e histórico do plantel." },
