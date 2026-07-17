@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import { MessageCircle, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useEffect } from "react";
-import { cartCount, cartTotal, useShop } from "@/lib/shop-store";
+import { buildWhatsAppOrderUrl, cartCount, cartTotal, useShop } from "@/lib/shop-store";
+import { useStore } from "@/lib/mock-store";
 
 interface Props {
   open: boolean;
@@ -14,6 +15,8 @@ export function CartDrawer({ open, onClose }: Props) {
   const removeFromCart = useShop((s) => s.removeFromCart);
   const total = cartTotal(cart);
   const count = cartCount(cart);
+  const whatsapp = useStore((s) => s.settings.whatsapp);
+  const whatsappUrl = buildWhatsAppOrderUrl(cart, whatsapp);
 
   useEffect(() => {
     if (!open) return;
@@ -134,13 +137,15 @@ export function CartDrawer({ open, onClose }: Props) {
               </span>
             </div>
             <div className="mt-4 flex flex-col gap-2">
-              <Link
-                to="/checkout"
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={onClose}
-                className="w-full rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
               >
-                Finalizar compra
-              </Link>
+                <MessageCircle className="h-4 w-4" /> Entrar em contato
+              </a>
               <Link
                 to="/carrinho"
                 onClick={onClose}
