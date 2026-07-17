@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { MessageCircle, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { cartTotal, useShop } from "@/lib/shop-store";
+import { buildWhatsAppOrderUrl, cartTotal, useShop } from "@/lib/shop-store";
+import { useStore } from "@/lib/mock-store";
 
 export const Route = createFileRoute("/carrinho")({
   head: () => ({ meta: [{ title: "Carrinho — Galinha GSB" }, { name: "robots", content: "noindex" }] }),
@@ -15,6 +16,8 @@ function CartPage() {
   const updateQuantity = useShop((s) => s.updateQuantity);
   const removeFromCart = useShop((s) => s.removeFromCart);
   const total = cartTotal(cart);
+  const whatsapp = useStore((s) => s.settings.whatsapp);
+  const whatsappUrl = buildWhatsAppOrderUrl(cart, whatsapp);
 
   return (
     <SiteLayout>
@@ -51,7 +54,7 @@ function CartPage() {
               <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground"><span>Subtotal</span><span>R$ {total.toFixed(2)}</span></div>
               <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground"><span>Frete</span><span>a combinar</span></div>
               <div className="mt-4 flex items-center justify-between border-t pt-4 font-display text-xl"><span>Total</span><span className="text-primary">R$ {total.toFixed(2)}</span></div>
-              <Link to="/checkout" className="mt-6 block rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">Finalizar compra</Link>
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"><MessageCircle className="h-4 w-4" /> Entrar em contato</a>
               <Link to="/catalogo" className="mt-2 block rounded-full border px-6 py-3 text-center text-sm font-semibold hover:bg-muted">Continuar comprando</Link>
             </aside>
           </div>
