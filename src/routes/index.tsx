@@ -83,14 +83,14 @@ function Home() {
           </div>
           <Link to="/catalogo" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
         </div>
-        <div className="mt-5 grid gap-3 grid-cols-2 md:mt-8 md:grid-cols-4 md:gap-4">
+        <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-8 md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
           {(Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>).map((key, i) => {
             const bg = ["bg-primary text-primary-foreground", "bg-accent text-accent-foreground", "bg-accent-warm text-accent-warm-foreground", "bg-primary-deep text-primary-foreground"][i];
             return (
               <Link
                 key={key}
                 to="/catalogo"
-                className={`group relative overflow-hidden rounded-3xl p-4 shadow-[var(--shadow-card)] md:p-6 ${bg}`}
+                className={`group relative w-[65%] shrink-0 snap-start overflow-hidden rounded-3xl p-4 shadow-[var(--shadow-card)] md:w-auto md:p-6 ${bg}`}
               >
                 <img src={CATEGORY_PLACEHOLDERS[key]} alt={CATEGORY_LABELS[key]} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
                 <div className="relative">
