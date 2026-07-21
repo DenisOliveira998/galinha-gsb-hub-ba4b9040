@@ -29,8 +29,8 @@ function BlogList() {
                 <td className="px-4 py-3 text-muted-foreground">{new Date(b.createdAt).toLocaleDateString("pt-BR")}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-2">
-                    <Link to="/admin/blog/$id" params={{ id: b.id }} className="rounded-lg p-2 hover:bg-muted"><Pencil className="h-4 w-4" /></Link>
-                    <button onClick={() => { if (confirm("Excluir post?")) del(b.id); }} className="rounded-lg p-2 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
+                    <Link to="/admin/blog/$id" params={{ id: b.id }} title="Editar" aria-label="Editar post" className="rounded-lg p-2 hover:bg-muted"><Pencil className="h-4 w-4" /></Link>
+                    <button onClick={() => { if (confirm(`Remover definitivamente "${b.title}"? Esta ação não pode ser desfeita.`)) del(b.id); }} title="Remover" aria-label="Remover post" className="rounded-lg p-2 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </td>
               </tr>
