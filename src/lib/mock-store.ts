@@ -227,11 +227,11 @@ export const useStore = create<State>()(
       storage: createJSONStorage(() =>
         typeof window !== "undefined"
           ? window.localStorage
-          : ({
+          : {
               getItem: () => null,
               setItem: () => {},
               removeItem: () => {},
-            } as Storage),
+            },
       ),
       // Persist only data — never the auth flag.
       partialize: (s) => ({
