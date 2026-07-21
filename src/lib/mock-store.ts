@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import chicksImage from "@/assets/category-chicks.jpg";
 
 export type Category = "OVOS_FERTEIS" | "PINTINHOS" | "MATRIZES" | "REPRODUTORES";
@@ -168,21 +169,23 @@ interface State {
 
 // Mock in-memory store. Substitua por integração com TiDB Cloud + Prisma
 // quando conectar o banco real.
-export const useStore = create<State>((set, get) => ({
-  isAuthenticated: false,
-  posts: initialPosts,
-  blog: initialBlog,
-  settings: initialSettings,
-  login: (email, password) => {
+export const useStore = create<State>()(
+  persist(
+    (set, get) => ({
+      isAuthenticated: false,
+      posts: initialPosts,
+      blog: initialBlog,
+      settings: initialSettings,
+      login: (email, password) => {
     // Credenciais mockadas — trocar por auth real depois
     if (email === "admin@galinhagsb.com" && password === "admin123") {
       set({ isAuthenticated: true });
       return true;
     }
     return false;
-  },
-  logout: () => set({ isAuthenticated: false }),
-  addPost: (p) => {
+      },
+      logout: () => set({ isAuthenticated: false }),
+      addPost: (p) => {
     const post: Post = {
       ...p,
       id: crypto.randomUUID(),
@@ -192,14 +195,14 @@ export const useStore = create<State>((set, get) => ({
     };
     set({ posts: [post, ...get().posts] });
     return post;
-  },
-  updatePost: (id, patch) =>
+      },
+      updatePost: (id, patch) =>
     set({
       posts: get().posts.map((p) => (p.id === id ? { ...p, ...patch } : p)),
     }),
-  deletePost: (id) =>
+      deletePost: (id) =>
     set({ posts: get().posts.filter((p) => p.id !== id) }),
-  addBlog: (b) => {
+      addBlog: (b) => {
     const post: BlogPost = {
       ...b,
       id: crypto.randomUUID(),
@@ -208,13 +211,35 @@ export const useStore = create<State>((set, get) => ({
     };
     set({ blog: [post, ...get().blog] });
     return post;
-  },
-  updateBlog: (id, patch) =>
+      },
+      updateBlog: (id, patch) =>
     set({
       blog: get().blog.map((b) => (b.id === id ? { ...b, ...patch } : b)),
     }),
-  deleteBlog: (id) =>
+      deleteBlog: (id) =>
     set({ blog: get().blog.filter((b) => b.id !== id) }),
-  updateSettings: (s) =>
-    set({ settings: { ...get().settings, ...s } }),
-}));
+      updateSettings: (s) =>
+        set({ settings: { ...get().settings, ...s } }),
+    }),
+    {
+      name: "gsb-store",
+      // SSR-safe: no storage on server; syncs to localStorage in the browser.
+      storage: createJSONStorage(() =>
+        typeof window !== "undefined"
+          ? window.localStorage
+          : {
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
+            },
+      ),
+      // Persist only data — never the auth flag.
+      partialize: (s) => ({
+        posts: s.posts,
+        blog: s.blog,
+        settings: s.settings,
+      }),
+      version: 1,
+    },
+  ),
+);
