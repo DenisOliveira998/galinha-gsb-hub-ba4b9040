@@ -38,8 +38,8 @@ function PostsList() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-2">
-                    <Link to="/admin/posts/$id" params={{ id: p.id }} className="rounded-lg p-2 hover:bg-muted"><Pencil className="h-4 w-4" /></Link>
-                    <button onClick={() => { if (confirm("Excluir anúncio?")) del(p.id); }} className="rounded-lg p-2 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
+                    <Link to="/admin/posts/$id" params={{ id: p.id }} title="Editar" aria-label="Editar anúncio" className="rounded-lg p-2 hover:bg-muted"><Pencil className="h-4 w-4" /></Link>
+                    <button onClick={() => { if (confirm(`Remover definitivamente "${p.title}"? Esta ação não pode ser desfeita.`)) del(p.id); }} title="Remover" aria-label="Remover anúncio" className="rounded-lg p-2 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </td>
               </tr>

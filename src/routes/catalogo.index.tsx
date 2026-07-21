@@ -58,7 +58,7 @@ function Catalog() {
             </button>
           </p>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           <FilterChip active={cat === "ALL"} onClick={() => setCat("ALL")}>Todos</FilterChip>
           {(Object.keys(CATEGORY_LABELS) as Category[]).map((c) => (
             <FilterChip key={c} active={cat === c} onClick={() => setCat(c)}>{CATEGORY_LABELS[c]}</FilterChip>
@@ -124,7 +124,7 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      className={`rounded-full px-4 py-2 text-sm font-medium transition ${active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-muted/70"}`}
+      className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition ${active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-muted/70"}`}
     >
       {children}
     </button>

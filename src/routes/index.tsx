@@ -83,14 +83,14 @@ function Home() {
           </div>
           <Link to="/catalogo" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
         </div>
-        <div className="mt-5 grid gap-3 grid-cols-2 md:mt-8 md:grid-cols-4 md:gap-4">
+        <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-8 md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
           {(Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>).map((key, i) => {
             const bg = ["bg-primary text-primary-foreground", "bg-accent text-accent-foreground", "bg-accent-warm text-accent-warm-foreground", "bg-primary-deep text-primary-foreground"][i];
             return (
               <Link
                 key={key}
                 to="/catalogo"
-                className={`group relative overflow-hidden rounded-3xl p-4 shadow-[var(--shadow-card)] md:p-6 ${bg}`}
+                className={`group relative w-[65%] shrink-0 snap-start overflow-hidden rounded-3xl p-4 shadow-[var(--shadow-card)] md:w-auto md:p-6 ${bg}`}
               >
                 <img src={CATEGORY_PLACEHOLDERS[key]} alt={CATEGORY_LABELS[key]} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
                 <div className="relative">
@@ -104,19 +104,20 @@ function Home() {
         </div>
       </section>
 
-      {/* Banner CTA */}
+      {/* Espaço publicitário — formato horizontal (banner largo) */}
       <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-20 md:px-8">
-        <div className="overflow-hidden rounded-[2rem] bg-[image:var(--gradient-hero)] p-6 text-primary-foreground shadow-[var(--shadow-card)] md:rounded-[2.5rem] md:p-14">
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
-            <div>
-              <h2 className="font-display text-xl md:text-4xl">Leve para casa uma peça da nossa tradição</h2>
-              <p className="mt-2 max-w-xl text-sm opacity-85 md:mt-3 md:text-base">
-                Fale conosco pelo WhatsApp e receba orientação personalizada para escolher os melhores exemplares para o seu plantel.
-              </p>
+        <div
+          role="complementary"
+          aria-label="Espaço publicitário — formato banner"
+          className="flex min-h-[100px] items-center justify-center rounded-3xl border-2 border-dashed border-accent/50 bg-accent/5 px-6 py-6 text-center md:min-h-[140px]"
+        >
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-accent md:text-xs">
+              Espaço publicitário · Banner horizontal
             </div>
-            <Link to="/contato" className="justify-self-start rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-[var(--shadow-soft)] md:justify-self-end md:px-6 md:py-3">
-              Falar no WhatsApp
-            </Link>
+            <p className="mt-1 text-xs text-muted-foreground md:mt-2 md:text-sm">
+              Formato retangular largo disponível para parceiros.
+            </p>
           </div>
         </div>
       </section>
