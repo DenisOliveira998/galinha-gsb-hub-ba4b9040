@@ -17,15 +17,15 @@ function Home() {
       {/* HERO */}
       <section className="relative bg-primary-deep text-primary-foreground">
         <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pt-10 pb-16 md:grid-cols-2 md:gap-10 md:px-8 md:pt-24 md:pb-32">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pt-10 pb-16 md:grid-cols-2 md:gap-10 md:px-8 md:pt-16 md:pb-24">
           <div>
             <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40 md:text-xs">
               Raça tradicional brasileira
             </span>
-            <h1 className="mt-3 font-display text-3xl leading-tight md:mt-5 md:text-6xl">
+            <h1 className="mt-3 font-display text-3xl leading-tight md:mt-5 md:text-5xl">
               Conheça a importância da raça <span className="text-accent-warm">GSB</span>
             </h1>
-            <p className="mt-3 max-w-xl text-sm opacity-85 md:mt-5 md:text-lg">
+            <p className="mt-3 max-w-xl text-sm opacity-85 md:mt-4 md:text-base">
               Ovos férteis, pintinhos, matrizes e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.
             </p>
             <div className="mt-5 flex flex-wrap gap-2 md:mt-8 md:gap-3">
@@ -75,15 +75,15 @@ function Home() {
       </section>
 
       {/* Categorias em destaque */}
-      <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-20 md:px-8">
+      <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-16 md:px-8">
         <div className="flex items-end justify-between">
           <div>
-            <h2 className="font-display text-2xl md:text-4xl">Nosso catálogo</h2>
-            <p className="mt-1 text-sm text-muted-foreground md:mt-2 md:text-base">Escolha a categoria e conheça as aves disponíveis.</p>
+            <h2 className="font-display text-2xl md:text-3xl">Nosso catálogo</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Escolha a categoria e conheça as aves disponíveis.</p>
           </div>
           <Link to="/catalogo" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
         </div>
-        <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-8 md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
+        <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-6 md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
           {(Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>).map((key, i) => {
             const bg = ["bg-primary text-primary-foreground", "bg-accent text-accent-foreground", "bg-accent-warm text-accent-warm-foreground", "bg-primary-deep text-primary-foreground"][i];
             return (
@@ -105,7 +105,7 @@ function Home() {
       </section>
 
       {/* Espaço publicitário — formato horizontal (banner largo) */}
-      <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-20 md:px-8">
+      <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-16 md:px-8">
         <div
           role="complementary"
           aria-label="Espaço publicitário — formato banner"
@@ -124,18 +124,18 @@ function Home() {
 
       {/* Destaques do catálogo */}
       {destaques.length > 0 && (
-        <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-20 md:px-8">
-          <h2 className="font-display text-2xl md:text-4xl">Últimos anúncios</h2>
-          <div className="mt-5 grid gap-4 md:mt-8 md:grid-cols-3 md:gap-6">
+        <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-16 md:px-8">
+          <h2 className="font-display text-2xl md:text-3xl">Últimos anúncios</h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 md:mt-6 md:grid-cols-3 md:gap-5">
             {destaques.map((p) => (
-              <Link key={p.id} to="/catalogo/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+              <Link key={p.id} to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
                 <div className="aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </div>
-                <div className="p-4 md:p-5">
+                <div className="flex flex-1 flex-col p-4 text-left md:p-5">
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{CATEGORY_LABELS[p.category]}</div>
-                  <h3 className="mt-1 font-display text-base md:mt-2 md:text-lg">{p.title}</h3>
-                  {p.price && <div className="mt-1 text-sm font-semibold md:mt-2 md:text-base">R$ {p.price.toFixed(2)}</div>}
+                  <h3 className="mt-1 line-clamp-2 font-display text-base md:mt-1.5 md:text-lg">{p.title}</h3>
+                  {p.price && <div className="mt-auto pt-2 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
                 </div>
               </Link>
             ))}
@@ -144,7 +144,7 @@ function Home() {
       )}
 
       {/* Espaço publicitário — slot mockado, pronto para integração futura */}
-      <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-20 md:px-8">
+      <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-16 md:px-8">
         <div
           role="complementary"
           aria-label="Espaço publicitário"
@@ -162,9 +162,9 @@ function Home() {
       </section>
 
       {/* Por que escolher a GSB */}
-      <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-24 md:px-8">
-        <h2 className="font-display text-2xl md:text-4xl">Por que escolher a Galinha GSB</h2>
-        <div className="mt-6 grid grid-cols-2 gap-6 md:mt-10 md:grid-cols-5 md:gap-8">
+      <section className="mx-auto mt-12 max-w-7xl px-4 pb-12 md:mt-16 md:px-8 md:pb-16">
+        <h2 className="font-display text-2xl md:text-3xl">Por que escolher a Galinha GSB</h2>
+        <div className="mt-6 grid grid-cols-2 gap-6 md:mt-8 md:grid-cols-5 md:gap-6">
           {[
             { icon: Feather, label: "Linhagem tradicional" },
             { icon: Egg, label: "Alta taxa de eclosão" },
