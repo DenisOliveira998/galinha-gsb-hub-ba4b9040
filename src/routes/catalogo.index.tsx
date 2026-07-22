@@ -35,13 +35,13 @@ function Catalog() {
   return (
     <SiteLayout>
       <section className="bg-primary-deep text-primary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-20">
-          <h1 className="font-display text-4xl md:text-5xl">Catálogo</h1>
-          <p className="mt-3 max-w-2xl opacity-85">Encontre ovos férteis, pintinhos, matrizes e reprodutores da raça GSB disponíveis no plantel.</p>
+        <div className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
+          <h1 className="font-display text-3xl md:text-4xl">Catálogo</h1>
+          <p className="mt-2 max-w-2xl text-sm opacity-85 md:text-base">Encontre ovos férteis, pintinhos, matrizes e reprodutores da raça GSB disponíveis no plantel.</p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 md:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-10">
         {q && (
           <p className="mb-4 text-sm text-muted-foreground">
             Resultados para <span className="font-semibold text-foreground">"{q}"</span> —{" "}
@@ -70,24 +70,24 @@ function Catalog() {
             {q ? "Nenhum anúncio encontrado para sua busca." : "Nenhum anúncio nesta categoria no momento."}
           </div>
         ) : (
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p) => (
-              <article key={p.id} className="group flex flex-col overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+              <article key={p.id} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
                 <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   {p.status === "SOLD" && (
                     <span className="absolute left-3 top-3 rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-destructive-foreground">Vendido</span>
                   )}
                 </Link>
-                <div className="flex flex-1 flex-col p-5">
-                  <div className="text-xs font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[p.category]}</div>
-                  <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-2 font-display text-lg hover:text-primary">
+                <div className="flex flex-1 flex-col p-4 text-left md:p-5">
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{CATEGORY_LABELS[p.category]}</div>
+                  <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
                     {p.title}
                   </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
-                  {p.price && <div className="mt-3 font-semibold">R$ {p.price.toFixed(2)}</div>}
+                  {p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
                   {p.status !== "SOLD" && (
-                    <div className="mt-4 flex flex-col gap-2">
+                    <div className="mt-auto flex flex-col gap-2 pt-4">
                       <button
                         type="button"
                         onClick={() => {
