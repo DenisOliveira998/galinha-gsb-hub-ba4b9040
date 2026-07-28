@@ -81,10 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Galinha GSB — Sertanejo Balão | Ovos férteis, pintinhos e matrizes" },
       { name: "description", content: "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, pintinhos, matrizes e reprodutores de procedência garantida." },
       { name: "author", content: "Galinha GSB" },
-      { property: "og:title", content: "Galinha GSB — Sertanejo Balão" },
-      { property: "og:description", content: "Criadouro tradicional da raça Sertanejo Balão. Procedência garantida e suporte ao criador." },
+      { property: "og:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, pintinhos e matrizes" },
+      { property: "og:description", content: "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, pintinhos, matrizes e reprodutores de procedência garantida." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, pintinhos e matrizes" },
+      { name: "twitter:description", content: "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, pintinhos, matrizes e reprodutores de procedência garantida." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4d8872f6-79cc-4566-9fb3-7c01832bf371/id-preview-59f11369--22283bae-4360-4524-8b15-cf24a08446a5.lovable.app-1784746833771.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4d8872f6-79cc-4566-9fb3-7c01832bf371/id-preview-59f11369--22283bae-4360-4524-8b15-cf24a08446a5.lovable.app-1784746833771.png" },
     ],
     links: [
       {
