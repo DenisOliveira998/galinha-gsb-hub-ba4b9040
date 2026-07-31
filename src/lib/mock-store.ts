@@ -305,7 +305,9 @@ export const useStore = create<State>()(
       id: crypto.randomUUID(),
       slug: slugify(p.title) + "-" + Math.random().toString(36).slice(2, 6),
       createdAt: new Date().toISOString(),
-      images: p.images.length ? p.images : [CATEGORY_PLACEHOLDERS[p.category]],
+      images: p.images.length
+        ? p.images
+        : [categoryImage(get().categories, get().categoryImages, p.category)],
     };
     set({ posts: [post, ...get().posts] });
     return post;
@@ -625,4 +627,36 @@ export function ratingAverage(ratings: Record<string, number[]> | undefined, pos
   const list = ratings?.[postId] ?? [];
   if (!list.length) return { average: 0, count: 0 };
   return { average: list.reduce((a, b) => a + b, 0) / list.length, count: list.length };
+}
+
+// --------------------------------------------------------------- Categorias
+
+/** Nome exibido de uma categoria (dinâmica, com fallback para as legadas). */
+export function categoryLabel(cats: CategoryItem[] | undefined, id: string): string {
+  return cats?.find((c) => c.id === id)?.label ?? CATEGORY_LABELS[id] ?? id;
+}
+
+/** Imagem de destaque de uma categoria. */
+export function categoryImage(
+  cats: CategoryItem[] | undefined,
+  images: Record<string, string[]> | undefined,
+  id: string,
+): string {
+  return (
+    images?.[id]?.[0] ??
+    cats?.find((c) => c.id === id)?.image ??
+    CATEGORY_PLACEHOLDERS[id] ??
+    "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&q=80"
+  );
+}
+
+/** Lista de categorias vinda do store (fonte única). */
+export function useCategories(): CategoryItem[] {
+  return useStore((s) => s.categories) ?? DEFAULT_CATEGORIES;
+}
+
+/** Função pronta para exibir o nome de uma categoria em qualquer página. */
+export function useCategoryLabel(): (id: string) => string {
+  const cats = useCategories();
+  return (id: string) => categoryLabel(cats, id);
 }
