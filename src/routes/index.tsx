@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { posts, blog } = useStore();
+  const { posts, blog, categoryImages } = useStore();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
   const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
 
