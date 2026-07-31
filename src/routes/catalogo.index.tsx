@@ -37,7 +37,7 @@ function Catalog() {
       <section className="bg-primary-deep text-primary-foreground">
         <div className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
           <h1 className="font-display text-3xl md:text-4xl">Catálogo</h1>
-          <p className="mt-2 max-w-2xl text-sm opacity-85 md:text-base">Encontre ovos férteis, pintinhos, matrizes e reprodutores da raça GSB disponíveis no plantel.</p>
+          <p className="mt-2 max-w-2xl text-sm opacity-85 md:text-base">Encontre ovos férteis, galinhas e reprodutores da raça GSB disponíveis no plantel.</p>
         </div>
       </section>
 

@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { ShoppingBag, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS } from "@/lib/mock-store";
+import { useStore, CATEGORY_LABELS, whatsappHref } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/catalogo/$slug")({
@@ -63,7 +63,7 @@ function PostDetail() {
               </div>
             )}
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={`https://wa.me/?text=Olá! Tenho interesse em: ${post.title}`} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
+              <a href={whatsappHref(settings, `Olá! Tenho interesse em: ${post.title}`)} target="_blank" rel="noopener noreferrer" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
                 Falar no WhatsApp
               </a>
               <Link to="/contato" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">Ver contato ({settings.whatsapp})</Link>

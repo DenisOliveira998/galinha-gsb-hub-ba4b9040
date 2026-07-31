@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore } from "@/lib/mock-store";
+import { useStore, formatDate } from "@/lib/mock-store";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogDetail,
@@ -25,7 +25,7 @@ function BlogDetail() {
         <div className="mt-6 overflow-hidden rounded-3xl shadow-[var(--shadow-card)]">
           <img src={post.coverImage} alt={post.title} className="aspect-[16/9] w-full object-cover" />
         </div>
-        <div className="mt-8 text-xs text-muted-foreground">{new Date(post.createdAt).toLocaleDateString("pt-BR")}</div>
+        <div className="mt-8 text-xs text-muted-foreground">{formatDate(post.createdAt)}</div>
         <h1 className="mt-2 font-display text-4xl">{post.title}</h1>
         <p className="mt-4 text-lg text-muted-foreground">{post.excerpt}</p>
         <div className="prose prose-lg mt-8 whitespace-pre-line text-foreground/90">{post.content}</div>

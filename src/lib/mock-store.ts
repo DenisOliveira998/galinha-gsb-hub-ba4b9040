@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import chicksImage from "@/assets/category-chicks.jpg";
 
-export type Category = "OVOS_FERTEIS" | "PINTINHOS" | "MATRIZES" | "REPRODUTORES";
+export type Category = "OVOS_FERTEIS" | "PINTINHOS" | "REPRODUTORES";
 export type PostStatus = "DRAFT" | "PUBLISHED" | "SOLD";
 
 export interface Post {
@@ -30,6 +30,8 @@ export interface BlogPost {
 
 export interface SiteSettings {
   whatsapp: string;
+  /** Link completo do WhatsApp, ex: https://wa.me/5511999999999 */
+  whatsappLink: string;
   instagram: string;
   email: string;
   aboutText: string;
@@ -39,7 +41,6 @@ export interface SiteSettings {
 export const CATEGORY_LABELS: Record<Category, string> = {
   OVOS_FERTEIS: "Ovos férteis",
   PINTINHOS: "Galinhas",
-  MATRIZES: "Matrizes",
   REPRODUTORES: "Reprodutores",
 };
 
@@ -48,8 +49,6 @@ export const CATEGORY_PLACEHOLDERS: Record<Category, string> = {
     "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=1200&q=80",
   PINTINHOS:
     chicksImage,
-  MATRIZES:
-    "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&q=80",
   REPRODUTORES:
     "https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=1200&q=80",
 };
@@ -69,7 +68,7 @@ const initialPosts: Post[] = [
     slug: "ovos-ferteis-gsb-duzia",
     category: "OVOS_FERTEIS",
     description:
-      "Dúzia de ovos férteis da raça Sertanejo Balão, coletados de matrizes selecionadas. Alta taxa de eclosão e procedência garantida.",
+      "Dúzia de ovos férteis da raça Sertanejo Balão, coletados de aves selecionadas. Alta taxa de eclosão e procedência garantida.",
     price: 120,
     status: "PUBLISHED",
     images: [CATEGORY_PLACEHOLDERS.OVOS_FERTEIS],
@@ -85,18 +84,6 @@ const initialPosts: Post[] = [
     price: 45,
     status: "PUBLISHED",
     images: [CATEGORY_PLACEHOLDERS.PINTINHOS],
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    title: "Matriz GSB adulta",
-    slug: "matriz-gsb-adulta",
-    category: "MATRIZES",
-    description:
-      "Matriz adulta em plena postura, linhagem tradicional. Ideal para iniciar ou reforçar seu plantel.",
-    price: 380,
-    status: "PUBLISHED",
-    images: [CATEGORY_PLACEHOLDERS.MATRIZES],
     createdAt: new Date().toISOString(),
   },
   {
@@ -143,6 +130,7 @@ const initialBlog: BlogPost[] = [
 
 const initialSettings: SiteSettings = {
   whatsapp: "(00) 00000-0000",
+  whatsappLink: "https://wa.me/5500000000000",
   instagram: "@instagram_do_criador",
   email: "email@exemplo.com",
   aboutText:
@@ -239,7 +227,44 @@ export const useStore = create<State>()(
         blog: s.blog,
         settings: s.settings,
       }),
-      version: 1,
+      version: 2,
+      migrate: (persisted: any, version) => {
+        if (!persisted) return persisted;
+        if (version < 2) {
+          persisted.posts = (persisted.posts ?? []).filter(
+            (p: any) => p.category !== "MATRIZES",
+          );
+          persisted.settings = {
+            ...initialSettings,
+            ...(persisted.settings ?? {}),
+          };
+          if (!persisted.settings.whatsappLink) {
+            persisted.settings.whatsappLink = initialSettings.whatsappLink;
+          }
+        }
+        return persisted;
+      },
     },
   ),
 );
+// ---------------------------------------------------------------------------
+// Helpers compartilhados — sempre derivam do mesmo store (fonte única).
+// ---------------------------------------------------------------------------
+
+/** Normaliza o link do WhatsApp configurado no admin (aceita link ou número). */
+export function whatsappHref(settings: SiteSettings, text?: string): string {
+  const raw = (settings.whatsappLink || "").trim();
+  let base: string;
+  if (/^https?:\/\//i.test(raw)) {
+    base = raw.split("?")[0].replace(/\/$/, "");
+  } else {
+    const digits = (raw || settings.whatsapp || "").replace(/\D/g, "");
+    base = `https://wa.me/${digits || "5500000000000"}`;
+  }
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
+}
+
+/** Data estável entre servidor e cliente (evita mismatch de fuso). */
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+}

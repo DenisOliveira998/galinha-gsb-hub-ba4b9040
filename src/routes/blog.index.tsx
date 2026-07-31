@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore } from "@/lib/mock-store";
+import { useStore, formatDate } from "@/lib/mock-store";
 
 export const Route = createFileRoute("/blog/")({
   component: Blog,
@@ -30,7 +30,7 @@ function Blog() {
                   <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </div>
                 <div className="flex flex-1 flex-col p-5 text-left">
-                  <div className="text-xs text-muted-foreground">{new Date(p.createdAt).toLocaleDateString("pt-BR")}</div>
+                  <div className="text-xs text-muted-foreground">{formatDate(p.createdAt)}</div>
                   <h2 className="mt-2 line-clamp-2 font-display text-xl">{p.title}</h2>
                   <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{p.excerpt}</p>
                   <div className="mt-auto pt-4 text-sm font-semibold text-primary">Ler mais →</div>

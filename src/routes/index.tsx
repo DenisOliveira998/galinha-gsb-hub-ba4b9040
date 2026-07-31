@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS, CATEGORY_PLACEHOLDERS } from "@/lib/mock-store";
+import { useStore, CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, formatDate } from "@/lib/mock-store";
 import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -27,7 +27,7 @@ function Home() {
               Conheça a importância da raça <span className="text-accent-warm">GSB</span>
             </h1>
             <p className="mt-3 max-w-xl text-sm opacity-85 md:mt-4 md:text-base">
-              Ovos férteis, pintinhos, matrizes e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.
+              Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.
             </p>
             <div className="mt-5 flex flex-wrap gap-2 md:mt-8 md:gap-3">
               <Link
@@ -166,7 +166,7 @@ function Home() {
                   <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </div>
                 <div className="flex flex-1 flex-col p-4 text-left md:p-5">
-                  <div className="text-[10px] text-muted-foreground md:text-xs">{new Date(p.createdAt).toLocaleDateString("pt-BR")}</div>
+                  <div className="text-[10px] text-muted-foreground md:text-xs">{formatDate(p.createdAt)}</div>
                   <h3 className="mt-1 line-clamp-2 font-display text-base md:text-lg">{p.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.excerpt}</p>
                   <div className="mt-auto pt-3 text-sm font-semibold text-primary">Ler mais →</div>

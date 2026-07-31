@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { BlogPost } from "@/lib/mock-store";
+import { ImageDropzone } from "./image-dropzone";
+import { X } from "lucide-react";
 
 type V = Omit<BlogPost, "id" | "slug" | "createdAt">;
 
@@ -17,8 +19,16 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
     >
       <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
         <F label="titulo"><input value={title} onChange={(e) => setTitle(e.target.value)} required className="i" placeholder="Título do post" /></F>
-        <F label="capa_url"><input value={coverImage} onChange={(e) => setCoverImage(e.target.value)} className="i" placeholder="URL da capa" /></F>
-        {coverImage && <img src={coverImage} alt="" className="aspect-[16/9] w-full rounded-2xl object-cover" />}
+        <F label="capa">
+          <ImageDropzone multiple={false} onFiles={(urls) => setCoverImage(urls[0])} label="Clique para escolher ou arraste a imagem de capa" />
+        </F>
+        <F label="capa_url"><input value={coverImage} onChange={(e) => setCoverImage(e.target.value)} className="i" placeholder="Ou cole a URL da capa" /></F>
+        {coverImage && (
+          <div className="relative">
+            <img src={coverImage} alt="Pré-visualização da capa" className="aspect-[16/9] w-full rounded-2xl object-cover" />
+            <button type="button" aria-label="Remover capa" onClick={() => setCoverImage("")} className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-destructive text-destructive-foreground hover:brightness-110"><X className="h-4 w-4" /></button>
+          </div>
+        )}
         <F label="resumo"><textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} className="i" placeholder="Resumo curto" /></F>
         <F label="conteudo"><textarea value={content} onChange={(e) => setContent(e.target.value)} rows={10} className="i" placeholder="Conteúdo completo" /></F>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} /> Publicado</label>
