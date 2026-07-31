@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Heart } from "lucide-react";
+import { Heart, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
 import { CATEGORY_LABELS, ratingAverage, useStore } from "@/lib/mock-store";
 import { FavoriteButton } from "@/components/site/favorite-button";
@@ -25,7 +26,13 @@ function Favoritos() {
   const posts = useStore((s) => s.posts);
   const favorites = useStore((s) => s.favorites);
   const ratings = useStore((s) => s.ratings);
+  const toggleFavorite = useStore((s) => s.toggleFavorite);
   const list = hydrated ? posts.filter((p) => (favorites ?? []).includes(p.id)) : [];
+
+  const remove = (id: string, title: string) => {
+    toggleFavorite(id);
+    toast.success("Removido dos favoritos", { description: title });
+  };
 
   return (
     <SiteLayout>
@@ -34,11 +41,30 @@ function Favoritos() {
           <h1 className="flex items-center gap-2 font-display text-3xl md:text-4xl">
             <Heart className="h-7 w-7" /> Favoritos
           </h1>
-          <p className="mt-2 text-sm opacity-85 md:text-base">Anúncios que você salvou para ver depois.</p>
+          <p className="mt-2 text-sm opacity-85 md:text-base">
+            Anúncios salvos ficam guardados na sua lista e voltam automaticamente na próxima visita.
+          </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-10">
+        {list.length > 0 && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 text-left">
+            <p className="text-sm text-muted-foreground">
+              {list.length} {list.length === 1 ? "anúncio salvo" : "anúncios salvos"}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                list.forEach((p) => toggleFavorite(p.id));
+                toast.success("Lista de favoritos limpa");
+              }}
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:bg-muted"
+            >
+              <Trash2 className="h-4 w-4" /> Limpar lista
+            </button>
+          </div>
+        )}
         {list.length === 0 ? (
           <div className="rounded-3xl bg-muted p-10 text-center text-muted-foreground">
             Você ainda não salvou nenhum anúncio.{" "}
@@ -61,7 +87,20 @@ function Favoritos() {
                     </Link>
                     <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
                     <div className="mt-1.5"><StarsDisplay average={r.average} count={r.count} /></div>
-                    {p.price && <div className="mt-auto pt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
+                    <div className="mt-auto flex items-center justify-between gap-3 pt-3">
+                      {p.price ? (
+                        <span className="text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</span>
+                      ) : (
+                        <span />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => remove(p.id, p.title)}
+                        className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> Remover
+                      </button>
+                    </div>
                   </div>
                 </article>
               );
