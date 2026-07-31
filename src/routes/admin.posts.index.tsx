@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { useStore, CATEGORY_LABELS } from "@/lib/mock-store";
+import { useStore, useCategoryLabel } from "@/lib/mock-store";
 import { Plus, Trash2, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/admin/posts/")({
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/admin/posts/")({
 function PostsList() {
   const posts = useStore((s) => s.posts);
   const del = useStore((s) => s.deletePost);
+  const catLabel = useCategoryLabel();
   return (
     <AdminShell title="Anúncios">
       <div className="mb-4 flex items-center justify-between">
@@ -31,7 +32,7 @@ function PostsList() {
             {posts.map((p) => (
               <tr key={p.id}>
                 <td className="px-4 py-3 font-medium">{p.title}</td>
-                <td className="px-4 py-3 text-muted-foreground">{CATEGORY_LABELS[p.category]}</td>
+                <td className="px-4 py-3 text-muted-foreground">{catLabel(p.category)}</td>
                 <td className="px-4 py-3">{p.price ? `R$ ${p.price.toFixed(2)}` : "—"}</td>
                 <td className="px-4 py-3">
                   <span className={`rounded-full px-2 py-1 text-xs font-medium ${p.status === "PUBLISHED" ? "bg-primary/10 text-primary" : p.status === "SOLD" ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}>{p.status}</span>

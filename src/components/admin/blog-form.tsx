@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { BlogBlock, BlogPost } from "@/lib/mock-store";
 import { ImageDropzone } from "./image-dropzone";
 import { MediaPickerDialog } from "./media-picker";
+import { BlogPreview } from "./blog-preview";
 import { ArrowDown, ArrowUp, ClipboardPaste, Images, ImagePlus, Type, X } from "lucide-react";
 
 type V = Omit<BlogPost, "id" | "slug" | "createdAt">;
@@ -69,8 +70,9 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
           blocks: blocks.filter((b) => (b.type === "text" ? b.text?.trim() : b.image?.trim())),
         });
       }}
-      className="max-w-3xl space-y-6"
+      className="space-y-6 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6 lg:space-y-0"
     >
+      <div className="min-w-0 space-y-6">
       <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
         <F label="titulo"><input value={title} onChange={(e) => setTitle(e.target.value)} required className="i" placeholder="Título do post" /></F>
         <F label="resumo"><textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} className="i" placeholder="Resumo curto" /></F>
@@ -179,6 +181,18 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
       <MediaPickerDialog open={picking !== null} onClose={() => setPicking(null)} onSelect={applyPicked} />
 
       <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Salvar</button>
+      </div>
+
+      <aside className="lg:sticky lg:top-24">
+        <BlogPreview
+          title={title}
+          excerpt={excerpt}
+          content={content}
+          coverImage={coverImage}
+          images={images}
+          blocks={blocks}
+        />
+      </aside>
       <style>{`.i{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.75rem 1rem;font-size:.875rem;outline:none}.i:focus{box-shadow:0 0 0 2px var(--color-ring)}.btn-ghost{display:inline-flex;align-items:center;gap:.5rem;border-radius:9999px;border:1px solid var(--color-border);padding:.5rem 1rem;font-size:.875rem;font-weight:600}.btn-ghost:hover{background:var(--color-muted)}`}</style>
     </form>
   );

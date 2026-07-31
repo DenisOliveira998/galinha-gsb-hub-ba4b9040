@@ -2,7 +2,14 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import chicksImage from "@/assets/category-chicks.jpg";
 
-export type Category = "OVOS_FERTEIS" | "PINTINHOS" | "REPRODUTORES";
+/** Categorias são dinâmicas (gerenciadas no admin) — o id é uma string livre. */
+export type Category = string;
+
+export interface CategoryItem {
+  id: string;
+  label: string;
+  image?: string;
+}
 export type PostStatus = "DRAFT" | "PUBLISHED" | "SOLD";
 
 export interface FaqItem {
@@ -74,13 +81,13 @@ export interface HeroSlide {
   ctaTo: string;
 }
 
-export const CATEGORY_LABELS: Record<Category, string> = {
+export const CATEGORY_LABELS: Record<string, string> = {
   OVOS_FERTEIS: "Ovos férteis",
   PINTINHOS: "Galinhas",
   REPRODUTORES: "Reprodutores",
 };
 
-export const CATEGORY_PLACEHOLDERS: Record<Category, string> = {
+export const CATEGORY_PLACEHOLDERS: Record<string, string> = {
   OVOS_FERTEIS:
     "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=1200&q=80",
   PINTINHOS:
@@ -88,6 +95,12 @@ export const CATEGORY_PLACEHOLDERS: Record<Category, string> = {
   REPRODUTORES:
     "https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=1200&q=80",
 };
+
+export const DEFAULT_CATEGORIES: CategoryItem[] = [
+  { id: "OVOS_FERTEIS", label: "Ovos férteis", image: CATEGORY_PLACEHOLDERS.OVOS_FERTEIS },
+  { id: "PINTINHOS", label: "Galinhas", image: CATEGORY_PLACEHOLDERS.PINTINHOS },
+  { id: "REPRODUTORES", label: "Reprodutores", image: CATEGORY_PLACEHOLDERS.REPRODUTORES },
+];
 
 const slugify = (s: string) =>
   s
@@ -210,7 +223,8 @@ interface State {
   blog: BlogPost[];
   settings: SiteSettings;
   heroSlides: HeroSlide[];
-  categoryImages: Record<Category, string[]>;
+  categories: CategoryItem[];
+  categoryImages: Record<string, string[]>;
   mediaLibrary: string[];
   /** Comentários por anúncio (mock). */
   comments: Comment[];
@@ -229,6 +243,10 @@ interface State {
   updateBlog: (id: string, b: Partial<BlogPost>) => void;
   deleteBlog: (id: string) => void;
   updateSettings: (s: Partial<SiteSettings>) => void;
+  addCategory: (label: string, image?: string) => CategoryItem;
+  updateCategory: (id: string, patch: Partial<Omit<CategoryItem, "id">>) => void;
+  deleteCategory: (id: string) => void;
+  moveCategory: (id: string, dir: -1 | 1) => void;
   addHeroSlide: (s: Omit<HeroSlide, "id">) => void;
   updateHeroSlide: (id: string, s: Partial<HeroSlide>) => void;
   deleteHeroSlide: (id: string) => void;
@@ -256,6 +274,7 @@ export const useStore = create<State>()(
       blog: initialBlog,
       settings: initialSettings,
       heroSlides: initialHeroSlides,
+      categories: DEFAULT_CATEGORIES,
       categoryImages: {
         OVOS_FERTEIS: [CATEGORY_PLACEHOLDERS.OVOS_FERTEIS],
         PINTINHOS: [CATEGORY_PLACEHOLDERS.PINTINHOS],
@@ -286,7 +305,9 @@ export const useStore = create<State>()(
       id: crypto.randomUUID(),
       slug: slugify(p.title) + "-" + Math.random().toString(36).slice(2, 6),
       createdAt: new Date().toISOString(),
-      images: p.images.length ? p.images : [CATEGORY_PLACEHOLDERS[p.category]],
+      images: p.images.length
+        ? p.images
+        : [categoryImage(get().categories, get().categoryImages, p.category)],
     };
     set({ posts: [post, ...get().posts] });
     return post;
@@ -325,6 +346,41 @@ export const useStore = create<State>()(
     set({ blog: get().blog.filter((b) => b.id !== id) }),
       updateSettings: (s) =>
         set({ settings: { ...get().settings, ...s } }),
+      addCategory: (label, image) => {
+        const base = slugify(label).replace(/-/g, "_").toUpperCase() || "CATEGORIA";
+        const existing = new Set((get().categories ?? []).map((c) => c.id));
+        let id = base;
+        let n = 2;
+        while (existing.has(id)) id = `${base}_${n++}`;
+        const item: CategoryItem = { id, label: label.trim(), image };
+        set({ categories: [...(get().categories ?? []), item] });
+        if (image) get().addMedia([image]);
+        return item;
+      },
+      updateCategory: (id, patch) => {
+        set({
+          categories: (get().categories ?? []).map((c) =>
+            c.id === id ? { ...c, ...patch } : c,
+          ),
+        });
+        if (patch.image) get().addMedia([patch.image]);
+      },
+      deleteCategory: (id) =>
+        set((s) => {
+          const { [id]: _drop, ...categoryImages } = s.categoryImages ?? {};
+          return {
+            categories: (s.categories ?? []).filter((c) => c.id !== id),
+            categoryImages,
+          };
+        }),
+      moveCategory: (id, dir) => {
+        const list = [...(get().categories ?? [])];
+        const i = list.findIndex((c) => c.id === id);
+        const j = i + dir;
+        if (i < 0 || j < 0 || j >= list.length) return;
+        [list[i], list[j]] = [list[j], list[i]];
+        set({ categories: list });
+      },
       addHeroSlide: (s) =>
         set({ heroSlides: [...get().heroSlides, { ...s, id: crypto.randomUUID() }] }),
       updateHeroSlide: (id, patch) => {
@@ -484,6 +540,7 @@ export const useStore = create<State>()(
         blog: s.blog,
         settings: s.settings,
         heroSlides: s.heroSlides,
+        categories: s.categories,
         categoryImages: s.categoryImages,
         mediaLibrary: s.mediaLibrary,
         comments: s.comments,
@@ -491,7 +548,7 @@ export const useStore = create<State>()(
         myRatings: s.myRatings,
         favorites: s.favorites,
       }),
-      version: 5,
+      version: 6,
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -530,6 +587,14 @@ export const useStore = create<State>()(
           persisted.myRatings = persisted.myRatings ?? {};
           persisted.favorites = persisted.favorites ?? [];
         }
+        if (version < 6) {
+          if (!persisted.categories?.length) {
+            persisted.categories = DEFAULT_CATEGORIES.map((c) => ({
+              ...c,
+              image: persisted.categoryImages?.[c.id]?.[0] ?? c.image,
+            }));
+          }
+        }
         return persisted;
       },
     },
@@ -562,4 +627,36 @@ export function ratingAverage(ratings: Record<string, number[]> | undefined, pos
   const list = ratings?.[postId] ?? [];
   if (!list.length) return { average: 0, count: 0 };
   return { average: list.reduce((a, b) => a + b, 0) / list.length, count: list.length };
+}
+
+// --------------------------------------------------------------- Categorias
+
+/** Nome exibido de uma categoria (dinâmica, com fallback para as legadas). */
+export function categoryLabel(cats: CategoryItem[] | undefined, id: string): string {
+  return cats?.find((c) => c.id === id)?.label ?? CATEGORY_LABELS[id] ?? id;
+}
+
+/** Imagem de destaque de uma categoria. */
+export function categoryImage(
+  cats: CategoryItem[] | undefined,
+  images: Record<string, string[]> | undefined,
+  id: string,
+): string {
+  return (
+    images?.[id]?.[0] ??
+    cats?.find((c) => c.id === id)?.image ??
+    CATEGORY_PLACEHOLDERS[id] ??
+    "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&q=80"
+  );
+}
+
+/** Lista de categorias vinda do store (fonte única). */
+export function useCategories(): CategoryItem[] {
+  return useStore((s) => s.categories) ?? DEFAULT_CATEGORIES;
+}
+
+/** Função pronta para exibir o nome de uma categoria em qualquer página. */
+export function useCategoryLabel(): (id: string) => string {
+  const cats = useCategories();
+  return (id: string) => categoryLabel(cats, id);
 }

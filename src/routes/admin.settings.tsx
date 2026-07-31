@@ -30,7 +30,16 @@ function Settings() {
         </div>
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
           <h3 className="font-display text-lg">Conteúdo do site</h3>
-          <F label="hero_imagem_url"><input value={form.heroImage} onChange={(e) => set("heroImage", e.target.value)} className="i" placeholder="URL da imagem do hero" /></F>
+          <F label="hero_imagem_url">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input value={form.heroImage} onChange={(e) => set("heroImage", e.target.value)} className="i" placeholder="Deixe vazio para exibir o carrossel" />
+              <button type="button" onClick={() => set("heroImage", "")} className="shrink-0 rounded-full border px-4 py-2 text-sm font-semibold hover:bg-muted">Limpar</button>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Com este campo preenchido, o hero mostra essa imagem fixa. Vazio, o hero passa a exibir
+              automaticamente o carrossel gerenciado em “Mídia do Site”.
+            </p>
+          </F>
           <F label="texto_sobre"><textarea value={form.aboutText} onChange={(e) => set("aboutText", e.target.value)} rows={6} className="i" placeholder="Texto da página Sobre" /></F>
         </div>
         <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Salvar alterações</button>

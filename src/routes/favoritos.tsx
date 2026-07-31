@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, Heart, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
-import { CATEGORY_LABELS, ratingAverage, useStore } from "@/lib/mock-store";
+import { ratingAverage, useCategoryLabel, useStore } from "@/lib/mock-store";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/favoritos")({
 function Favoritos() {
   const hydrated = useHydrated();
   const posts = useStore((s) => s.posts);
+  const catLabel = useCategoryLabel();
   const favorites = useStore((s) => s.favorites);
   const ratings = useStore((s) => s.ratings);
   const toggleFavorite = useStore((s) => s.toggleFavorite);
@@ -168,7 +169,7 @@ function Favoritos() {
                     <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   </Link>
                   <div className="flex flex-1 flex-col p-4 text-left">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{CATEGORY_LABELS[p.category]}</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{catLabel(p.category)}</div>
                     <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
                       {p.title}
                     </Link>

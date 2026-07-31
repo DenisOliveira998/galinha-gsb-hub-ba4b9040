@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { HelpCircle, ShoppingBag, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS, ratingAverage, whatsappHref } from "@/lib/mock-store";
+import { useStore, useCategoryLabel, ratingAverage, whatsappHref } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
 import { CommentsSection } from "@/components/site/comments-section";
 import { FavoriteButton } from "@/components/site/favorite-button";
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/catalogo/$slug")({
 function PostDetail() {
   const { slug } = Route.useParams();
   const post = useStore((s) => s.posts.find((p) => p.slug === slug));
+  const catLabel = useCategoryLabel();
   const settings = useStore((s) => s.settings);
   const allPosts = useStore((s) => s.posts);
   const ratings = useStore((s) => s.ratings);
@@ -51,7 +52,7 @@ function PostDetail() {
             <FavoriteButton postId={post.id} title={post.title} className="absolute right-3 top-3" />
           </div>
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[post.category]}</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
             <h1 className="mt-2 font-display text-3xl md:text-4xl">{post.title}</h1>
             <div className="mt-2"><StarsDisplay average={average} count={count} size="md" /></div>
             {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
@@ -137,7 +138,7 @@ function PostDetail() {
                       <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                     </Link>
                     <div className="flex flex-1 flex-col p-4 text-left">
-                      <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[p.category]}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
                       <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1 line-clamp-2 font-display text-base hover:text-primary">
                         {p.title}
                       </Link>

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, formatDate, ratingAverage } from "@/lib/mock-store";
+import { useStore, useCategories, categoryLabel, categoryImage, formatDate, ratingAverage } from "@/lib/mock-store";
 import { HeroCarousel } from "@/components/site/hero-carousel";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
@@ -14,6 +14,8 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { posts, blog, categoryImages, ratings } = useStore();
+  const categories = useCategories();
+  const heroImage = useStore((s) => s.settings.heroImage);
   const hydrated = useHydrated();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
   const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
@@ -51,7 +53,19 @@ function Home() {
             </div>
           </div>
           <div className="relative pb-6 md:pb-0">
-            <HeroCarousel />
+            {heroImage?.trim() ? (
+              <div className="relative w-full max-w-full overflow-hidden rounded-[2rem] shadow-[var(--shadow-card)] ring-4 ring-primary-glow/30">
+                <div className="relative aspect-[4/3] w-full sm:aspect-[16/10] md:aspect-[16/9]">
+                  <img
+                    src={heroImage}
+                    alt="Galinha Sertanejo Balão"
+                    className="absolute inset-0 h-full w-full object-contain"
+                  />
+                </div>
+              </div>
+            ) : (
+              <HeroCarousel />
+            )}
             <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm px-3 py-2 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 md:px-4 md:py-3">
               <div className="font-display text-lg font-semibold md:text-xl">+10 anos</div>
               <div className="text-[10px] md:text-xs">de tradição no plantel</div>
@@ -100,18 +114,19 @@ function Home() {
           <Link to="/catalogo" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
         </div>
         <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-5 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
-          {(Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>).map((key, i) => {
-            const bg = ["bg-primary text-primary-foreground", "bg-accent text-accent-foreground", "bg-accent-warm text-accent-warm-foreground", "bg-primary-deep text-primary-foreground"][i];
+          {categories.map((c, i) => {
+            const bg = ["bg-primary text-primary-foreground", "bg-accent text-accent-foreground", "bg-accent-warm text-accent-warm-foreground", "bg-primary-deep text-primary-foreground"][i % 4];
             return (
               <Link
-                key={key}
+                key={c.id}
                 to="/catalogo"
+                search={{ cat: c.id }}
                 className={`group relative h-[120px] w-[60%] shrink-0 snap-start overflow-hidden rounded-2xl p-3.5 text-left shadow-[var(--shadow-card)] md:h-[150px] md:w-auto md:rounded-3xl md:p-5 ${bg}`}
               >
-                <img src={categoryImages?.[key]?.[0] ?? CATEGORY_PLACEHOLDERS[key]} alt={CATEGORY_LABELS[key]} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
+                <img src={categoryImage(categories, categoryImages, c.id)} alt={c.label} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
                 <div className="relative flex h-full flex-col">
                   <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">Categoria</div>
-                  <div className="mt-1 line-clamp-2 font-display text-base md:text-xl">{CATEGORY_LABELS[key]}</div>
+                  <div className="mt-1 line-clamp-2 font-display text-base md:text-xl">{c.label}</div>
                   <div className="mt-auto text-xs opacity-90">Explorar →</div>
                 </div>
               </Link>
@@ -153,7 +168,7 @@ function Home() {
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </div>
                 <div className="flex flex-1 flex-col p-3.5 text-left md:p-4">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[p.category]}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{categoryLabel(categories, p.category)}</div>
                   <h3 className="mt-1 line-clamp-2 font-display text-sm md:text-base">{p.title}</h3>
                   <div className="mt-1"><StarsDisplay average={r.average} count={r.count} /></div>
                   {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}

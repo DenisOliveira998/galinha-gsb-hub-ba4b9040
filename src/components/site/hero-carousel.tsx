@@ -3,11 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useStore } from "@/lib/mock-store";
 
 export function HeroCarousel() {
-  const storeSlides = useStore((s) => s.heroSlides);
-  const heroImage = useStore((s) => s.settings.heroImage);
-  const slides = storeSlides.length
-    ? storeSlides
-    : [{ id: "fallback", image: heroImage, title: "Galinha Sertanejo Balão" }];
+  const slides = useStore((s) => s.heroSlides);
   const [i, setI] = useState(0);
 
   useEffect(() => {
@@ -25,7 +21,7 @@ export function HeroCarousel() {
 
   return (
     <div className="relative w-full max-w-full overflow-hidden rounded-[2rem] shadow-[var(--shadow-card)] ring-4 ring-primary-glow/30">
-      <div className="relative h-[240px] w-full sm:h-[320px] md:h-[380px] lg:h-[420px]">
+      <div className="relative aspect-[4/3] w-full bg-muted sm:aspect-[16/10] md:aspect-[16/9]">
         {slides.map((s, idx) => (
           <img
             key={s.id}
@@ -33,7 +29,7 @@ export function HeroCarousel() {
             alt={s.title || "Galinha Sertanejo Balão"}
             aria-hidden={idx !== i}
             loading={idx === 0 ? "eager" : "lazy"}
-            className={`absolute inset-0 block h-full w-full object-cover object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
+            className={`absolute inset-0 block h-full w-full object-contain object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
           />
         ))}
       </div>
