@@ -17,9 +17,10 @@ function Home() {
   return (
     <SiteLayout>
       {/* HERO */}
-      <section className="relative bg-primary-deep text-primary-foreground">
+      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
         <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-10 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-12 md:pt-10">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background/80" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-16 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-20 md:pt-10">
           <div>
             <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40 md:text-xs">
               Raça tradicional brasileira
@@ -53,6 +54,17 @@ function Home() {
             </div>
           </div>
         </div>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 1440 90"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-10 w-full text-background md:h-14"
+        >
+          <path
+            fill="currentColor"
+            d="M0,50 C240,95 480,10 720,38 C960,66 1200,96 1440,52 L1440,90 L0,90 Z"
+          />
+        </svg>
       </section>
 
       {/* 3 diferenciais */}
