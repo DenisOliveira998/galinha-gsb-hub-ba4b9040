@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { ShoppingBag, Zap } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
