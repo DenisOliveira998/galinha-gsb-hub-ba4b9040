@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
+import { useFavoritesSync } from "@/lib/use-favorites-sync";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
+  useFavoritesSync();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
