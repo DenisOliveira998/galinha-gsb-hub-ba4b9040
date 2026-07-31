@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, type Category, type Post, type PostStatus } from "@/lib/mock-store";
-import { X, Upload } from "lucide-react";
+import { CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, type Category, type FaqItem, type Post, type PostStatus } from "@/lib/mock-store";
+import { X, Upload, Plus, Trash2 } from "lucide-react";
 import { ImageDropzone } from "./image-dropzone";
 
 type FormValue = Omit<Post, "id" | "slug" | "createdAt">;
@@ -13,6 +13,7 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
   const [status, setStatus] = useState<PostStatus>(initial?.status ?? "DRAFT");
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
   const [newUrl, setNewUrl] = useState("");
+  const [faq, setFaq] = useState<FaqItem[]>(initial?.faq ?? []);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +24,7 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
       price: price ? parseFloat(price) : undefined,
       status,
       images: images.length ? images : [CATEGORY_PLACEHOLDERS[category]],
+      faq: faq.filter((f) => f.question.trim() || f.answer.trim()),
     });
   };
 
@@ -67,15 +69,34 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
           <h3 className="font-display text-lg">Imagens</h3>
           <span className="text-xs text-muted-foreground">Se vazio, será usado o placeholder da categoria automaticamente.</span>
         </div>
-        <ImageDropzone onFiles={(urls) => setImages((prev) => [...prev, ...urls])} />
+        <div className="mb-3">
+          <ImageDropzone
+            variant="plus"
+            label="Adicionar imagem"
+            onFiles={(urls) => setImages((prev) => [...prev, ...urls])}
+          />
+        </div>
+        <ImageDropzone
+          label="Clique para escolher ou arraste várias imagens — um campo é criado para cada uma"
+          onFiles={(urls) => setImages((prev) => [...prev, ...urls])}
+        />
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {images.map((url, i) => (
             <div key={i} className="group relative overflow-hidden rounded-2xl border">
+              <div className="px-3 pt-2 text-xs font-semibold text-muted-foreground">Imagem {i + 1}</div>
               <img src={url} alt="" className="aspect-square w-full object-cover" />
               <button type="button" aria-label="Remover imagem" onClick={() => setImages(images.filter((_, k) => k !== i))} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-destructive text-destructive-foreground transition hover:brightness-110"><X className="h-3 w-3" /></button>
               <div className="absolute bottom-2 left-2 flex gap-1">
                 <button type="button" onClick={() => move(i, -1)} className="rounded-md bg-card px-2 py-1 text-xs">←</button>
                 <button type="button" onClick={() => move(i, 1)} className="rounded-md bg-card px-2 py-1 text-xs">→</button>
+              </div>
+              <div className="p-2">
+                <ImageDropzone
+                  multiple={false}
+                  variant="plus"
+                  label="Trocar"
+                  onFiles={(urls) => urls[0] && setImages((prev) => prev.map((u, k) => (k === i ? urls[0] : u)))}
+                />
               </div>
             </div>
           ))}
@@ -89,6 +110,60 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
           >
             <Upload className="h-4 w-4" /> Adicionar
           </button>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="mb-1 flex items-center justify-between">
+          <h3 className="font-display text-lg">Perguntas e respostas</h3>
+          <button
+            type="button"
+            onClick={() =>
+              setFaq((prev) => [...prev, { id: crypto.randomUUID(), question: "", answer: "" }])
+            }
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-105"
+          >
+            <Plus className="h-4 w-4" /> Adicionar
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Aparecem automaticamente na página pública deste anúncio.
+        </p>
+        <div className="space-y-3">
+          {faq.map((f, i) => (
+            <div key={f.id} className="rounded-2xl border p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-semibold text-muted-foreground">Pergunta {i + 1}</span>
+                <button
+                  type="button"
+                  title="Remover pergunta"
+                  aria-label="Remover pergunta"
+                  onClick={() => setFaq((prev) => prev.filter((x) => x.id !== f.id))}
+                  className="rounded-lg border border-destructive/40 p-1.5 text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+              <input
+                value={f.question}
+                onChange={(e) => setFaq((prev) => prev.map((x) => (x.id === f.id ? { ...x, question: e.target.value } : x)))}
+                className="input"
+                placeholder="Pergunta"
+              />
+              <textarea
+                value={f.answer}
+                onChange={(e) => setFaq((prev) => prev.map((x) => (x.id === f.id ? { ...x, answer: e.target.value } : x)))}
+                rows={3}
+                className="input mt-2"
+                placeholder="Resposta"
+              />
+            </div>
+          ))}
+          {faq.length === 0 && (
+            <p className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
+              Nenhuma pergunta cadastrada. Use o botão “+ Adicionar”.
+            </p>
+          )}
         </div>
       </Card>
 

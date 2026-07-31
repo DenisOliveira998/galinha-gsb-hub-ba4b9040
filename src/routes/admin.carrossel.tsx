@@ -70,6 +70,9 @@ function MediaAdmin() {
               onFiles={(urls) => addHeroSlides(urls)}
             />
           </div>
+          <div className="mt-2">
+            <ImageDropzone variant="plus" multiple label="Adicionar imagem" onFiles={(urls) => addHeroSlides(urls)} />
+          </div>
 
           <div className="mt-4 space-y-4">
             {slides.map((s, i) => (
@@ -144,6 +147,9 @@ function MediaAdmin() {
                   onFiles={(urls) => addCategoryImages(cat, urls)}
                 />
               </div>
+              <div className="mt-2">
+                <ImageDropzone variant="plus" multiple label="Adicionar imagem" onFiles={(urls) => addCategoryImages(cat, urls)} />
+              </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {list.map((img, i) => (
                   <div key={`${cat}-${i}`} className="flex gap-3 rounded-xl border p-3">
@@ -204,6 +210,9 @@ function MediaAdmin() {
               label="Adicionar imagens ao estoque"
               onFiles={(urls) => useStore.getState().addMedia(urls)}
             />
+          </div>
+          <div className="mt-2">
+            <ImageDropzone variant="plus" multiple label="Adicionar imagem" onFiles={(urls) => useStore.getState().addMedia(urls)} />
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {library.map((img) => (
