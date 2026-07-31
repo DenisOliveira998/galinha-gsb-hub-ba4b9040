@@ -38,6 +38,15 @@ export interface SiteSettings {
   heroImage: string;
 }
 
+export interface HeroSlide {
+  id: string;
+  image: string;
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  ctaTo: string;
+}
+
 export const CATEGORY_LABELS: Record<Category, string> = {
   OVOS_FERTEIS: "Ovos férteis",
   PINTINHOS: "Galinhas",
@@ -139,11 +148,41 @@ const initialSettings: SiteSettings = {
     "https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=1400&q=80",
 };
 
+const initialHeroSlides: HeroSlide[] = [
+  {
+    id: "h1",
+    image:
+      "https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=1600&q=80",
+    title: "Conheça a raça GSB",
+    subtitle: "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão.",
+    ctaLabel: "Ver catálogo",
+    ctaTo: "/catalogo",
+  },
+  {
+    id: "h2",
+    image: chicksImage,
+    title: "Pintinhos saudáveis",
+    subtitle: "Aves selecionadas, com procedência garantida e suporte ao criador.",
+    ctaLabel: "Ver anúncios",
+    ctaTo: "/catalogo",
+  },
+  {
+    id: "h3",
+    image:
+      "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1600&q=80",
+    title: "Tradição no plantel",
+    subtitle: "Mais de 10 anos de dedicação à avicultura sertaneja.",
+    ctaLabel: "Sobre a raça",
+    ctaTo: "/sobre",
+  },
+];
+
 interface State {
   isAuthenticated: boolean;
   posts: Post[];
   blog: BlogPost[];
   settings: SiteSettings;
+  heroSlides: HeroSlide[];
   login: (email: string, password: string) => boolean;
   logout: () => void;
   addPost: (p: Omit<Post, "id" | "slug" | "createdAt">) => Post;
@@ -153,6 +192,10 @@ interface State {
   updateBlog: (id: string, b: Partial<BlogPost>) => void;
   deleteBlog: (id: string) => void;
   updateSettings: (s: Partial<SiteSettings>) => void;
+  addHeroSlide: (s: Omit<HeroSlide, "id">) => void;
+  updateHeroSlide: (id: string, s: Partial<HeroSlide>) => void;
+  deleteHeroSlide: (id: string) => void;
+  moveHeroSlide: (id: string, dir: -1 | 1) => void;
 }
 
 // Mock in-memory store. Substitua por integração com TiDB Cloud + Prisma
@@ -164,6 +207,7 @@ export const useStore = create<State>()(
       posts: initialPosts,
       blog: initialBlog,
       settings: initialSettings,
+      heroSlides: initialHeroSlides,
       login: (email, password) => {
     // Credenciais mockadas — trocar por auth real depois
     if (email === "admin@galinhagsb.com" && password === "admin123") {
@@ -208,6 +252,24 @@ export const useStore = create<State>()(
     set({ blog: get().blog.filter((b) => b.id !== id) }),
       updateSettings: (s) =>
         set({ settings: { ...get().settings, ...s } }),
+      addHeroSlide: (s) =>
+        set({ heroSlides: [...get().heroSlides, { ...s, id: crypto.randomUUID() }] }),
+      updateHeroSlide: (id, patch) =>
+        set({
+          heroSlides: get().heroSlides.map((s) =>
+            s.id === id ? { ...s, ...patch } : s,
+          ),
+        }),
+      deleteHeroSlide: (id) =>
+        set({ heroSlides: get().heroSlides.filter((s) => s.id !== id) }),
+      moveHeroSlide: (id, dir) => {
+        const list = [...get().heroSlides];
+        const i = list.findIndex((s) => s.id === id);
+        const j = i + dir;
+        if (i < 0 || j < 0 || j >= list.length) return;
+        [list[i], list[j]] = [list[j], list[i]];
+        set({ heroSlides: list });
+      },
     }),
     {
       name: "gsb-store",
@@ -226,8 +288,9 @@ export const useStore = create<State>()(
         posts: s.posts,
         blog: s.blog,
         settings: s.settings,
+        heroSlides: s.heroSlides,
       }),
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -240,6 +303,11 @@ export const useStore = create<State>()(
           };
           if (!persisted.settings.whatsappLink) {
             persisted.settings.whatsappLink = initialSettings.whatsappLink;
+          }
+        }
+        if (version < 3) {
+          if (!persisted.heroSlides?.length) {
+            persisted.heroSlides = initialHeroSlides;
           }
         }
         return persisted;
