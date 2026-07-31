@@ -24,6 +24,7 @@ export const Route = createFileRoute("/catalogo/$slug")({
 function PostDetail() {
   const { slug } = Route.useParams();
   const post = useStore((s) => s.posts.find((p) => p.slug === slug));
+  const catLabel = useCategoryLabel();
   const settings = useStore((s) => s.settings);
   const allPosts = useStore((s) => s.posts);
   const ratings = useStore((s) => s.ratings);

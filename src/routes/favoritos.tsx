@@ -25,6 +25,7 @@ export const Route = createFileRoute("/favoritos")({
 function Favoritos() {
   const hydrated = useHydrated();
   const posts = useStore((s) => s.posts);
+  const catLabel = useCategoryLabel();
   const favorites = useStore((s) => s.favorites);
   const ratings = useStore((s) => s.ratings);
   const toggleFavorite = useStore((s) => s.toggleFavorite);
