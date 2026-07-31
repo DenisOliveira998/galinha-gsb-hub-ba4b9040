@@ -44,14 +44,33 @@ function Favoritos() {
 
   const removeSelected = () => {
     const n = selected.length;
-    selected.forEach((id) => toggleFavorite(id));
+    const removed = [...selected];
+    removed.forEach((id) => toggleFavorite(id));
     setSelected([]);
-    toast.success(n === 1 ? "1 anúncio removido" : `${n} anúncios removidos`);
+    toast.success(n === 1 ? "1 anúncio removido" : `${n} anúncios removidos`, {
+      action: {
+        label: "Desfazer",
+        onClick: () => {
+          const favs = useStore.getState().favorites ?? [];
+          removed.filter((id) => !favs.includes(id)).forEach((id) => toggleFavorite(id));
+          toast.success("Remoção desfeita");
+        },
+      },
+    });
   };
 
   const remove = (id: string, title: string) => {
     toggleFavorite(id);
-    toast.success("Removido dos favoritos", { description: title });
+    toast.success("Removido dos favoritos", {
+      description: title,
+      action: {
+        label: "Desfazer",
+        onClick: () => {
+          if (!(useStore.getState().favorites ?? []).includes(id)) toggleFavorite(id);
+          toast.success("Remoção desfeita");
+        },
+      },
+    });
   };
 
   return (
@@ -104,9 +123,19 @@ function Favoritos() {
             <button
               type="button"
               onClick={() => {
-                list.forEach((p) => toggleFavorite(p.id));
+                const removed = list.map((p) => p.id);
+                removed.forEach((id) => toggleFavorite(id));
                 setSelected([]);
-                toast.success("Lista de favoritos limpa");
+                toast.success("Lista de favoritos limpa", {
+                  action: {
+                    label: "Desfazer",
+                    onClick: () => {
+                      const favs = useStore.getState().favorites ?? [];
+                      removed.filter((id) => !favs.includes(id)).forEach((id) => toggleFavorite(id));
+                      toast.success("Lista restaurada");
+                    },
+                  },
+                });
               }}
               className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:bg-muted"
             >
