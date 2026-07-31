@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { HelpCircle, ShoppingBag, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS, ratingAverage, whatsappHref } from "@/lib/mock-store";
+import { useStore, useCategoryLabel, ratingAverage, whatsappHref } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
 import { CommentsSection } from "@/components/site/comments-section";
 import { FavoriteButton } from "@/components/site/favorite-button";
