@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, type Category, type FaqItem, type Post, type PostStatus } from "@/lib/mock-store";
+import { categoryImage, useCategories, useStore, type Category, type FaqItem, type Post, type PostStatus } from "@/lib/mock-store";
 import { X, ClipboardPaste, Plus, Trash2, Images } from "lucide-react";
 import { ImageDropzone } from "./image-dropzone";
 import { MediaPickerDialog } from "./media-picker";
@@ -7,8 +7,10 @@ import { MediaPickerDialog } from "./media-picker";
 type FormValue = Omit<Post, "id" | "slug" | "createdAt">;
 
 export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: FormValue) => void }) {
+  const categories = useCategories();
+  const categoryImages = useStore((s) => s.categoryImages);
   const [title, setTitle] = useState(initial?.title ?? "");
-  const [category, setCategory] = useState<Category>(initial?.category ?? "OVOS_FERTEIS");
+  const [category, setCategory] = useState<Category>(initial?.category ?? categories[0]?.id ?? "OVOS_FERTEIS");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [price, setPrice] = useState<string>(initial?.price?.toString() ?? "");
   const [status, setStatus] = useState<PostStatus>(initial?.status ?? "DRAFT");
@@ -34,7 +36,7 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
       description,
       price: price ? parseFloat(price) : undefined,
       status,
-      images: images.length ? images : [CATEGORY_PLACEHOLDERS[category]],
+      images: images.length ? images : [categoryImage(categories, categoryImages, category)],
       faq: faq.filter((f) => f.question.trim() || f.answer.trim()),
     });
   };
@@ -56,7 +58,7 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="categoria">
             <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="input">
-              {(Object.keys(CATEGORY_LABELS) as Category[]).map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
+              {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </Field>
           <Field label="status">

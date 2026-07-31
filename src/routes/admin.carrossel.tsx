@@ -4,7 +4,7 @@ import { ArrowDown, ArrowUp, Images, Repeat, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { MediaPickerDialog } from "@/components/admin/media-picker";
-import { CATEGORY_LABELS, useStore, type Category } from "@/lib/mock-store";
+import { useCategories, useStore, type Category } from "@/lib/mock-store";
 
 export const Route = createFileRoute("/admin/carrossel")({
   component: MediaAdmin,
@@ -40,7 +40,9 @@ function MediaAdmin() {
     setPicking(null);
   };
 
-  const categories = Object.keys(CATEGORY_LABELS) as Category[];
+  const categoryList = useCategories();
+  const categories = categoryList.map((c) => c.id);
+  const labelOf = (id: string) => categoryList.find((c) => c.id === id)?.label ?? id;
 
   return (
     <AdminShell title="Mídia do Site">
@@ -134,7 +136,7 @@ function MediaAdmin() {
           const list = categoryImages?.[cat] ?? [];
           return (
             <section key={cat} className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
-              <h2 className="font-display text-lg">{CATEGORY_LABELS[cat]}</h2>
+              <h2 className="font-display text-lg">{labelOf(cat)}</h2>
               <p className="mt-1 text-xs text-muted-foreground">
                 Imagens usadas no card desta categoria. A primeira imagem é a exibida na home.
               </p>
@@ -153,7 +155,7 @@ function MediaAdmin() {
                   <div key={`${cat}-${i}`} className="flex gap-3 rounded-xl border p-3">
                     <div>
                       <div className="mb-1 text-xs font-semibold text-muted-foreground">Imagem {i + 1}</div>
-                      <img src={img} alt={`${CATEGORY_LABELS[cat]} ${i + 1}`} className="h-20 w-28 rounded-lg object-cover" />
+                      <img src={img} alt={`${labelOf(cat)} ${i + 1}`} className="h-20 w-28 rounded-lg object-cover" />
                     </div>
                     <div className="flex flex-1 flex-col gap-1">
                       <div className="flex gap-1">
