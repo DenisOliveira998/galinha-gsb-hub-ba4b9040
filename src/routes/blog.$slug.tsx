@@ -43,6 +43,28 @@ function BlogDetail() {
           </div>
 
           <div className="mt-5 whitespace-pre-line text-left text-sm leading-relaxed text-foreground/90 md:text-base">{post.content}</div>
+
+          {(post.blocks ?? []).length > 0 && (
+            <div className="mt-6 space-y-5">
+              {(post.blocks ?? []).map((b) =>
+                b.type === "text" ? (
+                  <p key={b.id} className="whitespace-pre-line text-left text-sm leading-relaxed text-foreground/90 md:text-base">
+                    {b.text}
+                  </p>
+                ) : b.image ? (
+                  <img key={b.id} src={b.image} alt="" loading="lazy" className="aspect-[16/9] w-full rounded-2xl object-cover" />
+                ) : null,
+              )}
+            </div>
+          )}
+
+          {(post.images ?? []).length > 0 && (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {(post.images ?? []).map((img, i) => (
+                <img key={i} src={img} alt={`${post.title} — imagem ${i + 1}`} loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover" />
+              ))}
+            </div>
+          )}
         </article>
 
         <aside className="hidden lg:block">
