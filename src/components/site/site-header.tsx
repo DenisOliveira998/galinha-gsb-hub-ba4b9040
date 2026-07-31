@@ -43,7 +43,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-primary-deep text-primary-foreground shadow-[var(--shadow-soft)]">
+      <header className="sticky top-0 z-40 bg-brand-green text-brand-green-foreground shadow-[var(--shadow-soft)]">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4 md:px-8">
           <Link to="/" className="flex items-center gap-2">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary-glow/20 ring-1 ring-primary-glow/40">
