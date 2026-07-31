@@ -17,7 +17,7 @@ function Home() {
   return (
     <SiteLayout>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
+      <section className="relative overflow-hidden bg-brand-green text-brand-green-foreground">
         <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background/80" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-16 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-20 md:pt-10">
