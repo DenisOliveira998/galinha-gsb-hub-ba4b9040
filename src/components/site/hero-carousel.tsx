@@ -29,7 +29,7 @@ export function HeroCarousel() {
             alt={s.title || "Galinha Sertanejo Balão"}
             aria-hidden={idx !== i}
             loading={idx === 0 ? "eager" : "lazy"}
-            className={`absolute inset-0 block h-full w-full object-contain object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
+            className={`absolute inset-0 block h-full w-full object-cover object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
           />
         ))}
       </div>
