@@ -16,8 +16,44 @@ function Home() {
 
   return (
     <SiteLayout>
-      <HeroCarousel />
-      <h1 className="sr-only">Galinha GSB — Sertanejo Balão: ovos férteis, galinhas e reprodutores</h1>
+      {/* HERO */}
+      <section className="relative bg-primary-deep text-primary-foreground">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-10 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-12 md:pt-10">
+          <div>
+            <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40 md:text-xs">
+              Raça tradicional brasileira
+            </span>
+            <h1 className="mt-3 font-display text-2xl leading-tight md:mt-4 md:text-4xl">
+              Conheça a importância da raça <span className="text-accent-warm">GSB</span>
+            </h1>
+            <p className="mt-2.5 max-w-xl text-sm opacity-85 md:mt-3 md:text-base">
+              Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 md:mt-6 md:gap-3">
+              <Link
+                to="/catalogo"
+                className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-[var(--shadow-soft)] transition hover:brightness-105 md:px-6"
+              >
+                Ver catálogo
+              </Link>
+              <Link
+                to="/sobre"
+                className="rounded-full border border-primary-foreground/25 bg-primary-foreground/5 px-5 py-2.5 text-sm font-semibold transition hover:bg-primary-foreground/10 md:px-6"
+              >
+                Sobre a raça
+              </Link>
+            </div>
+          </div>
+          <div className="relative pb-6 md:pb-0">
+            <HeroCarousel />
+            <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm px-3 py-2 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 md:px-4 md:py-3">
+              <div className="font-display text-lg font-semibold md:text-xl">+10 anos</div>
+              <div className="text-[10px] md:text-xs">de tradição no plantel</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* 3 diferenciais */}
       <section className="relative mx-auto mt-5 max-w-7xl px-3 md:mt-6 md:px-8">
