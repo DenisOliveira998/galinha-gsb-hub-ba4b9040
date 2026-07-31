@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, formatDate } from "@/lib/mock-store";
+import { useStore, CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, formatDate, ratingAverage } from "@/lib/mock-store";
 import { HeroCarousel } from "@/components/site/hero-carousel";
+import { FavoriteButton } from "@/components/site/favorite-button";
+import { StarsDisplay } from "@/components/site/star-rating";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -10,7 +13,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { posts, blog, categoryImages } = useStore();
+  const { posts, blog, categoryImages, ratings } = useStore();
+  const hydrated = useHydrated();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
   const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
 
@@ -139,18 +143,25 @@ function Home() {
         <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
           <h2 className="font-display text-xl md:text-2xl">Últimos anúncios</h2>
           <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-3 md:gap-4">
-            {destaques.map((p) => (
-              <Link key={p.id} to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full w-[68%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] sm:w-auto md:rounded-3xl">
+            {destaques.map((p) => {
+              const r = hydrated ? ratingAverage(ratings, p.id) : { average: 0, count: 0 };
+              return (
+              <div key={p.id} className="relative flex h-full w-[68%] shrink-0 snap-start sm:w-auto">
+              <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
+              <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:rounded-3xl">
                 <div className="aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </div>
                 <div className="flex flex-1 flex-col p-3.5 text-left md:p-4">
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[p.category]}</div>
                   <h3 className="mt-1 line-clamp-2 font-display text-sm md:text-base">{p.title}</h3>
+                  <div className="mt-1"><StarsDisplay average={r.average} count={r.count} /></div>
                   {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
                 </div>
               </Link>
-            ))}
+              </div>
+              );
+            })}
           </div>
         </section>
       )}

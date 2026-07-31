@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Egg, MessageCircle, Moon, Search, ShoppingBag, Sun, User } from "lucide-react";
+import { Egg, Heart, MessageCircle, Moon, Search, ShoppingBag, Sun, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useTheme } from "@/hooks/use-theme";
@@ -11,8 +11,10 @@ export function SiteHeader() {
   const cart = useShop((s) => s.cart);
   const settings = useStore((s) => s.settings);
   const currentCustomerId = useShop((s) => s.currentCustomerId);
+  const favorites = useStore((s) => s.favorites);
   const hydrated = useHydrated();
   const count = hydrated ? cartCount(cart) : 0;
+  const favCount = hydrated ? (favorites ?? []).length : 0;
   const [cartOpen, setCartOpen] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -82,6 +84,7 @@ export function SiteHeader() {
           <nav className="hidden items-center gap-5 text-sm lg:flex">
             <Link to="/" className="opacity-80 hover:opacity-100" activeOptions={{ exact: true }} activeProps={{ className: "opacity-100 font-semibold" }}>Início</Link>
             <Link to="/catalogo" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Catálogo</Link>
+            <Link to="/favoritos" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Favoritos</Link>
             <Link to="/sobre" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Sobre</Link>
             <Link to="/blog" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Blog</Link>
             <Link to="/contato" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Contato</Link>
@@ -107,6 +110,19 @@ export function SiteHeader() {
             >
               <MessageCircle className="h-5 w-5" />
             </a>
+            <Link
+              to="/favoritos"
+              aria-label="Meus favoritos"
+              title="Meus favoritos"
+              className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10"
+            >
+              <Heart className="h-5 w-5" />
+              {favCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+                  {favCount}
+                </span>
+              )}
+            </Link>
             <Link
               to={currentCustomerId ? "/conta" : "/conta/login"}
               aria-label={currentCustomerId ? "Minha conta" : "Entrar"}
