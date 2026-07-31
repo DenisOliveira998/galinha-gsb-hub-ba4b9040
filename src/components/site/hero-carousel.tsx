@@ -24,15 +24,16 @@ export function HeroCarousel() {
   const go = (d: number) => setI((n) => (n + d + slides.length) % slides.length);
 
   return (
-    <div className="relative overflow-hidden rounded-[2rem] shadow-[var(--shadow-card)] ring-4 ring-primary-glow/30">
-      <div className="relative aspect-[4/3] w-full md:aspect-[5/4]">
+    <div className="relative w-full max-w-full overflow-hidden rounded-[2rem] shadow-[var(--shadow-card)] ring-4 ring-primary-glow/30">
+      <div className="relative h-[240px] w-full sm:h-[320px] md:h-[380px] lg:h-[420px]">
         {slides.map((s, idx) => (
           <img
             key={s.id}
             src={s.image}
             alt={s.title || "Galinha Sertanejo Balão"}
             aria-hidden={idx !== i}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
+            loading={idx === 0 ? "eager" : "lazy"}
+            className={`absolute inset-0 block h-full w-full object-cover object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
           />
         ))}
       </div>

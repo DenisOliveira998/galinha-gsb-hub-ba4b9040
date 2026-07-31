@@ -42,6 +42,17 @@ export interface BlogPost {
   coverImage: string;
   published: boolean;
   createdAt: string;
+  /** Imagens numeradas adicionais (galeria do post). */
+  images?: string[];
+  /** Blocos alternados de texto e imagem que compõem o corpo do post. */
+  blocks?: BlogBlock[];
+}
+
+export interface BlogBlock {
+  id: string;
+  type: "text" | "image";
+  text?: string;
+  image?: string;
 }
 
 export interface SiteSettings {

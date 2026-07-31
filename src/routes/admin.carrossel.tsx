@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowDown, ArrowUp, Images, Repeat, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { MediaPickerDialog } from "@/components/admin/media-picker";
 import { CATEGORY_LABELS, useStore, type Category } from "@/lib/mock-store";
 
 export const Route = createFileRoute("/admin/carrossel")({
@@ -48,14 +49,11 @@ function MediaAdmin() {
           Central de imagens do site. Tudo o que você alterar aqui aparece imediatamente nas páginas públicas.
         </p>
 
-        {picking && (
-          <div className="rounded-2xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
-            Selecione uma imagem no <strong>Estoque de imagens</strong> para aplicar neste espaço.{" "}
-            <button type="button" onClick={() => setPicking(null)} className="font-semibold underline">
-              Cancelar
-            </button>
-          </div>
-        )}
+        <MediaPickerDialog
+          open={picking !== null}
+          onClose={() => setPicking(null)}
+          onSelect={applyFromLibrary}
+        />
 
         {/* ------------------------------------------------ Carrossel */}
         <section className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
@@ -202,7 +200,7 @@ function MediaAdmin() {
             <Images className="h-4 w-4" /> Estoque de imagens
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Todas as imagens já enviadas ao site. Clique em <strong>Usar imagem do estoque</strong> em um tópico e depois escolha uma imagem aqui.
+            Todas as imagens já enviadas ao site. Use o botão <strong>Usar imagem do estoque</strong> em qualquer espaço para escolher uma delas em um popup.
           </p>
           <div className="mt-3">
             <ImageDropzone
@@ -217,17 +215,9 @@ function MediaAdmin() {
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {library.map((img) => (
               <div key={img} className="overflow-hidden rounded-xl border">
-                <button
-                  type="button"
-                  onClick={() => applyFromLibrary(img)}
-                  disabled={!picking}
-                  className="block w-full disabled:cursor-default"
-                  title={picking ? "Aplicar esta imagem" : "Selecione um espaço para aplicar"}
-                >
-                  <img src={img} alt="Imagem do estoque" className={`h-24 w-full object-cover transition ${picking ? "hover:opacity-80" : ""}`} />
-                </button>
+                <img src={img} alt="Imagem do estoque" className="h-24 w-full object-cover" />
                 <div className="flex items-center justify-between px-2 py-1.5">
-                  <span className="text-[11px] text-muted-foreground">{picking ? "Clique para usar" : "Estoque"}</span>
+                  <span className="text-[11px] text-muted-foreground">Estoque</span>
                   <button
                     type="button"
                     title="Remover do estoque"
