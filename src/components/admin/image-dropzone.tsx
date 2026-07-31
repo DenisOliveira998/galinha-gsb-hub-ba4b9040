@@ -11,9 +11,9 @@ async function fileToDataUrl(file: File): Promise<string> {
 }
 
 /**
- * Reduz a imagem antes de guardar (data URL). Imagens grandes estouram a cota
- * do localStorage e impedem que outras alterações (ex.: exclusões) sejam
- * salvas.
+ * Reduz e comprime a imagem antes de guardar (data URL): no máximo 1920px no
+ * maior lado e formato WebP quando o navegador suporta. Imagens grandes
+ * estouram a cota do localStorage e pesam no carregamento do site.
  */
 async function compressImage(file: File): Promise<string> {
   const dataUrl = await fileToDataUrl(file);
@@ -25,7 +25,7 @@ async function compressImage(file: File): Promise<string> {
       el.onerror = reject;
       el.src = dataUrl;
     });
-    const max = 1024;
+    const max = 1920;
     const scale = Math.min(1, max / Math.max(img.width, img.height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(img.width * scale);
@@ -33,7 +33,10 @@ async function compressImage(file: File): Promise<string> {
     const ctx = canvas.getContext("2d");
     if (!ctx) return dataUrl;
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const out = canvas.toDataURL("image/jpeg", 0.72);
+    const webp = canvas.toDataURL("image/webp", 0.78);
+    const out = webp.startsWith("data:image/webp")
+      ? webp
+      : canvas.toDataURL("image/jpeg", 0.75);
     return out.length < dataUrl.length ? out : dataUrl;
   } catch {
     return dataUrl;
