@@ -415,8 +415,15 @@ export const useStore = create<State>()(
       toggleFavorite: (postId) =>
         set((s) => {
           const list = s.favorites ?? [];
+          const isFav = list.includes(postId);
+          // Espelha a mudança no banco (não bloqueia a UI).
+          if (typeof window !== "undefined") {
+            void import("./favorites-db").then((m) =>
+              isFav ? m.removeFavoriteRemote(postId) : m.addFavoriteRemote(postId),
+            );
+          }
           return {
-            favorites: list.includes(postId)
+            favorites: isFav
               ? list.filter((f) => f !== postId)
               : [postId, ...list],
           };
