@@ -3,8 +3,11 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ShoppingBag, Zap } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS, type Category } from "@/lib/mock-store";
+import { useStore, CATEGORY_LABELS, ratingAverage, type Category } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
+import { FavoriteButton } from "@/components/site/favorite-button";
+import { StarsDisplay } from "@/components/site/star-rating";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 type CatalogSearch = { q?: string };
 
@@ -17,6 +20,8 @@ export const Route = createFileRoute("/catalogo/")({
 
 function Catalog() {
   const posts = useStore((s) => s.posts).filter((p) => p.status !== "DRAFT");
+  const ratings = useStore((s) => s.ratings);
+  const hydrated = useHydrated();
   const addToCart = useShop((s) => s.addToCart);
   const navigate = useNavigate();
   const { q } = Route.useSearch();
@@ -71,8 +76,11 @@ function Catalog() {
           </div>
         ) : (
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((p) => (
-              <article key={p.id} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+            {filtered.map((p) => {
+              const r = hydrated ? ratingAverage(ratings, p.id) : { average: 0, count: 0 };
+              return (
+              <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+                <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
                 <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   {p.status === "SOLD" && (
@@ -85,6 +93,7 @@ function Catalog() {
                     {p.title}
                   </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+                  <div className="mt-1.5"><StarsDisplay average={r.average} count={r.count} /></div>
                   {p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
                   {p.status !== "SOLD" && (
                     <div className="mt-auto flex flex-col gap-2 pt-4">
@@ -112,7 +121,8 @@ function Catalog() {
                   )}
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

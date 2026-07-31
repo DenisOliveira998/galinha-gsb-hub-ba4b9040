@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -41,6 +42,11 @@ import { Route as AdminBlogIdRouteImport } from './routes/admin.blog.$id'
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritosRoute = FavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContatoRoute = ContatoRouteImport.update({
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/favoritos': typeof FavoritosRoute
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/favoritos': typeof FavoritosRoute
   '/sobre': typeof SobreRoute
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/login': typeof AdminLoginRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/favoritos': typeof FavoritosRoute
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/conta'
     | '/contato'
+    | '/favoritos'
     | '/sobre'
     | '/admin/blog'
     | '/admin/carrossel'
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/checkout'
     | '/contato'
+    | '/favoritos'
     | '/sobre'
     | '/admin/carrossel'
     | '/admin/login'
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/conta'
     | '/contato'
+    | '/favoritos'
     | '/sobre'
     | '/admin/blog'
     | '/admin/carrossel'
@@ -360,6 +372,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRouteWithChildren
   ContaRoute: typeof ContaRouteWithChildren
   ContatoRoute: typeof ContatoRoute
+  FavoritosRoute: typeof FavoritosRoute
   SobreRoute: typeof SobreRoute
 }
 
@@ -370,6 +383,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favoritos': {
+      id: '/favoritos'
+      path: '/favoritos'
+      fullPath: '/favoritos'
+      preLoaderRoute: typeof FavoritosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contato': {
@@ -675,6 +695,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRouteWithChildren,
   ContaRoute: ContaRouteWithChildren,
   ContatoRoute: ContatoRoute,
+  FavoritosRoute: FavoritosRoute,
   SobreRoute: SobreRoute,
 }
 export const routeTree = rootRouteImport
