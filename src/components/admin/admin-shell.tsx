@@ -1,7 +1,7 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useStore } from "@/lib/mock-store";
-import { Egg, LayoutDashboard, FileText, Newspaper, Settings, LogOut } from "lucide-react";
+import { Egg, LayoutDashboard, FileText, Newspaper, Settings, LogOut, GalleryHorizontal } from "lucide-react";
 
 export function AdminShell({ children, title }: { children: ReactNode; title: string }) {
   const logout = useStore((s) => s.logout);
@@ -11,6 +11,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/posts", label: "Anúncios", icon: FileText },
     { to: "/admin/blog", label: "Blog", icon: Newspaper },
+    { to: "/admin/carrossel", label: "Carrossel", icon: GalleryHorizontal },
     { to: "/admin/settings", label: "Configurações", icon: Settings },
   ];
 

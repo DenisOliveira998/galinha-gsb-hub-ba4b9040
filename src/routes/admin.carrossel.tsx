@@ -26,8 +26,11 @@ function CarouselAdmin() {
             Clique ou arraste uma imagem. As alterações aparecem imediatamente na home.
           </p>
           <div className="mt-3">
-            <ImageDropzone value={newImage} onChange={setNewImage} />
+            <ImageDropzone multiple={false} onFiles={(urls) => setNewImage(urls[0] ?? "")} />
           </div>
+          {newImage && (
+            <img src={newImage} alt="Pré-visualização" className="mt-3 h-28 w-44 rounded-xl object-cover" />
+          )}
           <button
             type="button"
             disabled={!newImage}
