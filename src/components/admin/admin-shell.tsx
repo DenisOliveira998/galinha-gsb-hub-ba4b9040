@@ -17,7 +17,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
 
   return (
     <div className="flex min-h-screen bg-muted/40">
-      <aside className="hidden w-64 flex-col bg-sidebar text-sidebar-foreground md:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto bg-sidebar text-sidebar-foreground md:flex">
         <div className="flex items-center gap-2 px-6 py-6">
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-sidebar-primary/30">
             <Egg className="h-4 w-4" />
@@ -51,8 +51,8 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
           <LogOut className="h-4 w-4" /> Sair
         </button>
       </aside>
-      <div className="flex-1">
-        <header className="border-b bg-card px-6 py-4">
+      <div className="min-w-0 flex-1">
+        <header className="sticky top-0 z-30 border-b bg-card px-6 py-4">
           <h1 className="text-xl font-semibold">{title}</h1>
         </header>
         <div className="p-6">{children}</div>
