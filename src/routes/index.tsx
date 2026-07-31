@@ -9,8 +9,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { posts, settings } = useStore();
+  const { posts, settings, blog } = useStore();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
+  const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
 
   return (
     <SiteLayout>
@@ -144,6 +145,38 @@ function Home() {
       )}
 
       {/* Espaço publicitário — slot mockado, pronto para integração futura */}
+      {ultimosPosts.length > 0 && (
+        <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-16 md:px-8">
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-2xl md:text-3xl">Do nosso blog</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Dicas de manejo e novidades do plantel.</p>
+            </div>
+            <Link to="/blog" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
+          </div>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 md:mt-6 md:grid-cols-3 md:gap-5">
+            {ultimosPosts.map((p) => (
+              <Link
+                key={p.id}
+                to="/blog/$slug"
+                params={{ slug: p.slug }}
+                className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
+              >
+                <div className="aspect-[16/9] overflow-hidden">
+                  <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                </div>
+                <div className="flex flex-1 flex-col p-4 text-left md:p-5">
+                  <div className="text-[10px] text-muted-foreground md:text-xs">{new Date(p.createdAt).toLocaleDateString("pt-BR")}</div>
+                  <h3 className="mt-1 line-clamp-2 font-display text-base md:text-lg">{p.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.excerpt}</p>
+                  <div className="mt-auto pt-3 text-sm font-semibold text-primary">Ler mais →</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="mx-auto mt-12 max-w-7xl px-4 md:mt-16 md:px-8">
         <div
           role="complementary"
