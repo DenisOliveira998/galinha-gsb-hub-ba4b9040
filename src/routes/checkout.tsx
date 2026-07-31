@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, ChevronRight } from "lucide-react";
+import { useStore, whatsappHref } from "@/lib/mock-store";
+import { buildOrderMessage } from "@/lib/shop-store";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cartTotal, useShop } from "@/lib/shop-store";
@@ -153,6 +155,14 @@ function Checkout() {
               ))}
             </div>
             <div className="mt-4 flex items-center justify-between border-t pt-4 font-display text-xl"><span>Total</span><span className="text-primary">R$ {total.toFixed(2)}</span></div>
+            <a
+              href={whatsappHref(settings, buildOrderMessage(cart))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted"
+            >
+              Falar no WhatsApp
+            </a>
           </aside>
         </div>
       </div>

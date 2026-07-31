@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore } from "@/lib/mock-store";
+import { useStore, whatsappHref } from "@/lib/mock-store";
 import { Instagram, Mail, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
@@ -26,7 +26,7 @@ function Contact() {
           <h1 className="font-display text-4xl md:text-5xl">Fale conosco</h1>
           <p className="mt-4 text-muted-foreground">Estamos à disposição para conversar sobre o plantel, tirar dúvidas sobre manejo e ajudar você a escolher os melhores exemplares.</p>
           <div className="mt-8 space-y-4">
-            <div className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><MessageCircle className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">WhatsApp</div><div className="font-semibold">{s.whatsapp}</div></div></div>
+            <a href={whatsappHref(s, "Olá! Vim pelo site e gostaria de mais informações.")} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)] transition hover:bg-muted"><MessageCircle className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">WhatsApp</div><div className="font-semibold">{s.whatsapp}</div></div></a>
             <div className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><Instagram className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">Instagram</div><div className="font-semibold">{s.instagram}</div></div></div>
             <div className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><Mail className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">E-mail</div><div className="font-semibold">{s.email}</div></div></div>
           </div>

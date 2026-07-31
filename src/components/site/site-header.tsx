@@ -1,12 +1,14 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Egg, Search, ShoppingBag, User } from "lucide-react";
+import { Egg, MessageCircle, Search, ShoppingBag, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cartCount, useShop } from "@/lib/shop-store";
+import { useStore, whatsappHref } from "@/lib/mock-store";
 import { CartDrawer } from "./cart-drawer";
 
 export function SiteHeader() {
   const cart = useShop((s) => s.cart);
+  const settings = useStore((s) => s.settings);
   const currentCustomerId = useShop((s) => s.currentCustomerId);
   const hydrated = useHydrated();
   const count = hydrated ? cartCount(cart) : 0;
@@ -84,6 +86,16 @@ export function SiteHeader() {
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
+            <a
+              href={whatsappHref(settings, "Olá! Preciso de ajuda.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Falar no WhatsApp"
+              title="Falar no WhatsApp"
+              className="grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
             <Link
               to={currentCustomerId ? "/conta" : "/conta/login"}
               aria-label={currentCustomerId ? "Minha conta" : "Entrar"}
