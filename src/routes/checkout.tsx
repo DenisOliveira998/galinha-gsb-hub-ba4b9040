@@ -46,6 +46,7 @@ function Steps({ current }: { current: Step }) {
 function Checkout() {
   const hydrated = useHydrated();
   const cart = useShop((s) => s.cart);
+  const settings = useStore((s) => s.settings);
   const currentCustomerId = useShop((s) => s.currentCustomerId);
   const customers = useShop((s) => s.customers);
   const placeOrder = useShop((s) => s.placeOrder);
