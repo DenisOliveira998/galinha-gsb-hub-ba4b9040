@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Heart, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Check, Heart, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
 import { CATEGORY_LABELS, ratingAverage, useStore } from "@/lib/mock-store";
@@ -28,6 +29,25 @@ function Favoritos() {
   const ratings = useStore((s) => s.ratings);
   const toggleFavorite = useStore((s) => s.toggleFavorite);
   const list = hydrated ? posts.filter((p) => (favorites ?? []).includes(p.id)) : [];
+  const [selected, setSelected] = useState<string[]>([]);
+  const ids = useMemo(() => list.map((p) => p.id).join(","), [list]);
+
+  useEffect(() => {
+    const valid = new Set(ids ? ids.split(",") : []);
+    setSelected((prev) => prev.filter((id) => valid.has(id)));
+  }, [ids]);
+
+  const toggleSelected = (id: string) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  const allSelected = list.length > 0 && selected.length === list.length;
+
+  const removeSelected = () => {
+    const n = selected.length;
+    selected.forEach((id) => toggleFavorite(id));
+    setSelected([]);
+    toast.success(n === 1 ? "1 anúncio removido" : `${n} anúncios removidos`);
+  };
 
   const remove = (id: string, title: string) => {
     toggleFavorite(id);
@@ -50,13 +70,42 @@ function Favoritos() {
       <section className="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-10">
         {list.length > 0 && (
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 text-left">
-            <p className="text-sm text-muted-foreground">
-              {list.length} {list.length === 1 ? "anúncio salvo" : "anúncios salvos"}
-            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm text-muted-foreground">
+                {list.length} {list.length === 1 ? "anúncio salvo" : "anúncios salvos"}
+                {selected.length > 0 ? ` · ${selected.length} selecionado(s)` : ""}
+              </p>
+              <button
+                type="button"
+                onClick={() => setSelected(allSelected ? [] : list.map((p) => p.id))}
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:bg-muted"
+              >
+                <Check className="h-3.5 w-3.5" /> {allSelected ? "Desmarcar todos" : "Selecionar todos"}
+              </button>
+              {selected.length > 0 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={removeSelected}
+                    className="inline-flex items-center gap-2 rounded-full bg-destructive px-3 py-1.5 text-xs font-semibold text-destructive-foreground transition hover:opacity-90"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Remover selecionados ({selected.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelected([])}
+                    className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:bg-muted"
+                  >
+                    <X className="h-3.5 w-3.5" /> Limpar seleção
+                  </button>
+                </>
+              )}
+            </div>
             <button
               type="button"
               onClick={() => {
                 list.forEach((p) => toggleFavorite(p.id));
+                setSelected([]);
                 toast.success("Lista de favoritos limpa");
               }}
               className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:bg-muted"
@@ -75,8 +124,17 @@ function Favoritos() {
             {list.map((p) => {
               const r = ratingAverage(ratings, p.id);
               return (
-                <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+                <article key={p.id} className={`group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] ${selected.includes(p.id) ? "ring-2 ring-primary" : ""}`}>
                   <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
+                  <label className="absolute left-3 top-3 z-10 flex cursor-pointer items-center gap-2 rounded-full bg-background/85 px-2.5 py-1.5 text-xs font-semibold shadow-[var(--shadow-soft)] backdrop-blur-sm">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(p.id)}
+                      onChange={() => toggleSelected(p.id)}
+                      className="h-4 w-4 accent-[var(--color-primary)]"
+                    />
+                    Selecionar
+                  </label>
                   <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="aspect-[4/3] overflow-hidden">
                     <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   </Link>
