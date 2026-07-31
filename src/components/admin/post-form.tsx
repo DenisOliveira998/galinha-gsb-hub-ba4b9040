@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, type Category, type FaqItem, type Post, type PostStatus } from "@/lib/mock-store";
-import { X, Upload, Plus, Trash2 } from "lucide-react";
+import { X, ClipboardPaste, Plus, Trash2, Images } from "lucide-react";
 import { ImageDropzone } from "./image-dropzone";
+import { MediaPickerDialog } from "./media-picker";
 
 type FormValue = Omit<Post, "id" | "slug" | "createdAt">;
 
@@ -14,6 +15,16 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
   const [newUrl, setNewUrl] = useState("");
   const [faq, setFaq] = useState<FaqItem[]>(initial?.faq ?? []);
+  const [picking, setPicking] = useState<null | { index: number | "new" }>(null);
+
+  const pasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text.trim()) setNewUrl(text.trim());
+    } catch {
+      /* navegador bloqueou o acesso à área de transferência */
+    }
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,12 +80,19 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
           <h3 className="font-display text-lg">Imagens</h3>
           <span className="text-xs text-muted-foreground">Se vazio, será usado o placeholder da categoria automaticamente.</span>
         </div>
-        <div className="mb-3">
+        <div className="mb-3 flex flex-wrap gap-2">
           <ImageDropzone
             variant="plus"
             label="Adicionar imagem"
             onFiles={(urls) => setImages((prev) => [...prev, ...urls])}
           />
+          <button
+            type="button"
+            onClick={() => setPicking({ index: "new" })}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold hover:bg-muted"
+          >
+            <Images className="h-4 w-4" /> Usar imagem do estoque
+          </button>
         </div>
         <ImageDropzone
           label="Clique para escolher ou arraste várias imagens — um campo é criado para cada uma"
@@ -90,27 +108,51 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
                 <button type="button" onClick={() => move(i, -1)} className="rounded-md bg-card px-2 py-1 text-xs">←</button>
                 <button type="button" onClick={() => move(i, 1)} className="rounded-md bg-card px-2 py-1 text-xs">→</button>
               </div>
-              <div className="p-2">
+              <div className="flex flex-wrap gap-2 p-2">
                 <ImageDropzone
                   multiple={false}
                   variant="plus"
                   label="Trocar"
                   onFiles={(urls) => urls[0] && setImages((prev) => prev.map((u, k) => (k === i ? urls[0] : u)))}
                 />
+                <button
+                  type="button"
+                  onClick={() => setPicking({ index: i })}
+                  className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold hover:bg-muted"
+                >
+                  <Images className="h-3.5 w-3.5" /> Estoque
+                </button>
               </div>
             </div>
           ))}
         </div>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <input value={newUrl} onChange={(e) => setNewUrl(e.target.value)} className="input flex-1" placeholder="Ou cole a URL de uma imagem" />
+          <input
+            value={newUrl}
+            onChange={(e) => setNewUrl(e.target.value)}
+            onBlur={() => { if (newUrl.trim()) { setImages((prev) => [...prev, newUrl.trim()]); setNewUrl(""); } }}
+            className="input flex-1"
+            placeholder="Ou cole a URL de uma imagem (aplicada ao sair do campo)"
+          />
           <button
             type="button"
-            onClick={() => { if (newUrl.trim()) { setImages([...images, newUrl.trim()]); setNewUrl(""); } }}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-105"
+            title="Colar da área de transferência"
+            onClick={() => void pasteFromClipboard()}
+            className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold hover:bg-muted"
           >
-            <Upload className="h-4 w-4" /> Adicionar
+            <ClipboardPaste className="h-4 w-4" /> Colar
           </button>
         </div>
+
+        <MediaPickerDialog
+          open={picking !== null}
+          onClose={() => setPicking(null)}
+          onSelect={(image) => {
+            if (!picking) return;
+            if (picking.index === "new") setImages((prev) => [...prev, image]);
+            else setImages((prev) => prev.map((u, k) => (k === picking.index ? image : u)));
+          }}
+        />
       </Card>
 
       <Card>
