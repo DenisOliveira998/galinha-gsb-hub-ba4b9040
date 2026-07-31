@@ -2,7 +2,14 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import chicksImage from "@/assets/category-chicks.jpg";
 
-export type Category = "OVOS_FERTEIS" | "PINTINHOS" | "REPRODUTORES";
+/** Categorias são dinâmicas (gerenciadas no admin) — o id é uma string livre. */
+export type Category = string;
+
+export interface CategoryItem {
+  id: string;
+  label: string;
+  image?: string;
+}
 export type PostStatus = "DRAFT" | "PUBLISHED" | "SOLD";
 
 export interface FaqItem {
@@ -74,13 +81,13 @@ export interface HeroSlide {
   ctaTo: string;
 }
 
-export const CATEGORY_LABELS: Record<Category, string> = {
+export const CATEGORY_LABELS: Record<string, string> = {
   OVOS_FERTEIS: "Ovos férteis",
   PINTINHOS: "Galinhas",
   REPRODUTORES: "Reprodutores",
 };
 
-export const CATEGORY_PLACEHOLDERS: Record<Category, string> = {
+export const CATEGORY_PLACEHOLDERS: Record<string, string> = {
   OVOS_FERTEIS:
     "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=1200&q=80",
   PINTINHOS:
@@ -88,6 +95,12 @@ export const CATEGORY_PLACEHOLDERS: Record<Category, string> = {
   REPRODUTORES:
     "https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=1200&q=80",
 };
+
+export const DEFAULT_CATEGORIES: CategoryItem[] = [
+  { id: "OVOS_FERTEIS", label: "Ovos férteis", image: CATEGORY_PLACEHOLDERS.OVOS_FERTEIS },
+  { id: "PINTINHOS", label: "Galinhas", image: CATEGORY_PLACEHOLDERS.PINTINHOS },
+  { id: "REPRODUTORES", label: "Reprodutores", image: CATEGORY_PLACEHOLDERS.REPRODUTORES },
+];
 
 const slugify = (s: string) =>
   s
