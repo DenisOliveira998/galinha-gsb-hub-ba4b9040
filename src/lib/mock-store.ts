@@ -274,12 +274,14 @@ export const useStore = create<State>()(
         set({ settings: { ...get().settings, ...s } }),
       addHeroSlide: (s) =>
         set({ heroSlides: [...get().heroSlides, { ...s, id: crypto.randomUUID() }] }),
-      updateHeroSlide: (id, patch) =>
+      updateHeroSlide: (id, patch) => {
+        if (patch.image) get().addMedia([patch.image]);
         set({
           heroSlides: get().heroSlides.map((s) =>
             s.id === id ? { ...s, ...patch } : s,
           ),
-        }),
+        });
+      },
       deleteHeroSlide: (id) =>
         set({ heroSlides: get().heroSlides.filter((s) => s.id !== id) }),
       addHeroSlides: (images) => {
