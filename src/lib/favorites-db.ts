@@ -76,7 +76,7 @@ export async function addFavoriteRemote(postId: string) {
   if (!c || !ownerKey) return;
   const { error } = await c
     .from("favorites")
-    .upsert({ owner_key: ownerKey, post_id: postId }, { onConflict: "owner_key,post_id" });
+    .upsert({ owner_key: ownerKey, post_id: postId }, { onConflict: "owner_key,post_id", ignoreDuplicates: true });
   if (error) console.error("[favoritos] falha ao salvar", error.message);
 }
 
@@ -98,7 +98,7 @@ export async function addManyFavoritesRemote(postIds: string[]) {
     .from("favorites")
     .upsert(
       postIds.map((post_id) => ({ owner_key: ownerKey, post_id })),
-      { onConflict: "owner_key,post_id" },
+      { onConflict: "owner_key,post_id", ignoreDuplicates: true },
     );
   if (error) console.error("[favoritos] falha ao sincronizar", error.message);
 }
