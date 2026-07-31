@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CATEGORY_LABELS, CATEGORY_PLACEHOLDERS, type Category, type Post, type PostStatus } from "@/lib/mock-store";
 import { X, Upload } from "lucide-react";
+import { ImageDropzone } from "./image-dropzone";
 
 type FormValue = Omit<Post, "id" | "slug" | "createdAt">;
 
@@ -66,24 +67,25 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
           <h3 className="font-display text-lg">Imagens</h3>
           <span className="text-xs text-muted-foreground">Se vazio, será usado o placeholder da categoria automaticamente.</span>
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
+        <ImageDropzone onFiles={(urls) => setImages((prev) => [...prev, ...urls])} />
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
           {images.map((url, i) => (
             <div key={i} className="group relative overflow-hidden rounded-2xl border">
               <img src={url} alt="" className="aspect-square w-full object-cover" />
-              <button type="button" onClick={() => setImages(images.filter((_, k) => k !== i))} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-destructive text-destructive-foreground opacity-0 transition group-hover:opacity-100"><X className="h-3 w-3" /></button>
-              <div className="absolute bottom-2 left-2 flex gap-1 opacity-0 transition group-hover:opacity-100">
+              <button type="button" aria-label="Remover imagem" onClick={() => setImages(images.filter((_, k) => k !== i))} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-destructive text-destructive-foreground transition hover:brightness-110"><X className="h-3 w-3" /></button>
+              <div className="absolute bottom-2 left-2 flex gap-1">
                 <button type="button" onClick={() => move(i, -1)} className="rounded-md bg-card px-2 py-1 text-xs">←</button>
                 <button type="button" onClick={() => move(i, 1)} className="rounded-md bg-card px-2 py-1 text-xs">→</button>
               </div>
             </div>
           ))}
         </div>
-        <div className="mt-4 flex gap-2">
-          <input value={newUrl} onChange={(e) => setNewUrl(e.target.value)} className="input flex-1" placeholder="URL da imagem (upload real será feito com Vercel Blob/R2)" />
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <input value={newUrl} onChange={(e) => setNewUrl(e.target.value)} className="input flex-1" placeholder="Ou cole a URL de uma imagem" />
           <button
             type="button"
             onClick={() => { if (newUrl.trim()) { setImages([...images, newUrl.trim()]); setNewUrl(""); } }}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-105"
           >
             <Upload className="h-4 w-4" /> Adicionar
           </button>
