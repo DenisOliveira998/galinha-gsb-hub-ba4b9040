@@ -1,7 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Egg, MessageCircle, Search, ShoppingBag, User } from "lucide-react";
+import { Egg, MessageCircle, Moon, Search, ShoppingBag, Sun, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { useTheme } from "@/hooks/use-theme";
 import { cartCount, useShop } from "@/lib/shop-store";
 import { useStore, whatsappHref } from "@/lib/mock-store";
 import { CartDrawer } from "./cart-drawer";
@@ -19,6 +20,7 @@ export function SiteHeader() {
     select: (s) => (s.location.search as { q?: string })?.q ?? "",
   });
   const [query, setQuery] = useState(searchParam);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   // Sync input with the URL when the user navigates.
   useEffect(() => {
@@ -86,6 +88,15 @@ export function SiteHeader() {
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+              title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+              className="grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10"
+            >
+              {hydrated && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
             <a
               href={whatsappHref(settings, "Olá! Preciso de ajuda.")}
               target="_blank"
