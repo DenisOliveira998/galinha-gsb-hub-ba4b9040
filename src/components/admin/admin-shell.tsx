@@ -11,7 +11,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/posts", label: "Anúncios", icon: FileText },
     { to: "/admin/blog", label: "Blog", icon: Newspaper },
-    { to: "/admin/carrossel", label: "Carrossel", icon: GalleryHorizontal },
+    { to: "/admin/carrossel", label: "Mídia do Site", icon: GalleryHorizontal },
     { to: "/admin/settings", label: "Configurações", icon: Settings },
   ];
 

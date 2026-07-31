@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { posts, blog } = useStore();
+  const { posts, blog, categoryImages } = useStore();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
   const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
 
@@ -104,7 +104,7 @@ function Home() {
                 to="/catalogo"
                 className={`group relative h-[120px] w-[60%] shrink-0 snap-start overflow-hidden rounded-2xl p-3.5 text-left shadow-[var(--shadow-card)] md:h-[150px] md:w-auto md:rounded-3xl md:p-5 ${bg}`}
               >
-                <img src={CATEGORY_PLACEHOLDERS[key]} alt={CATEGORY_LABELS[key]} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
+                <img src={categoryImages?.[key]?.[0] ?? CATEGORY_PLACEHOLDERS[key]} alt={CATEGORY_LABELS[key]} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
                 <div className="relative flex h-full flex-col">
                   <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">Categoria</div>
                   <div className="mt-1 line-clamp-2 font-display text-base md:text-xl">{CATEGORY_LABELS[key]}</div>

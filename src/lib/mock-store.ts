@@ -183,6 +183,8 @@ interface State {
   blog: BlogPost[];
   settings: SiteSettings;
   heroSlides: HeroSlide[];
+  categoryImages: Record<Category, string[]>;
+  mediaLibrary: string[];
   login: (email: string, password: string) => boolean;
   logout: () => void;
   addPost: (p: Omit<Post, "id" | "slug" | "createdAt">) => Post;
@@ -196,6 +198,13 @@ interface State {
   updateHeroSlide: (id: string, s: Partial<HeroSlide>) => void;
   deleteHeroSlide: (id: string) => void;
   moveHeroSlide: (id: string, dir: -1 | 1) => void;
+  addHeroSlides: (images: string[]) => void;
+  addCategoryImages: (c: Category, images: string[]) => void;
+  updateCategoryImage: (c: Category, index: number, image: string) => void;
+  deleteCategoryImage: (c: Category, index: number) => void;
+  moveCategoryImage: (c: Category, index: number, dir: -1 | 1) => void;
+  addMedia: (images: string[]) => void;
+  deleteMedia: (image: string) => void;
 }
 
 // Mock in-memory store. Substitua por integração com TiDB Cloud + Prisma
@@ -208,6 +217,17 @@ export const useStore = create<State>()(
       blog: initialBlog,
       settings: initialSettings,
       heroSlides: initialHeroSlides,
+      categoryImages: {
+        OVOS_FERTEIS: [CATEGORY_PLACEHOLDERS.OVOS_FERTEIS],
+        PINTINHOS: [CATEGORY_PLACEHOLDERS.PINTINHOS],
+        REPRODUTORES: [CATEGORY_PLACEHOLDERS.REPRODUTORES],
+      },
+      mediaLibrary: [
+        ...initialHeroSlides.map((s) => s.image),
+        CATEGORY_PLACEHOLDERS.OVOS_FERTEIS,
+        CATEGORY_PLACEHOLDERS.PINTINHOS,
+        CATEGORY_PLACEHOLDERS.REPRODUTORES,
+      ],
       login: (email, password) => {
     // Credenciais mockadas — trocar por auth real depois
     if (email === "admin@galinhagsb.com" && password === "admin123") {
@@ -254,14 +274,72 @@ export const useStore = create<State>()(
         set({ settings: { ...get().settings, ...s } }),
       addHeroSlide: (s) =>
         set({ heroSlides: [...get().heroSlides, { ...s, id: crypto.randomUUID() }] }),
-      updateHeroSlide: (id, patch) =>
+      updateHeroSlide: (id, patch) => {
+        if (patch.image) get().addMedia([patch.image]);
         set({
           heroSlides: get().heroSlides.map((s) =>
             s.id === id ? { ...s, ...patch } : s,
           ),
-        }),
+        });
+      },
       deleteHeroSlide: (id) =>
         set({ heroSlides: get().heroSlides.filter((s) => s.id !== id) }),
+      addHeroSlides: (images) => {
+        if (!images.length) return;
+        set({
+          heroSlides: [
+            ...get().heroSlides,
+            ...images.map((image) => ({
+              id: crypto.randomUUID(),
+              image,
+              title: "Novo destaque",
+              subtitle: "",
+              ctaLabel: "Ver catálogo",
+              ctaTo: "/catalogo",
+            })),
+          ],
+        });
+        get().addMedia(images);
+      },
+      addCategoryImages: (c, images) => {
+        if (!images.length) return;
+        const current = get().categoryImages;
+        set({ categoryImages: { ...current, [c]: [...(current[c] ?? []), ...images] } });
+        get().addMedia(images);
+      },
+      updateCategoryImage: (c, index, image) => {
+        const current = get().categoryImages;
+        const list = [...(current[c] ?? [])];
+        if (index < 0 || index >= list.length) return;
+        list[index] = image;
+        set({ categoryImages: { ...current, [c]: list } });
+        get().addMedia([image]);
+      },
+      deleteCategoryImage: (c, index) => {
+        const current = get().categoryImages;
+        set({
+          categoryImages: {
+            ...current,
+            [c]: (current[c] ?? []).filter((_, i) => i !== index),
+          },
+        });
+      },
+      moveCategoryImage: (c, index, dir) => {
+        const current = get().categoryImages;
+        const list = [...(current[c] ?? [])];
+        const j = index + dir;
+        if (index < 0 || j < 0 || j >= list.length) return;
+        [list[index], list[j]] = [list[j], list[index]];
+        set({ categoryImages: { ...current, [c]: list } });
+      },
+      addMedia: (images) => {
+        const lib = get().mediaLibrary;
+        const next = images.filter((i) => i && !lib.includes(i));
+        if (!next.length) return;
+        set({ mediaLibrary: [...next, ...lib] });
+      },
+      deleteMedia: (image) =>
+        set({ mediaLibrary: get().mediaLibrary.filter((i) => i !== image) }),
       moveHeroSlide: (id, dir) => {
         const list = [...get().heroSlides];
         const i = list.findIndex((s) => s.id === id);
@@ -289,8 +367,10 @@ export const useStore = create<State>()(
         blog: s.blog,
         settings: s.settings,
         heroSlides: s.heroSlides,
+        categoryImages: s.categoryImages,
+        mediaLibrary: s.mediaLibrary,
       }),
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -309,6 +389,19 @@ export const useStore = create<State>()(
           if (!persisted.heroSlides?.length) {
             persisted.heroSlides = initialHeroSlides;
           }
+        }
+        if (version < 4) {
+          persisted.categoryImages = persisted.categoryImages ?? {
+            OVOS_FERTEIS: [CATEGORY_PLACEHOLDERS.OVOS_FERTEIS],
+            PINTINHOS: [CATEGORY_PLACEHOLDERS.PINTINHOS],
+            REPRODUTORES: [CATEGORY_PLACEHOLDERS.REPRODUTORES],
+          };
+          persisted.mediaLibrary = persisted.mediaLibrary ?? [
+            ...(persisted.heroSlides ?? []).map((s: any) => s.image),
+            CATEGORY_PLACEHOLDERS.OVOS_FERTEIS,
+            CATEGORY_PLACEHOLDERS.PINTINHOS,
+            CATEGORY_PLACEHOLDERS.REPRODUTORES,
+          ];
         }
         return persisted;
       },
