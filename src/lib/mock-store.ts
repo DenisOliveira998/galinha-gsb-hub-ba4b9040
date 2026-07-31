@@ -5,6 +5,20 @@ import chicksImage from "@/assets/category-chicks.jpg";
 export type Category = "OVOS_FERTEIS" | "PINTINHOS" | "REPRODUTORES";
 export type PostStatus = "DRAFT" | "PUBLISHED" | "SOLD";
 
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface Comment {
+  id: string;
+  postId: string;
+  name: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface Post {
   id: string;
   title: string;
@@ -15,6 +29,8 @@ export interface Post {
   status: PostStatus;
   images: string[];
   createdAt: string;
+  /** Perguntas e respostas cadastradas manualmente no admin. */
+  faq?: FaqItem[];
 }
 
 export interface BlogPost {
@@ -185,6 +201,14 @@ interface State {
   heroSlides: HeroSlide[];
   categoryImages: Record<Category, string[]>;
   mediaLibrary: string[];
+  /** Comentários por anúncio (mock). */
+  comments: Comment[];
+  /** Notas 1–5 por anúncio (mock). */
+  ratings: Record<string, number[]>;
+  /** Nota dada pelo visitante atual, por anúncio. */
+  myRatings: Record<string, number>;
+  /** IDs de anúncios favoritados. */
+  favorites: string[];
   login: (email: string, password: string) => boolean;
   logout: () => void;
   addPost: (p: Omit<Post, "id" | "slug" | "createdAt">) => Post;
@@ -205,6 +229,10 @@ interface State {
   moveCategoryImage: (c: Category, index: number, dir: -1 | 1) => void;
   addMedia: (images: string[]) => void;
   deleteMedia: (image: string) => void;
+  addComment: (postId: string, name: string, text: string) => void;
+  deleteComment: (id: string) => void;
+  ratePost: (postId: string, value: number) => void;
+  toggleFavorite: (postId: string) => void;
 }
 
 // Mock in-memory store. Substitua por integração com TiDB Cloud + Prisma
@@ -228,6 +256,10 @@ export const useStore = create<State>()(
         CATEGORY_PLACEHOLDERS.PINTINHOS,
         CATEGORY_PLACEHOLDERS.REPRODUTORES,
       ],
+      comments: [],
+      ratings: {},
+      myRatings: {},
+      favorites: [],
       login: (email, password) => {
     // Credenciais mockadas — trocar por auth real depois
     if (email === "admin@galinhagsb.com" && password === "admin123") {
@@ -253,7 +285,17 @@ export const useStore = create<State>()(
       posts: get().posts.map((p) => (p.id === id ? { ...p, ...patch } : p)),
     }),
       deletePost: (id) =>
-    set({ posts: get().posts.filter((p) => p.id !== id) }),
+        set((s) => {
+          const { [id]: _r, ...ratings } = s.ratings ?? {};
+          const { [id]: _m, ...myRatings } = s.myRatings ?? {};
+          return {
+            posts: s.posts.filter((p) => p.id !== id),
+            comments: (s.comments ?? []).filter((c) => c.postId !== id),
+            favorites: (s.favorites ?? []).filter((f) => f !== id),
+            ratings,
+            myRatings,
+          };
+        }),
       addBlog: (b) => {
     const post: BlogPost = {
       ...b,
@@ -340,6 +382,45 @@ export const useStore = create<State>()(
       },
       deleteMedia: (image) =>
         set({ mediaLibrary: get().mediaLibrary.filter((i) => i !== image) }),
+      addComment: (postId, name, text) =>
+        set((s) => ({
+          comments: [
+            ...(s.comments ?? []),
+            {
+              id: crypto.randomUUID(),
+              postId,
+              name: name.trim() || "Visitante",
+              text: text.trim(),
+              createdAt: new Date().toISOString(),
+            },
+          ],
+        })),
+      deleteComment: (id) =>
+        set((s) => ({ comments: (s.comments ?? []).filter((c) => c.id !== id) })),
+      ratePost: (postId, value) =>
+        set((s) => {
+          const v = Math.min(5, Math.max(1, Math.round(value)));
+          const list = [...((s.ratings ?? {})[postId] ?? [])];
+          const mine = (s.myRatings ?? {})[postId];
+          if (mine) {
+            const i = list.indexOf(mine);
+            if (i >= 0) list.splice(i, 1);
+          }
+          list.push(v);
+          return {
+            ratings: { ...(s.ratings ?? {}), [postId]: list },
+            myRatings: { ...(s.myRatings ?? {}), [postId]: v },
+          };
+        }),
+      toggleFavorite: (postId) =>
+        set((s) => {
+          const list = s.favorites ?? [];
+          return {
+            favorites: list.includes(postId)
+              ? list.filter((f) => f !== postId)
+              : [postId, ...list],
+          };
+        }),
       moveHeroSlide: (id, dir) => {
         const list = [...get().heroSlides];
         const i = list.findIndex((s) => s.id === id);
@@ -351,10 +432,28 @@ export const useStore = create<State>()(
     }),
     {
       name: "gsb-store",
-      // SSR-safe: no storage on server; syncs to localStorage in the browser.
+      // SSR-safe + resiliente a limite de cota do localStorage. Se o espaço
+      // acabar (imagens em data URL são pesadas), descartamos primeiro o
+      // estoque de imagens para que exclusões/edições continuem persistindo.
       storage: createJSONStorage(() =>
         typeof window !== "undefined"
-          ? window.localStorage
+          ? {
+              getItem: (n: string) => window.localStorage.getItem(n),
+              removeItem: (n: string) => window.localStorage.removeItem(n),
+              setItem: (n: string, v: string) => {
+                try {
+                  window.localStorage.setItem(n, v);
+                } catch {
+                  try {
+                    const parsed = JSON.parse(v);
+                    if (parsed?.state) parsed.state.mediaLibrary = [];
+                    window.localStorage.setItem(n, JSON.stringify(parsed));
+                  } catch {
+                    /* espaço insuficiente — mantém apenas em memória */
+                  }
+                }
+              },
+            }
           : {
               getItem: () => null,
               setItem: () => {},
@@ -369,8 +468,12 @@ export const useStore = create<State>()(
         heroSlides: s.heroSlides,
         categoryImages: s.categoryImages,
         mediaLibrary: s.mediaLibrary,
+        comments: s.comments,
+        ratings: s.ratings,
+        myRatings: s.myRatings,
+        favorites: s.favorites,
       }),
-      version: 4,
+      version: 5,
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -403,6 +506,12 @@ export const useStore = create<State>()(
             CATEGORY_PLACEHOLDERS.REPRODUTORES,
           ];
         }
+        if (version < 5) {
+          persisted.comments = persisted.comments ?? [];
+          persisted.ratings = persisted.ratings ?? {};
+          persisted.myRatings = persisted.myRatings ?? {};
+          persisted.favorites = persisted.favorites ?? [];
+        }
         return persisted;
       },
     },
@@ -428,4 +537,11 @@ export function whatsappHref(settings: SiteSettings, text?: string): string {
 /** Data estável entre servidor e cliente (evita mismatch de fuso). */
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+}
+
+/** Média de avaliações de um anúncio (0 quando não há notas). */
+export function ratingAverage(ratings: Record<string, number[]> | undefined, postId: string) {
+  const list = ratings?.[postId] ?? [];
+  if (!list.length) return { average: 0, count: 0 };
+  return { average: list.reduce((a, b) => a + b, 0) / list.length, count: list.length };
 }
