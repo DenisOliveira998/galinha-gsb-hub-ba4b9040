@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { useStore } from "@/lib/mock-store";
+import { useStore, formatDate } from "@/lib/mock-store";
 import { Plus, Trash2, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/admin/blog/")({
@@ -26,7 +26,7 @@ function BlogList() {
               <tr key={b.id}>
                 <td className="px-4 py-3 font-medium">{b.title}</td>
                 <td className="px-4 py-3">{b.published ? "Sim" : "Não"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{new Date(b.createdAt).toLocaleDateString("pt-BR")}</td>
+                <td className="px-4 py-3 text-muted-foreground">{formatDate(b.createdAt)}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-2">
                     <Link to="/admin/blog/$id" params={{ id: b.id }} title="Editar" aria-label="Editar post" className="rounded-lg p-2 hover:bg-muted"><Pencil className="h-4 w-4" /></Link>

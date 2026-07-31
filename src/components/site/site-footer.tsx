@@ -36,14 +36,13 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm opacity-90">
             <li><Link to="/catalogo">Ovos férteis</Link></li>
             <li><Link to="/catalogo">Pintinhos</Link></li>
-            <li><Link to="/catalogo">Matrizes</Link></li>
             <li><Link to="/catalogo">Reprodutores</Link></li>
           </ul>
         </div>
         <div>
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider opacity-70">Contato</h4>
           <ul className="space-y-2 text-sm opacity-90">
-            <li className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> {s.whatsapp}</li>
+            <li><a href={whatsappHref(s)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-100"><MessageCircle className="h-4 w-4" /> {s.whatsapp}</a></li>
             <li className="flex items-center gap-2"><Instagram className="h-4 w-4" /> {s.instagram}</li>
             <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> {s.email}</li>
           </ul>

@@ -63,7 +63,7 @@ function PostDetail() {
               </div>
             )}
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={`https://wa.me/?text=Olá! Tenho interesse em: ${post.title}`} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
+              <a href={whatsappHref(settings, `Olá! Tenho interesse em: ${post.title}`)} target="_blank" rel="noopener noreferrer" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
                 Falar no WhatsApp
               </a>
               <Link to="/contato" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">Ver contato ({settings.whatsapp})</Link>
