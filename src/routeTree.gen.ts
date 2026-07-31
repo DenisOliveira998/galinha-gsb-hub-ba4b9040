@@ -30,6 +30,7 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminCarrosselRouteImport } from './routes/admin.carrossel'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminPostsIndexRouteImport } from './routes/admin.posts.index'
@@ -144,6 +145,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCategoriasRoute = AdminCategoriasRouteImport.update({
+  id: '/categorias',
+  path: '/categorias',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCarrosselRoute = AdminCarrosselRouteImport.update({
   id: '/carrossel',
   path: '/carrossel',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
+  '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/favoritos': typeof FavoritosRoute
   '/sobre': typeof SobreRoute
   '/admin/carrossel': typeof AdminCarrosselRoute
+  '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
+  '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/admin/blog'
     | '/admin/carrossel'
+    | '/admin/categorias'
     | '/admin/login'
     | '/admin/posts'
     | '/admin/settings'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/favoritos'
     | '/sobre'
     | '/admin/carrossel'
+    | '/admin/categorias'
     | '/admin/login'
     | '/admin/settings'
     | '/blog/$slug'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/admin/blog'
     | '/admin/carrossel'
+    | '/admin/categorias'
     | '/admin/login'
     | '/admin/posts'
     | '/admin/settings'
@@ -525,6 +537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/categorias': {
+      id: '/admin/categorias'
+      path: '/categorias'
+      fullPath: '/admin/categorias'
+      preLoaderRoute: typeof AdminCategoriasRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/carrossel': {
       id: '/admin/carrossel'
       path: '/carrossel'
@@ -619,6 +638,7 @@ const AdminPostsRouteWithChildren = AdminPostsRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminBlogRoute: typeof AdminBlogRouteWithChildren
   AdminCarrosselRoute: typeof AdminCarrosselRoute
+  AdminCategoriasRoute: typeof AdminCategoriasRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminPostsRoute: typeof AdminPostsRouteWithChildren
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -628,6 +648,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBlogRoute: AdminBlogRouteWithChildren,
   AdminCarrosselRoute: AdminCarrosselRoute,
+  AdminCategoriasRoute: AdminCategoriasRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminPostsRoute: AdminPostsRouteWithChildren,
   AdminSettingsRoute: AdminSettingsRoute,
