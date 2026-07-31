@@ -51,7 +51,7 @@ function PostDetail() {
             <FavoriteButton postId={post.id} title={post.title} className="absolute right-3 top-3" />
           </div>
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[post.category]}</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
             <h1 className="mt-2 font-display text-3xl md:text-4xl">{post.title}</h1>
             <div className="mt-2"><StarsDisplay average={average} count={count} size="md" /></div>
             {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
@@ -137,7 +137,7 @@ function PostDetail() {
                       <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                     </Link>
                     <div className="flex flex-1 flex-col p-4 text-left">
-                      <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{CATEGORY_LABELS[p.category]}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
                       <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1 line-clamp-2 font-display text-base hover:text-primary">
                         {p.title}
                       </Link>
