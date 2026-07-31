@@ -68,7 +68,7 @@ const initialPosts: Post[] = [
     slug: "ovos-ferteis-gsb-duzia",
     category: "OVOS_FERTEIS",
     description:
-      "Dúzia de ovos férteis da raça Sertanejo Balão, coletados de matrizes selecionadas. Alta taxa de eclosão e procedência garantida.",
+      "Dúzia de ovos férteis da raça Sertanejo Balão, coletados de aves selecionadas. Alta taxa de eclosão e procedência garantida.",
     price: 120,
     status: "PUBLISHED",
     images: [CATEGORY_PLACEHOLDERS.OVOS_FERTEIS],
