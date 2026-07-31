@@ -3,17 +3,18 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ShoppingBag, Zap } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS, ratingAverage, type Category } from "@/lib/mock-store";
+import { useStore, categoryLabel, useCategories, ratingAverage, type Category } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { useHydrated } from "@/hooks/use-hydrated";
 
-type CatalogSearch = { q?: string };
+type CatalogSearch = { q?: string; cat?: string };
 
 export const Route = createFileRoute("/catalogo/")({
   validateSearch: (search: Record<string, unknown>): CatalogSearch => ({
     q: typeof search.q === "string" ? search.q : undefined,
+    cat: typeof search.cat === "string" ? search.cat : undefined,
   }),
   component: Catalog,
 });
@@ -24,18 +25,24 @@ function Catalog() {
   const hydrated = useHydrated();
   const addToCart = useShop((s) => s.addToCart);
   const navigate = useNavigate();
-  const { q } = Route.useSearch();
-  const [cat, setCat] = useState<Category | "ALL">("ALL");
+  const { q, cat: catParam } = Route.useSearch();
+  const categories = useCategories();
+  const cat: Category | "ALL" = catParam ?? "ALL";
+  const setCat = (c: Category | "ALL") =>
+    navigate({
+      to: "/catalogo",
+      search: (prev: Record<string, unknown>) => ({ ...prev, cat: c === "ALL" ? undefined : c }),
+    });
 
   const filtered = useMemo(() => {
     const term = (q ?? "").trim().toLowerCase();
     return posts.filter((p) => {
       if (cat !== "ALL" && p.category !== cat) return false;
       if (!term) return true;
-      const haystack = `${p.title} ${p.description} ${CATEGORY_LABELS[p.category]}`.toLowerCase();
+      const haystack = `${p.title} ${p.description} ${categoryLabel(categories, p.category)}`.toLowerCase();
       return haystack.includes(term);
     });
-  }, [posts, cat, q]);
+  }, [posts, cat, q, categories]);
 
   return (
     <SiteLayout>
@@ -65,8 +72,8 @@ function Catalog() {
         )}
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           <FilterChip active={cat === "ALL"} onClick={() => setCat("ALL")}>Todos</FilterChip>
-          {(Object.keys(CATEGORY_LABELS) as Category[]).map((c) => (
-            <FilterChip key={c} active={cat === c} onClick={() => setCat(c)}>{CATEGORY_LABELS[c]}</FilterChip>
+          {categories.map((c) => (
+            <FilterChip key={c.id} active={cat === c.id} onClick={() => setCat(c.id)}>{c.label}</FilterChip>
           ))}
         </div>
 
@@ -88,7 +95,7 @@ function Catalog() {
                   )}
                 </Link>
                 <div className="flex flex-1 flex-col p-4 text-left md:p-5">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{CATEGORY_LABELS[p.category]}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{categoryLabel(categories, p.category)}</div>
                   <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
                     {p.title}
                   </Link>
