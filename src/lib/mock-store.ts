@@ -223,7 +223,8 @@ interface State {
   blog: BlogPost[];
   settings: SiteSettings;
   heroSlides: HeroSlide[];
-  categoryImages: Record<Category, string[]>;
+  categories: CategoryItem[];
+  categoryImages: Record<string, string[]>;
   mediaLibrary: string[];
   /** Comentários por anúncio (mock). */
   comments: Comment[];
@@ -242,6 +243,10 @@ interface State {
   updateBlog: (id: string, b: Partial<BlogPost>) => void;
   deleteBlog: (id: string) => void;
   updateSettings: (s: Partial<SiteSettings>) => void;
+  addCategory: (label: string, image?: string) => CategoryItem;
+  updateCategory: (id: string, patch: Partial<Omit<CategoryItem, "id">>) => void;
+  deleteCategory: (id: string) => void;
+  moveCategory: (id: string, dir: -1 | 1) => void;
   addHeroSlide: (s: Omit<HeroSlide, "id">) => void;
   updateHeroSlide: (id: string, s: Partial<HeroSlide>) => void;
   deleteHeroSlide: (id: string) => void;
@@ -269,6 +274,7 @@ export const useStore = create<State>()(
       blog: initialBlog,
       settings: initialSettings,
       heroSlides: initialHeroSlides,
+      categories: DEFAULT_CATEGORIES,
       categoryImages: {
         OVOS_FERTEIS: [CATEGORY_PLACEHOLDERS.OVOS_FERTEIS],
         PINTINHOS: [CATEGORY_PLACEHOLDERS.PINTINHOS],
@@ -338,6 +344,41 @@ export const useStore = create<State>()(
     set({ blog: get().blog.filter((b) => b.id !== id) }),
       updateSettings: (s) =>
         set({ settings: { ...get().settings, ...s } }),
+      addCategory: (label, image) => {
+        const base = slugify(label).replace(/-/g, "_").toUpperCase() || "CATEGORIA";
+        const existing = new Set((get().categories ?? []).map((c) => c.id));
+        let id = base;
+        let n = 2;
+        while (existing.has(id)) id = `${base}_${n++}`;
+        const item: CategoryItem = { id, label: label.trim(), image };
+        set({ categories: [...(get().categories ?? []), item] });
+        if (image) get().addMedia([image]);
+        return item;
+      },
+      updateCategory: (id, patch) => {
+        set({
+          categories: (get().categories ?? []).map((c) =>
+            c.id === id ? { ...c, ...patch } : c,
+          ),
+        });
+        if (patch.image) get().addMedia([patch.image]);
+      },
+      deleteCategory: (id) =>
+        set((s) => {
+          const { [id]: _drop, ...categoryImages } = s.categoryImages ?? {};
+          return {
+            categories: (s.categories ?? []).filter((c) => c.id !== id),
+            categoryImages,
+          };
+        }),
+      moveCategory: (id, dir) => {
+        const list = [...(get().categories ?? [])];
+        const i = list.findIndex((c) => c.id === id);
+        const j = i + dir;
+        if (i < 0 || j < 0 || j >= list.length) return;
+        [list[i], list[j]] = [list[j], list[i]];
+        set({ categories: list });
+      },
       addHeroSlide: (s) =>
         set({ heroSlides: [...get().heroSlides, { ...s, id: crypto.randomUUID() }] }),
       updateHeroSlide: (id, patch) => {
@@ -497,6 +538,7 @@ export const useStore = create<State>()(
         blog: s.blog,
         settings: s.settings,
         heroSlides: s.heroSlides,
+        categories: s.categories,
         categoryImages: s.categoryImages,
         mediaLibrary: s.mediaLibrary,
         comments: s.comments,
@@ -504,7 +546,7 @@ export const useStore = create<State>()(
         myRatings: s.myRatings,
         favorites: s.favorites,
       }),
-      version: 5,
+      version: 6,
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -542,6 +584,14 @@ export const useStore = create<State>()(
           persisted.ratings = persisted.ratings ?? {};
           persisted.myRatings = persisted.myRatings ?? {};
           persisted.favorites = persisted.favorites ?? [];
+        }
+        if (version < 6) {
+          if (!persisted.categories?.length) {
+            persisted.categories = DEFAULT_CATEGORIES.map((c) => ({
+              ...c,
+              image: persisted.categoryImages?.[c.id]?.[0] ?? c.image,
+            }));
+          }
         }
         return persisted;
       },
