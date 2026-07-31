@@ -32,7 +32,7 @@ export function HeroCarousel() {
             >
               <img src={s.image} alt={s.title} className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary-deep/85 via-primary-deep/50 to-transparent" />
-              <div className="absolute inset-0 flex flex-col justify-center gap-1.5 px-4 text-left text-primary-foreground md:gap-2 md:px-10">
+              <div className="absolute inset-0 flex flex-col justify-center gap-1.5 px-12 text-left text-primary-foreground md:gap-2 md:px-16">
                 <h2 className="max-w-lg font-display text-lg leading-tight sm:text-2xl md:text-3xl">{s.title}</h2>
                 {s.subtitle && (
                   <p className="line-clamp-2 max-w-md text-[11px] opacity-85 sm:text-sm">{s.subtitle}</p>
