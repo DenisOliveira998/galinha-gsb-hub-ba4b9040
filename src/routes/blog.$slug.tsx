@@ -20,16 +20,42 @@ function BlogDetail() {
   if (!post) throw notFound();
   return (
     <SiteLayout>
-      <article className="mx-auto max-w-3xl px-4 py-12 md:px-8">
-        <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground">← Voltar ao blog</Link>
-        <div className="mt-6 overflow-hidden rounded-3xl shadow-[var(--shadow-card)]">
-          <img src={post.coverImage} alt={post.title} className="aspect-[16/9] w-full object-cover" />
-        </div>
-        <div className="mt-8 text-xs text-muted-foreground">{formatDate(post.createdAt)}</div>
-        <h1 className="mt-2 font-display text-4xl">{post.title}</h1>
-        <p className="mt-4 text-lg text-muted-foreground">{post.excerpt}</p>
-        <div className="prose prose-lg mt-8 whitespace-pre-line text-foreground/90">{post.content}</div>
-      </article>
+      <div className="mx-auto grid max-w-6xl gap-6 px-3 py-6 text-left md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_240px]">
+        <article className="min-w-0 text-left">
+          <Link to="/blog" className="text-xs text-muted-foreground hover:text-foreground md:text-sm">← Voltar ao blog</Link>
+          <div className="mt-3 overflow-hidden rounded-2xl shadow-[var(--shadow-card)] md:mt-4 md:rounded-3xl">
+            <img src={post.coverImage} alt={post.title} className="aspect-[16/9] w-full object-cover" />
+          </div>
+          <div className="mt-4 text-[11px] text-muted-foreground md:text-xs">{formatDate(post.createdAt)}</div>
+          <h1 className="mt-1 text-left font-display text-xl md:text-2xl">{post.title}</h1>
+          <p className="mt-2 text-left text-sm text-muted-foreground md:text-base">{post.excerpt}</p>
+
+          {/* Anúncio dentro do conteúdo — visível no mobile/tablet */}
+          <div
+            role="complementary"
+            aria-label="Espaço publicitário"
+            className="mt-5 grid min-h-[90px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-5 text-center lg:hidden"
+          >
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
+              <p className="mt-1 text-xs text-muted-foreground">Reserve este espaço.</p>
+            </div>
+          </div>
+
+          <div className="mt-5 whitespace-pre-line text-left text-sm leading-relaxed text-foreground/90 md:text-base">{post.content}</div>
+        </article>
+
+        <aside className="hidden lg:block">
+          <div
+            role="complementary"
+            aria-label="Espaço publicitário — formato vertical"
+            className="sticky top-24 flex min-h-[600px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center"
+          >
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
+            <p className="mt-2 text-xs text-muted-foreground">Formato vertical (skyscraper) disponível para parceiros.</p>
+          </div>
+        </aside>
+      </div>
     </SiteLayout>
   );
 }
