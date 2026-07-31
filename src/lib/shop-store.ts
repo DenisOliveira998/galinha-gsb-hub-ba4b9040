@@ -173,23 +173,16 @@ export function cartCount(items: CartItem[]) {
 // Monta a URL do WhatsApp (wa.me) com a mensagem pré-preenchida a partir
 // dos itens do carrinho. Ao integrar backend real, o número do vendedor
 // deve vir das configurações da loja.
-export function buildWhatsAppOrderUrl(
-  items: CartItem[],
-  phone: string,
-): string {
-  const digits = (phone || "").replace(/\D/g, "");
-  // Fallback para número placeholder quando não configurado no admin.
-  const number = digits || "5500000000000";
+export function buildOrderMessage(items: CartItem[]): string {
   const total = cartTotal(items);
   const lines = items.map(
     (i) => `• ${i.title} — ${i.quantity}x (R$ ${(i.price * i.quantity).toFixed(2)})`,
   );
-  const msg = [
+  return [
     "Olá! Gostaria de confirmar o pedido abaixo:",
     "",
     ...lines,
     "",
     `Total: R$ ${total.toFixed(2)}`,
   ].join("\n");
-  return `https://wa.me/${number}?text=${encodeURIComponent(msg)}`;
 }

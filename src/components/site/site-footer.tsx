@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useStore } from "@/lib/mock-store";
+import { useStore, whatsappHref } from "@/lib/mock-store";
 import { Egg, Instagram, Mail, MessageCircle } from "lucide-react";
 
 export function SiteFooter() {

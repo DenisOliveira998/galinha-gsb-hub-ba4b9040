@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { MessageCircle, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useEffect } from "react";
-import { buildWhatsAppOrderUrl, cartCount, cartTotal, useShop } from "@/lib/shop-store";
-import { useStore } from "@/lib/mock-store";
+import { buildOrderMessage, cartCount, cartTotal, useShop } from "@/lib/shop-store";
+import { useStore, whatsappHref } from "@/lib/mock-store";
 
 interface Props {
   open: boolean;
@@ -15,8 +15,8 @@ export function CartDrawer({ open, onClose }: Props) {
   const removeFromCart = useShop((s) => s.removeFromCart);
   const total = cartTotal(cart);
   const count = cartCount(cart);
-  const whatsapp = useStore((s) => s.settings.whatsapp);
-  const whatsappUrl = buildWhatsAppOrderUrl(cart, whatsapp);
+  const settings = useStore((s) => s.settings);
+  const whatsappUrl = whatsappHref(settings, buildOrderMessage(cart));
 
   useEffect(() => {
     if (!open) return;

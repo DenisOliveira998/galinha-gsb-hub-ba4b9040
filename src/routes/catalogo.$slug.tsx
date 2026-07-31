@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { ShoppingBag, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, CATEGORY_LABELS } from "@/lib/mock-store";
+import { useStore, CATEGORY_LABELS, whatsappHref } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/catalogo/$slug")({
