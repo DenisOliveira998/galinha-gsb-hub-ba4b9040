@@ -121,7 +121,7 @@ function CategoriesAdmin() {
             <div key={c.id} className="rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]">
               <div className="flex flex-wrap items-center gap-3">
                 <img
-                  src={draftImage(c.id, c.image) || "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400&q=60"}
+                  src={draftImage(c.id, c.image ?? "") || "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400&q=60"}
                   alt=""
                   className="h-16 w-24 shrink-0 rounded-xl object-cover"
                 />
