@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { MediaPickerDialog } from "@/components/admin/media-picker";
 import { useCategories, useStore } from "@/lib/mock-store";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 
 export const Route = createFileRoute("/admin/categorias")({
   component: CategoriesAdmin,
@@ -23,10 +24,38 @@ function CategoriesAdmin() {
   const [newImage, setNewImage] = useState("");
   /** Slot aguardando imagem do estoque: "new" ou o id da categoria. */
   const [picking, setPicking] = useState<string | null>(null);
+  /** Edições pendentes por categoria — aplicadas somente no botão "Aplicar alterações". */
+  const [drafts, setDrafts] = useState<Record<string, { label?: string; image?: string }>>({});
+  const [confirming, setConfirming] = useState(false);
+  const [removing, setRemoving] = useState<{ id: string; label: string } | null>(null);
+
+  const draftLabel = (id: string, fallback: string) => drafts[id]?.label ?? fallback;
+  const draftImage = (id: string, fallback: string) => drafts[id]?.image ?? fallback;
+  const setDraft = (id: string, patch: { label?: string; image?: string }) =>
+    setDrafts((d) => ({ ...d, [id]: { ...d[id], ...patch } }));
+
+  const pending = categories.filter((c) => {
+    const d = drafts[c.id];
+    if (!d) return false;
+    return (d.label !== undefined && d.label !== c.label) || (d.image !== undefined && d.image !== c.image);
+  });
+
+  const applyChanges = () => {
+    pending.forEach((c) => {
+      const d = drafts[c.id]!;
+      const patch: { label?: string; image?: string } = {};
+      if (d.label !== undefined && d.label !== c.label) patch.label = d.label.trim() || c.label;
+      if (d.image !== undefined && d.image !== c.image) patch.image = d.image;
+      updateCategory(c.id, patch);
+    });
+    setDrafts({});
+    setConfirming(false);
+    toast.success("Alterações aplicadas");
+  };
 
   const countOf = (id: string) => posts.filter((p) => p.category === id).length;
 
-  const remove = (id: string, label: string) => {
+  const askRemove = (id: string, label: string) => {
     const used = countOf(id);
     if (used > 0) {
       toast.error("Categoria em uso", {
@@ -34,9 +63,7 @@ function CategoriesAdmin() {
       });
       return;
     }
-    if (!window.confirm(`Remover a categoria “${label}”?`)) return;
-    deleteCategory(id);
-    toast.success("Categoria removida");
+    setRemoving({ id, label });
   };
 
   return (
@@ -52,7 +79,7 @@ function CategoriesAdmin() {
           onClose={() => setPicking(null)}
           onSelect={(image) => {
             if (picking === "new") setNewImage(image);
-            else if (picking) updateCategory(picking, { image });
+            else if (picking) setDraft(picking, { image });
             setPicking(null);
           }}
         />
@@ -94,14 +121,14 @@ function CategoriesAdmin() {
             <div key={c.id} className="rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]">
               <div className="flex flex-wrap items-center gap-3">
                 <img
-                  src={c.image || "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400&q=60"}
+                  src={draftImage(c.id, c.image ?? "") || "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400&q=60"}
                   alt=""
                   className="h-16 w-24 shrink-0 rounded-xl object-cover"
                 />
                 <div className="min-w-[12rem] flex-1">
                   <input
-                    value={c.label}
-                    onChange={(e) => updateCategory(c.id, { label: e.target.value })}
+                    value={draftLabel(c.id, c.label)}
+                    onChange={(e) => setDraft(c.id, { label: e.target.value })}
                     className="ci"
                     aria-label="Nome da categoria"
                   />
@@ -110,7 +137,7 @@ function CategoriesAdmin() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <ImageDropzone variant="plus" multiple={false} label="Trocar imagem" onFiles={(u) => u[0] && updateCategory(c.id, { image: u[0] })} />
+                  <ImageDropzone variant="plus" multiple={false} label="Trocar imagem" onFiles={(u) => u[0] && setDraft(c.id, { image: u[0] })} />
                   <button type="button" onClick={() => setPicking(c.id)} className="cbtn">
                     <Images className="h-4 w-4" /> Estoque
                   </button>
@@ -120,7 +147,7 @@ function CategoriesAdmin() {
                   <button type="button" aria-label="Mover para baixo" disabled={i === categories.length - 1} onClick={() => moveCategory(c.id, 1)} className="rounded-lg border p-2 disabled:opacity-40">
                     <ArrowDown className="h-4 w-4" />
                   </button>
-                  <button type="button" aria-label="Remover categoria" onClick={() => remove(c.id, c.label)} className="rounded-lg border border-destructive/40 p-2 text-destructive">
+                  <button type="button" aria-label="Remover categoria" onClick={() => askRemove(c.id, c.label)} className="rounded-lg border border-destructive/40 p-2 text-destructive">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -133,6 +160,59 @@ function CategoriesAdmin() {
             </p>
           )}
         </div>
+
+        <div className="sticky bottom-4 flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
+          <button
+            type="button"
+            disabled={!pending.length}
+            onClick={() => setConfirming(true)}
+            className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            Aplicar alterações
+          </button>
+          <button type="button" onClick={() => setDrafts({})} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
+            Descartar
+          </button>
+          <span className="text-xs text-muted-foreground">
+            {pending.length ? `${pending.length} categoria(s) alterada(s)` : "Nenhuma alteração pendente"}
+          </span>
+        </div>
+
+        <ConfirmDialog
+          open={confirming}
+          title="Aplicar alterações nas categorias?"
+          description="As mudanças passam a valer imediatamente no catálogo, na home e nos anúncios."
+          onCancel={() => setConfirming(false)}
+          onConfirm={applyChanges}
+        >
+          <ul className="space-y-2">
+            {pending.map((c) => (
+              <li key={c.id}>
+                <span className="font-semibold">{c.label}</span>
+                {drafts[c.id]?.label !== undefined && drafts[c.id]!.label !== c.label && (
+                  <div className="text-xs text-muted-foreground">Novo nome: {drafts[c.id]!.label}</div>
+                )}
+                {drafts[c.id]?.image !== undefined && drafts[c.id]!.image !== c.image && (
+                  <div className="text-xs text-muted-foreground">Nova imagem selecionada</div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </ConfirmDialog>
+
+        <ConfirmDialog
+          open={removing !== null}
+          destructive
+          title="Remover categoria?"
+          description={removing ? `A categoria “${removing.label}” deixará de aparecer no site.` : undefined}
+          confirmLabel="Remover"
+          onCancel={() => setRemoving(null)}
+          onConfirm={() => {
+            if (removing) deleteCategory(removing.id);
+            setRemoving(null);
+            toast.success("Categoria removida");
+          }}
+        />
 
         <style>{`.ci{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.65rem 1rem;font-size:.875rem;outline:none}.ci:focus{box-shadow:0 0 0 2px var(--color-ring)}.cbtn{display:inline-flex;align-items:center;gap:.5rem;border-radius:9999px;border:1px solid var(--color-border);padding:.5rem 1rem;font-size:.875rem;font-weight:600}.cbtn:hover{background:var(--color-muted)}`}</style>
       </div>

@@ -15,7 +15,6 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { posts, blog, categoryImages, ratings } = useStore();
   const categories = useCategories();
-  const heroImage = useStore((s) => s.settings.heroImage);
   const hydrated = useHydrated();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
   const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
@@ -53,19 +52,7 @@ function Home() {
             </div>
           </div>
           <div className="relative pb-6 md:pb-0">
-            {heroImage?.trim() ? (
-              <div className="relative w-full max-w-full overflow-hidden rounded-[2rem] shadow-[var(--shadow-card)] ring-4 ring-primary-glow/30">
-                <div className="relative aspect-[4/3] w-full sm:aspect-[16/10] md:aspect-[16/9]">
-                  <img
-                    src={heroImage}
-                    alt="Galinha Sertanejo Balão"
-                    className="absolute inset-0 h-full w-full object-contain"
-                  />
-                </div>
-              </div>
-            ) : (
-              <HeroCarousel />
-            )}
+            <HeroCarousel />
             <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm px-3 py-2 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 md:px-4 md:py-3">
               <div className="font-display text-lg font-semibold md:text-xl">+10 anos</div>
               <div className="text-[10px] md:text-xs">de tradição no plantel</div>
@@ -203,7 +190,7 @@ function Home() {
                   <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </div>
                 <div className="flex flex-1 flex-col p-3.5 text-left md:p-4">
-                  <div className="text-[10px] text-muted-foreground">{formatDate(p.createdAt)}</div>
+                  <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
                   <h3 className="mt-1 line-clamp-2 font-display text-sm md:text-base">{p.title}</h3>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{p.excerpt}</p>
                   <div className="mt-auto pt-3 text-xs font-semibold text-primary md:text-sm">Ler mais →</div>

@@ -1,24 +1,62 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { useStore } from "@/lib/mock-store";
+import { useStore, type SiteSettings } from "@/lib/mock-store";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { DEFAULT_BRAND_COLOR, normalizeHex } from "@/lib/brand-color";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/settings")({
   component: Settings,
+  head: () => ({
+    meta: [
+      { title: "Configurações do site — Painel Galinha GSB" },
+      { name: "description", content: "Contatos, textos e aparência do site Galinha GSB." },
+    ],
+  }),
 });
+
+const LABELS: Record<keyof SiteSettings, string> = {
+  whatsapp: "WhatsApp exibido",
+  whatsappLink: "Link do WhatsApp",
+  instagram: "Instagram",
+  email: "E-mail",
+  aboutText: "Texto “Sobre”",
+  brandColor: "Cor principal do site",
+};
+
+const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F"];
 
 function Settings() {
   const settings = useStore((s) => s.settings);
   const update = useStore((s) => s.updateSettings);
   const [form, setForm] = useState(settings);
-  const [saved, setSaved] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm({ ...form, [k]: v });
+
+  const color = normalizeHex(form.brandColor) ?? DEFAULT_BRAND_COLOR;
+  const changes = (Object.keys(LABELS) as Array<keyof SiteSettings>).filter(
+    (k) => (form[k] ?? "") !== (settings[k] ?? ""),
+  );
+
+  const apply = () => {
+    update(form);
+    setConfirming(false);
+    toast.success("Alterações aplicadas no site");
+  };
 
   return (
     <AdminShell title="Configurações">
       <form
-        onSubmit={(e) => { e.preventDefault(); update(form); setSaved(true); setTimeout(() => setSaved(false), 2000); }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!changes.length) {
+            toast.info("Nenhuma alteração para aplicar");
+            return;
+          }
+          setConfirming(true);
+        }}
         className="max-w-3xl space-y-6"
       >
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
@@ -28,22 +66,95 @@ function Settings() {
           <F label="instagram"><input value={form.instagram} onChange={(e) => set("instagram", e.target.value)} className="i" placeholder="@instagram_do_criador" /></F>
           <F label="email"><input value={form.email} onChange={(e) => set("email", e.target.value)} className="i" placeholder="email@exemplo.com" /></F>
         </div>
+
+        <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
+          <div>
+            <h3 className="font-display text-lg">Aparência</h3>
+            <p className="text-xs text-muted-foreground">
+              A cor escolhida substitui o verde da marca em todo o site: cabeçalho, hero, botões
+              principais, destaques e rodapé.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <input
+              type="color"
+              aria-label="Seletor de cor principal"
+              value={color}
+              onChange={(e) => set("brandColor", e.target.value)}
+              className="h-24 w-32 cursor-pointer rounded-2xl border bg-background p-1"
+            />
+            <div className="min-w-[12rem] flex-1 space-y-2">
+              <F label="cor_hexadecimal">
+                <input
+                  value={form.brandColor}
+                  onChange={(e) => set("brandColor", e.target.value)}
+                  className="i font-mono uppercase"
+                  placeholder="#2D5A3D"
+                />
+                {!normalizeHex(form.brandColor) && (
+                  <p className="mt-1 text-xs text-destructive">Código hexadecimal inválido (ex: #2D5A3D).</p>
+                )}
+              </F>
+              <div className="flex flex-wrap gap-2">
+                {PRESETS.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    aria-label={`Usar cor ${p}`}
+                    onClick={() => set("brandColor", p)}
+                    className="h-8 w-8 rounded-full border"
+                    style={{ background: p }}
+                  />
+                ))}
+                <button type="button" onClick={() => set("brandColor", DEFAULT_BRAND_COLOR)} className="rounded-full border px-3 py-1 text-xs font-semibold hover:bg-muted">
+                  Restaurar padrão
+                </button>
+              </div>
+            </div>
+            <div className="w-full rounded-2xl p-4 text-sm" style={{ background: color, color: "#fff" }}>
+              Pré-visualização da cor principal
+            </div>
+          </div>
+        </div>
+
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
           <h3 className="font-display text-lg">Conteúdo do site</h3>
-          <F label="hero_imagem_url">
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input value={form.heroImage} onChange={(e) => set("heroImage", e.target.value)} className="i" placeholder="Deixe vazio para exibir o carrossel" />
-              <button type="button" onClick={() => set("heroImage", "")} className="shrink-0 rounded-full border px-4 py-2 text-sm font-semibold hover:bg-muted">Limpar</button>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Com este campo preenchido, o hero mostra essa imagem fixa. Vazio, o hero passa a exibir
-              automaticamente o carrossel gerenciado em “Mídia do Site”.
-            </p>
-          </F>
+          <p className="text-xs text-muted-foreground">
+            As imagens do hero são gerenciadas em “Mídia do Site” → Carrossel.
+          </p>
           <F label="texto_sobre"><textarea value={form.aboutText} onChange={(e) => set("aboutText", e.target.value)} rows={6} className="i" placeholder="Texto da página Sobre" /></F>
         </div>
-        <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Salvar alterações</button>
-        {saved && <p className="text-sm text-primary">Salvo!</p>}
+
+        <div className="sticky bottom-4 flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
+          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50" disabled={!changes.length}>
+            Aplicar alterações
+          </button>
+          <button type="button" onClick={() => setForm(settings)} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
+            Descartar
+          </button>
+          <span className="text-xs text-muted-foreground">
+            {changes.length ? `${changes.length} alteração(ões) pendente(s)` : "Nenhuma alteração pendente"}
+          </span>
+        </div>
+
+        <ConfirmDialog
+          open={confirming}
+          title="Aplicar alterações no site?"
+          description="As mudanças abaixo passam a valer imediatamente nas páginas públicas."
+          confirmLabel="Confirmar"
+          onCancel={() => setConfirming(false)}
+          onConfirm={apply}
+        >
+          <ul className="space-y-2">
+            {changes.map((k) => (
+              <li key={k}>
+                <span className="font-semibold">{LABELS[k]}</span>
+                <div className="text-xs text-muted-foreground line-through">{String(settings[k] || "—").slice(0, 120)}</div>
+                <div className="text-xs">{String(form[k] || "—").slice(0, 120)}</div>
+              </li>
+            ))}
+          </ul>
+        </ConfirmDialog>
         <style>{`.i{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.75rem 1rem;font-size:.875rem;outline:none}.i:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>
       </form>
     </AdminShell>

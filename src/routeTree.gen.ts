@@ -9,14 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as PublicidadeRouteImport } from './routes/publicidade'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AfiliadosRouteImport } from './routes/afiliados'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContaIndexRouteImport } from './routes/conta.index'
@@ -40,14 +45,34 @@ import { Route as AdminPostsIdRouteImport } from './routes/admin.posts.$id'
 import { Route as AdminBlogNovoRouteImport } from './routes/admin.blog.novo'
 import { Route as AdminBlogIdRouteImport } from './routes/admin.blog.$id'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicidadeRoute = PublicidadeRouteImport.update({
+  id: '/publicidade',
+  path: '/publicidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FavoritosRoute = FavoritosRouteImport.update({
   id: '/favoritos',
   path: '/favoritos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContatoRoute = ContatoRouteImport.update({
@@ -78,6 +103,11 @@ const CarrinhoRoute = CarrinhoRouteImport.update({
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AfiliadosRoute = AfiliadosRouteImport.update({
+  id: '/afiliados',
+  path: '/afiliados',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -194,14 +224,19 @@ const AdminBlogIdRoute = AdminBlogIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/afiliados': typeof AfiliadosRoute
   '/blog': typeof BlogRouteWithChildren
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/cookies': typeof CookiesRoute
   '/favoritos': typeof FavoritosRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/publicidade': typeof PublicidadeRoute
   '/sobre': typeof SobreRoute
+  '/termos': typeof TermosRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -225,11 +260,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/afiliados': typeof AfiliadosRoute
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/cookies': typeof CookiesRoute
   '/favoritos': typeof FavoritosRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/publicidade': typeof PublicidadeRoute
   '/sobre': typeof SobreRoute
+  '/termos': typeof TermosRoute
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/login': typeof AdminLoginRoute
@@ -253,14 +293,19 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/afiliados': typeof AfiliadosRoute
   '/blog': typeof BlogRouteWithChildren
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/cookies': typeof CookiesRoute
   '/favoritos': typeof FavoritosRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/publicidade': typeof PublicidadeRoute
   '/sobre': typeof SobreRoute
+  '/termos': typeof TermosRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -287,14 +332,19 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/afiliados'
     | '/blog'
     | '/carrinho'
     | '/catalogo'
     | '/checkout'
     | '/conta'
     | '/contato'
+    | '/cookies'
     | '/favoritos'
+    | '/privacidade'
+    | '/publicidade'
     | '/sobre'
+    | '/termos'
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
@@ -318,11 +368,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/afiliados'
     | '/carrinho'
     | '/checkout'
     | '/contato'
+    | '/cookies'
     | '/favoritos'
+    | '/privacidade'
+    | '/publicidade'
     | '/sobre'
+    | '/termos'
     | '/admin/carrossel'
     | '/admin/categorias'
     | '/admin/login'
@@ -345,14 +400,19 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/afiliados'
     | '/blog'
     | '/carrinho'
     | '/catalogo'
     | '/checkout'
     | '/conta'
     | '/contato'
+    | '/cookies'
     | '/favoritos'
+    | '/privacidade'
+    | '/publicidade'
     | '/sobre'
+    | '/termos'
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
@@ -378,18 +438,30 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AfiliadosRoute: typeof AfiliadosRoute
   BlogRoute: typeof BlogRouteWithChildren
   CarrinhoRoute: typeof CarrinhoRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
   CheckoutRoute: typeof CheckoutRouteWithChildren
   ContaRoute: typeof ContaRouteWithChildren
   ContatoRoute: typeof ContatoRoute
+  CookiesRoute: typeof CookiesRoute
   FavoritosRoute: typeof FavoritosRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  PublicidadeRoute: typeof PublicidadeRoute
   SobreRoute: typeof SobreRoute
+  TermosRoute: typeof TermosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sobre': {
       id: '/sobre'
       path: '/sobre'
@@ -397,11 +469,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/publicidade': {
+      id: '/publicidade'
+      path: '/publicidade'
+      fullPath: '/publicidade'
+      preLoaderRoute: typeof PublicidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/favoritos': {
       id: '/favoritos'
       path: '/favoritos'
       fullPath: '/favoritos'
       preLoaderRoute: typeof FavoritosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contato': {
@@ -444,6 +537,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog'
       preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/afiliados': {
+      id: '/afiliados'
+      path: '/afiliados'
+      fullPath: '/afiliados'
+      preLoaderRoute: typeof AfiliadosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -710,25 +810,20 @@ const ContaRouteWithChildren = ContaRoute._addFileChildren(ContaRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AfiliadosRoute: AfiliadosRoute,
   BlogRoute: BlogRouteWithChildren,
   CarrinhoRoute: CarrinhoRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
   CheckoutRoute: CheckoutRouteWithChildren,
   ContaRoute: ContaRouteWithChildren,
   ContatoRoute: ContatoRoute,
+  CookiesRoute: CookiesRoute,
   FavoritosRoute: FavoritosRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  PublicidadeRoute: PublicidadeRoute,
   SobreRoute: SobreRoute,
+  TermosRoute: TermosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
