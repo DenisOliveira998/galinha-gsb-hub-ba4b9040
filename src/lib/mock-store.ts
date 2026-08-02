@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
 import chicksImage from "@/assets/category-chicks.jpg";
 
 /** Categorias são dinâmicas (gerenciadas no admin) — o id é uma string livre. */
