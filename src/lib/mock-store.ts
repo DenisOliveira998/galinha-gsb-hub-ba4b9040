@@ -69,7 +69,8 @@ export interface SiteSettings {
   instagram: string;
   email: string;
   aboutText: string;
-  heroImage: string;
+  /** Cor principal da marca (hex), configurável em Configurações -> Aparência. */
+  brandColor: string;
 }
 
 export interface HeroSlide {
@@ -184,8 +185,7 @@ const initialSettings: SiteSettings = {
   email: "email@exemplo.com",
   aboutText:
     "A Galinha GSB (Sertanejo Balão) é uma raça tradicional brasileira, criada com dedicação em nosso plantel há muitos anos. Trabalhamos com procedência garantida, suporte ao criador e amor pela avicultura sertaneja.",
-  heroImage:
-    "https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=1400&q=80",
+  brandColor: DEFAULT_BRAND_COLOR,
 };
 
 const initialHeroSlides: HeroSlide[] = [
@@ -548,7 +548,7 @@ export const useStore = create<State>()(
         myRatings: s.myRatings,
         favorites: s.favorites,
       }),
-      version: 6,
+      version: 7,
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -593,6 +593,14 @@ export const useStore = create<State>()(
               ...c,
               image: persisted.categoryImages?.[c.id]?.[0] ?? c.image,
             }));
+          }
+        }
+        if (version < 7) {
+          persisted.settings = { ...initialSettings, ...(persisted.settings ?? {}) };
+          // Campo legado "Hero Imagem" — o hero usa apenas o carrossel agora.
+          delete persisted.settings.heroImage;
+          if (!persisted.settings.brandColor) {
+            persisted.settings.brandColor = DEFAULT_BRAND_COLOR;
           }
         }
         return persisted;
