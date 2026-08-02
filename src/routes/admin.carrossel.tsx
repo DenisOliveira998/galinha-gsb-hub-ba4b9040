@@ -5,6 +5,8 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { MediaPickerDialog } from "@/components/admin/media-picker";
 import { useCategories, useStore, type Category } from "@/lib/mock-store";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/carrossel")({
   component: MediaAdmin,
@@ -28,6 +30,30 @@ function MediaAdmin() {
 
   /** Slot que está aguardando uma imagem do estoque. */
   const [picking, setPicking] = useState<Target | null>(null);
+  /** Textos dos slides editados, aplicados apenas no botão "Aplicar alterações". */
+  const [drafts, setDrafts] = useState<Record<string, Partial<{ title: string; subtitle: string; ctaLabel: string; ctaTo: string }>>>({});
+  const [confirming, setConfirming] = useState(false);
+  const [removingSlide, setRemovingSlide] = useState<string | null>(null);
+
+  const setDraft = (id: string, patch: Record<string, string>) =>
+    setDrafts((d) => ({ ...d, [id]: { ...d[id], ...patch } }));
+  const val = (id: string, key: "title" | "subtitle" | "ctaLabel" | "ctaTo", fallback: string) =>
+    (drafts[id]?.[key] as string | undefined) ?? fallback;
+
+  const pending = slides.filter((s) => {
+    const d = drafts[s.id];
+    if (!d) return false;
+    return (["title", "subtitle", "ctaLabel", "ctaTo"] as const).some(
+      (k) => d[k] !== undefined && d[k] !== s[k],
+    );
+  });
+
+  const applyChanges = () => {
+    pending.forEach((s) => updateSlide(s.id, drafts[s.id]!));
+    setDrafts({});
+    setConfirming(false);
+    toast.success("Alterações aplicadas no site");
+  };
 
   const applyFromLibrary = (image: string) => {
     if (!picking) return;
@@ -83,11 +109,11 @@ function MediaAdmin() {
                     <img src={s.image} alt={s.title} className="h-24 w-36 rounded-xl object-cover" />
                   </div>
                   <div className="min-w-[220px] flex-1 space-y-2">
-                    <input value={s.title} onChange={(e) => updateSlide(s.id, { title: e.target.value })} placeholder="Título" className="ci" />
-                    <input value={s.subtitle} onChange={(e) => updateSlide(s.id, { subtitle: e.target.value })} placeholder="Subtítulo" className="ci" />
+                    <input value={val(s.id, "title", s.title)} onChange={(e) => setDraft(s.id, { title: e.target.value })} placeholder="Título" className="ci" />
+                    <input value={val(s.id, "subtitle", s.subtitle)} onChange={(e) => setDraft(s.id, { subtitle: e.target.value })} placeholder="Subtítulo" className="ci" />
                     <div className="grid grid-cols-2 gap-2">
-                      <input value={s.ctaLabel} onChange={(e) => updateSlide(s.id, { ctaLabel: e.target.value })} placeholder="Texto do botão" className="ci" />
-                      <select value={s.ctaTo} onChange={(e) => updateSlide(s.id, { ctaTo: e.target.value })} className="ci">
+                      <input value={val(s.id, "ctaLabel", s.ctaLabel)} onChange={(e) => setDraft(s.id, { ctaLabel: e.target.value })} placeholder="Texto do botão" className="ci" />
+                      <select value={val(s.id, "ctaTo", s.ctaTo)} onChange={(e) => setDraft(s.id, { ctaTo: e.target.value })} className="ci">
                         <option value="/catalogo">/catalogo</option>
                         <option value="/blog">/blog</option>
                         <option value="/sobre">/sobre</option>
@@ -116,7 +142,7 @@ function MediaAdmin() {
                       type="button"
                       title="Remover"
                       aria-label="Remover imagem"
-                      onClick={() => { if (confirm("Remover esta imagem do carrossel?")) deleteSlide(s.id); }}
+                      onClick={() => setRemovingSlide(s.id)}
                       className="rounded-lg border border-destructive/40 p-2 text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -125,6 +151,54 @@ function MediaAdmin() {
                 </div>
               </div>
             ))}
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t pt-4">
+              <button
+                type="button"
+                disabled={!pending.length}
+                onClick={() => setConfirming(true)}
+                className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+              >
+                Aplicar alterações
+              </button>
+              <button type="button" onClick={() => setDrafts({})} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
+                Descartar
+              </button>
+              <span className="text-xs text-muted-foreground">
+                {pending.length ? `${pending.length} slide(s) alterado(s)` : "Nenhuma alteração pendente nos textos"}
+              </span>
+            </div>
+
+            <ConfirmDialog
+              open={confirming}
+              title="Aplicar alterações no carrossel?"
+              description="Os textos abaixo passam a aparecer imediatamente na home."
+              onCancel={() => setConfirming(false)}
+              onConfirm={applyChanges}
+            >
+              <ul className="space-y-2">
+                {pending.map((s, i) => (
+                  <li key={s.id}>
+                    <span className="font-semibold">Imagem {slides.indexOf(s) + 1}</span>
+                    <div className="text-xs text-muted-foreground">
+                      {val(s.id, "title", s.title)} — {val(s.id, "subtitle", s.subtitle)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </ConfirmDialog>
+
+            <ConfirmDialog
+              open={removingSlide !== null}
+              destructive
+              title="Remover esta imagem do carrossel?"
+              confirmLabel="Remover"
+              onCancel={() => setRemovingSlide(null)}
+              onConfirm={() => {
+                if (removingSlide) deleteSlide(removingSlide);
+                setRemovingSlide(null);
+              }}
+            />
+
             {slides.length === 0 && (
               <p className="rounded-xl bg-muted p-6 text-center text-sm text-muted-foreground">Nenhuma imagem no carrossel.</p>
             )}
