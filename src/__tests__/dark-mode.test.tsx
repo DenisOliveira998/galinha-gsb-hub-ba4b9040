@@ -17,9 +17,10 @@ function runInitScript() {
 }
 
 beforeEach(() => {
-  localStorage.clear();
   document.documentElement.className = "";
   setTheme("light");
+  // setTheme grava a preferência: limpar depois para começar sem escolha salva.
+  localStorage.clear();
 });
 
 describe("dark mode", () => {
