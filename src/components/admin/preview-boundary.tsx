@@ -24,12 +24,6 @@ export class PreviewBoundary extends Component<Props, State> {
     });
   }
 
-  componentDidUpdate(previous: Props) {
-    if (this.state.failed && previous.children !== this.props.children) {
-      this.setState({ failed: false });
-    }
-  }
-
   render() {
     if (this.state.failed) {
       return (
