@@ -5,6 +5,7 @@ import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { DEFAULT_BRAND_COLOR, normalizeHex } from "@/lib/brand-color";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PreviewBoundary } from "@/components/admin/preview-boundary";
 
 export const Route = createFileRoute("/admin/settings")({
   component: Settings,
@@ -30,7 +31,15 @@ const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F
 function Settings() {
   const settings = useStore((s) => s.settings);
   const update = useStore((s) => s.updateSettings);
-  const [form, setForm] = useState(settings);
+  const safeSettings: SiteSettings = {
+    whatsapp: settings?.whatsapp ?? "",
+    whatsappLink: settings?.whatsappLink ?? "",
+    instagram: settings?.instagram ?? "",
+    email: settings?.email ?? "",
+    aboutText: settings?.aboutText ?? "",
+    brandColor: settings?.brandColor ?? DEFAULT_BRAND_COLOR,
+  };
+  const [form, setForm] = useState<SiteSettings>(safeSettings);
   const [confirming, setConfirming] = useState(false);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm({ ...form, [k]: v });
@@ -38,7 +47,7 @@ function Settings() {
   const color = normalizeHex(form.brandColor) ?? DEFAULT_BRAND_COLOR;
   const hexValid = normalizeHex(form.brandColor) !== null;
   const changes = (Object.keys(LABELS) as Array<keyof SiteSettings>).filter(
-    (k) => (form[k] ?? "") !== (settings[k] ?? ""),
+    (k) => (form[k] ?? "") !== (safeSettings[k] ?? ""),
   );
 
   const apply = () => {
@@ -128,9 +137,11 @@ function Settings() {
                 </button>
               </div>
             </div>
-            <div className="w-full rounded-2xl p-4 text-sm" style={{ backgroundColor: color, color: "#fff" }}>
-              Pré-visualização da cor principal
-            </div>
+            <PreviewBoundary label="Não foi possível exibir a cor selecionada.">
+              <div className="w-full rounded-2xl p-4 text-sm text-primary-foreground" style={{ backgroundColor: color }}>
+                Pré-visualização da cor principal
+              </div>
+            </PreviewBoundary>
           </div>
         </div>
 
@@ -146,7 +157,7 @@ function Settings() {
           <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50" disabled={!changes.length || !hexValid}>
             Aplicar alterações
           </button>
-          <button type="button" onClick={() => setForm(settings)} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
+          <button type="button" onClick={() => setForm(safeSettings)} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
             Descartar
           </button>
           <span className="text-xs text-muted-foreground">
@@ -166,7 +177,7 @@ function Settings() {
             {changes.map((k) => (
               <li key={k}>
                 <span className="font-semibold">{LABELS[k]}</span>
-                <div className="text-xs text-muted-foreground line-through">{String(settings[k] || "—").slice(0, 120)}</div>
+                <div className="text-xs text-muted-foreground line-through">{String(safeSettings[k] || "—").slice(0, 120)}</div>
                 <div className="text-xs">{String(form[k] || "—").slice(0, 120)}</div>
               </li>
             ))}
