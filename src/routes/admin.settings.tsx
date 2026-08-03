@@ -81,7 +81,7 @@ function Settings() {
               aria-label="Seletor de cor principal"
               value={color}
               onChange={(e) => set("brandColor", e.target.value)}
-              className="h-24 w-32 cursor-pointer rounded-2xl border bg-background p-1"
+              className="swatch h-24 w-32 cursor-pointer rounded-2xl"
             />
             <div className="min-w-[12rem] flex-1 space-y-2">
               <F label="cor_hexadecimal">
@@ -111,7 +111,7 @@ function Settings() {
                 </button>
               </div>
             </div>
-            <div className="w-full rounded-2xl p-4 text-sm" style={{ background: color, color: "#fff" }}>
+            <div className="w-full rounded-2xl p-4 text-sm" style={{ backgroundColor: color, color: "#fff" }}>
               Pré-visualização da cor principal
             </div>
           </div>
@@ -155,7 +155,11 @@ function Settings() {
             ))}
           </ul>
         </ConfirmDialog>
-        <style>{`.i{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.75rem 1rem;font-size:.875rem;outline:none}.i:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>
+        <style>{`.i{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.75rem 1rem;font-size:.875rem;outline:none}.i:focus{box-shadow:0 0 0 2px var(--color-ring)}
+.swatch{-webkit-appearance:none;appearance:none;border:none;padding:0;background:none;overflow:hidden}
+.swatch::-webkit-color-swatch-wrapper{padding:0;border:none}
+.swatch::-webkit-color-swatch{border:none;border-radius:1rem}
+.swatch::-moz-color-swatch{border:none;border-radius:1rem}`}</style>
       </form>
     </AdminShell>
   );
