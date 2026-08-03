@@ -3,6 +3,7 @@ import { categoryImage, useCategories, useStore, type Category, type FaqItem, ty
 import { X, ClipboardPaste, Plus, Trash2, Images } from "lucide-react";
 import { ImageDropzone } from "./image-dropzone";
 import { MediaPickerDialog } from "./media-picker";
+import { PostPreview } from "./post-preview";
 
 type FormValue = Omit<Post, "id" | "slug" | "createdAt">;
 
@@ -50,8 +51,12 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
   };
 
   return (
-    <form onSubmit={submit} className="max-w-3xl space-y-6">
-      <Card>
+    <form
+      onSubmit={submit}
+      className="space-y-6 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6 lg:space-y-0"
+    >
+      <div className="space-y-6">
+        <Card>
         <Field label="titulo">
           <input value={title} onChange={(e) => setTitle(e.target.value)} required className="input" placeholder="Ovos férteis GSB — dúzia" />
         </Field>
@@ -211,9 +216,22 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
         </div>
       </Card>
 
-      <div className="flex gap-3">
-        <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Salvar</button>
+        <div className="flex gap-3">
+          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Salvar</button>
+        </div>
       </div>
+
+      <aside className="lg:sticky lg:top-24">
+        <PostPreview
+          title={title}
+          categoryLabel={categories.find((c) => c.id === category)?.label ?? String(category)}
+          description={description}
+          price={price}
+          status={status}
+          images={images}
+          faq={faq}
+        />
+      </aside>
 
       <style>{`.input{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.75rem 1rem;font-size:.875rem;outline:none}.input:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>
     </form>
