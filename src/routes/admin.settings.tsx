@@ -36,12 +36,13 @@ function Settings() {
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm({ ...form, [k]: v });
 
   const color = normalizeHex(form.brandColor) ?? DEFAULT_BRAND_COLOR;
+  const hexValid = normalizeHex(form.brandColor) !== null;
   const changes = (Object.keys(LABELS) as Array<keyof SiteSettings>).filter(
     (k) => (form[k] ?? "") !== (settings[k] ?? ""),
   );
 
   const apply = () => {
-    update(form);
+    update({ ...form, brandColor: normalizeHex(form.brandColor) ?? DEFAULT_BRAND_COLOR });
     setConfirming(false);
     toast.success("Alterações aplicadas no site");
   };
@@ -53,6 +54,10 @@ function Settings() {
           e.preventDefault();
           if (!changes.length) {
             toast.info("Nenhuma alteração para aplicar");
+            return;
+          }
+          if (!hexValid) {
+            toast.error("Cor inválida. Use o formato #RRGGBB (ex: #2D5A3D).");
             return;
           }
           setConfirming(true);
@@ -88,11 +93,23 @@ function Settings() {
                 <input
                   value={form.brandColor}
                   onChange={(e) => set("brandColor", e.target.value)}
+                  onBlur={() => {
+                    const n = normalizeHex(form.brandColor);
+                    if (n) set("brandColor", n.toUpperCase());
+                  }}
+                  aria-invalid={!hexValid}
+                  maxLength={7}
                   className="i font-mono uppercase"
                   placeholder="#2D5A3D"
                 />
-                {!normalizeHex(form.brandColor) && (
-                  <p className="mt-1 text-xs text-destructive">Código hexadecimal inválido (ex: #2D5A3D).</p>
+                {hexValid ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Aceita #RRGGBB ou a forma curta #RGB (expandida automaticamente).
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-destructive">
+                    Código hexadecimal inválido. Use #RRGGBB (ex: #2D5A3D) ou #RGB (ex: #2A5).
+                  </p>
                 )}
               </F>
               <div className="flex flex-wrap gap-2">
@@ -126,7 +143,7 @@ function Settings() {
         </div>
 
         <div className="sticky bottom-4 flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
-          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50" disabled={!changes.length}>
+          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50" disabled={!changes.length || !hexValid}>
             Aplicar alterações
           </button>
           <button type="button" onClick={() => setForm(settings)} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
