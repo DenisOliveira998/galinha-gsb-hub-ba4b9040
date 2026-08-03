@@ -4,6 +4,7 @@ import { X, ClipboardPaste, Plus, Trash2, Images } from "lucide-react";
 import { ImageDropzone } from "./image-dropzone";
 import { MediaPickerDialog } from "./media-picker";
 import { PostPreview } from "./post-preview";
+import { PreviewBoundary } from "./preview-boundary";
 
 type FormValue = Omit<Post, "id" | "slug" | "createdAt">;
 
@@ -15,9 +16,9 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
   const [description, setDescription] = useState(initial?.description ?? "");
   const [price, setPrice] = useState<string>(initial?.price?.toString() ?? "");
   const [status, setStatus] = useState<PostStatus>(initial?.status ?? "DRAFT");
-  const [images, setImages] = useState<string[]>(initial?.images ?? []);
+  const [images, setImages] = useState<string[]>(Array.isArray(initial?.images) ? initial.images : []);
   const [newUrl, setNewUrl] = useState("");
-  const [faq, setFaq] = useState<FaqItem[]>(initial?.faq ?? []);
+  const [faq, setFaq] = useState<FaqItem[]>(Array.isArray(initial?.faq) ? initial.faq : []);
   const [picking, setPicking] = useState<null | { index: number | "new" }>(null);
 
   const pasteFromClipboard = async () => {
@@ -222,15 +223,17 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
       </div>
 
       <aside className="lg:sticky lg:top-24">
-        <PostPreview
-          title={title}
-          categoryLabel={categories.find((c) => c.id === category)?.label ?? String(category)}
-          description={description}
-          price={price}
-          status={status}
-          images={images}
-          faq={faq}
-        />
+        <PreviewBoundary>
+          <PostPreview
+            title={title}
+            categoryLabel={categories.find((c) => c.id === category)?.label ?? String(category || "Sem categoria")}
+            description={description}
+            price={price}
+            status={status}
+            images={images}
+            faq={faq}
+          />
+        </PreviewBoundary>
       </aside>
 
       <style>{`.input{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.75rem 1rem;font-size:.875rem;outline:none}.input:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>

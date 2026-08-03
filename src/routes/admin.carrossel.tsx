@@ -7,6 +7,7 @@ import { MediaPickerDialog } from "@/components/admin/media-picker";
 import { useCategories, useStore, type Category } from "@/lib/mock-store";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { toast } from "sonner";
+import { PreviewBoundary, SafeImagePreview } from "@/components/admin/preview-boundary";
 
 export const Route = createFileRoute("/admin/carrossel")({
   component: MediaAdmin,
@@ -15,9 +16,9 @@ export const Route = createFileRoute("/admin/carrossel")({
 type Target = { kind: "hero"; index: number } | { kind: "category"; category: Category; index: number };
 
 function MediaAdmin() {
-  const slides = useStore((s) => s.heroSlides);
-  const categoryImages = useStore((s) => s.categoryImages);
-  const library = useStore((s) => s.mediaLibrary);
+  const slides = useStore((s) => s.heroSlides) ?? [];
+  const categoryImages = useStore((s) => s.categoryImages) ?? {};
+  const library = useStore((s) => s.mediaLibrary) ?? [];
   const updateSlide = useStore((s) => s.updateHeroSlide);
   const deleteSlide = useStore((s) => s.deleteHeroSlide);
   const moveSlide = useStore((s) => s.moveHeroSlide);
@@ -49,7 +50,10 @@ function MediaAdmin() {
   });
 
   const applyChanges = () => {
-    pending.forEach((s) => updateSlide(s.id, drafts[s.id]!));
+    pending.forEach((s) => {
+      const draft = drafts[s.id];
+      if (draft) updateSlide(s.id, draft);
+    });
     setDrafts({});
     setConfirming(false);
     toast.success("Alterações aplicadas no site");
@@ -106,7 +110,10 @@ function MediaAdmin() {
                 <div className="flex flex-wrap gap-4">
                   <div className="shrink-0">
                     <div className="mb-1 text-xs font-semibold text-muted-foreground">Imagem {i + 1}</div>
-                    <img src={s.image} alt={s.title} className="h-24 w-36 rounded-xl object-cover" />
+                     <PreviewBoundary>
+                       <SafeImagePreview src={s.image} alt={s.title || "Imagem do carrossel"} className="h-24 w-36 rounded-xl object-cover" />
+                       <span hidden className="h-24 w-36 rounded-xl bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
+                     </PreviewBoundary>
                   </div>
                   <div className="min-w-[220px] flex-1 space-y-2">
                     <input value={val(s.id, "title", s.title)} onChange={(e) => setDraft(s.id, { title: e.target.value })} placeholder="Título" className="ci" />
@@ -229,7 +236,10 @@ function MediaAdmin() {
                   <div key={`${cat}-${i}`} className="flex gap-3 rounded-xl border p-3">
                     <div>
                       <div className="mb-1 text-xs font-semibold text-muted-foreground">Imagem {i + 1}</div>
-                      <img src={img} alt={`${labelOf(cat)} ${i + 1}`} className="h-20 w-28 rounded-lg object-cover" />
+                       <PreviewBoundary>
+                         <SafeImagePreview src={img} alt={`${labelOf(cat)} ${i + 1}`} className="h-20 w-28 rounded-lg object-cover" />
+                         <span hidden className="h-20 w-28 rounded-lg bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
+                       </PreviewBoundary>
                     </div>
                     <div className="flex flex-1 flex-col gap-1">
                       <div className="flex gap-1">
@@ -291,7 +301,10 @@ function MediaAdmin() {
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {library.map((img) => (
               <div key={img} className="overflow-hidden rounded-xl border">
-                <img src={img} alt="Imagem do estoque" className="h-24 w-full object-cover" />
+                <PreviewBoundary>
+                  <SafeImagePreview src={img} alt="Imagem do estoque" className="h-24 w-full object-cover" />
+                  <span hidden className="h-24 w-full bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
+                </PreviewBoundary>
                 <div className="flex items-center justify-between px-2 py-1.5">
                   <span className="text-[11px] text-muted-foreground">Estoque</span>
                   <button

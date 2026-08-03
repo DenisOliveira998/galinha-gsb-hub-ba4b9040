@@ -3,6 +3,7 @@ import type { BlogBlock, BlogPost } from "@/lib/mock-store";
 import { ImageDropzone } from "./image-dropzone";
 import { MediaPickerDialog } from "./media-picker";
 import { BlogPreview } from "./blog-preview";
+import { PreviewBoundary, SafeImagePreview } from "./preview-boundary";
 import { ArrowDown, ArrowUp, ClipboardPaste, Images, ImagePlus, Type, X } from "lucide-react";
 
 type V = Omit<BlogPost, "id" | "slug" | "createdAt">;
@@ -15,8 +16,8 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
   const [content, setContent] = useState(initial?.content ?? "");
   const [coverImage, setCoverImage] = useState(initial?.coverImage ?? "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80");
   const [published, setPublished] = useState(initial?.published ?? false);
-  const [images, setImages] = useState<string[]>(initial?.images ?? []);
-  const [blocks, setBlocks] = useState<BlogBlock[]>(initial?.blocks ?? []);
+  const [images, setImages] = useState<string[]>(Array.isArray(initial?.images) ? initial.images : []);
+  const [blocks, setBlocks] = useState<BlogBlock[]>(Array.isArray(initial?.blocks) ? initial.blocks : []);
   const [picking, setPicking] = useState<Picking | null>(null);
 
   const addBlock = (type: BlogBlock["type"]) =>
@@ -94,7 +95,10 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
         </div>
         {coverImage && (
           <div className="relative">
-            <img src={coverImage} alt="Pré-visualização da capa" className="aspect-[16/9] w-full rounded-2xl object-cover" />
+            <PreviewBoundary>
+              <SafeImagePreview src={coverImage} alt="Pré-visualização da capa" className="aspect-[16/9] w-full rounded-2xl object-cover" />
+              <span hidden className="aspect-[16/9] w-full rounded-2xl bg-muted p-3 text-xs text-muted-foreground">Imagem indisponível</span>
+            </PreviewBoundary>
             <button type="button" aria-label="Remover capa" onClick={() => setCoverImage("")} className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-destructive text-destructive-foreground hover:brightness-110"><X className="h-4 w-4" /></button>
           </div>
         )}
@@ -184,14 +188,16 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
       </div>
 
       <aside className="lg:sticky lg:top-24">
-        <BlogPreview
-          title={title}
-          excerpt={excerpt}
-          content={content}
-          coverImage={coverImage}
-          images={images}
-          blocks={blocks}
-        />
+        <PreviewBoundary>
+          <BlogPreview
+            title={title}
+            excerpt={excerpt}
+            content={content}
+            coverImage={coverImage}
+            images={images}
+            blocks={blocks}
+          />
+        </PreviewBoundary>
       </aside>
       <style>{`.i{width:100%;border-radius:1rem;border:1px solid var(--color-border);background:var(--color-background);padding:.75rem 1rem;font-size:.875rem;outline:none}.i:focus{box-shadow:0 0 0 2px var(--color-ring)}.btn-ghost{display:inline-flex;align-items:center;gap:.5rem;border-radius:9999px;border:1px solid var(--color-border);padding:.5rem 1rem;font-size:.875rem;font-weight:600}.btn-ghost:hover{background:var(--color-muted)}`}</style>
     </form>

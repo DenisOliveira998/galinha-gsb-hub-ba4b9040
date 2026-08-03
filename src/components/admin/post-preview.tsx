@@ -10,17 +10,19 @@ export function PostPreview({
   images,
   faq,
 }: {
-  title: string;
-  categoryLabel: string;
-  description: string;
-  price: string;
-  status: string;
-  images: string[];
-  faq: FaqItem[];
+  title?: string;
+  categoryLabel?: string;
+  description?: string;
+  price?: string;
+  status?: string;
+  images?: string[];
+  faq?: FaqItem[];
 }) {
-  const cover = images[0];
-  const rest = images.slice(1);
-  const priceNum = price ? parseFloat(price) : undefined;
+  const safeImages = Array.isArray(images) ? images.filter((image): image is string => typeof image === "string" && image.length > 0) : [];
+  const safeFaq = Array.isArray(faq) ? faq.filter((item): item is FaqItem => Boolean(item && typeof item.question === "string" && typeof item.answer === "string")) : [];
+  const cover = safeImages[0];
+  const rest = safeImages.slice(1);
+  const priceNum = price ? Number.parseFloat(price) : undefined;
 
   return (
     <div className="rounded-2xl bg-card p-4 text-left shadow-[var(--shadow-soft)]">
@@ -41,7 +43,7 @@ export function PostPreview({
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-secondary px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-secondary-foreground">
-          {categoryLabel}
+          {categoryLabel || "Sem categoria"}
         </span>
         <span className="rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           {status === "PUBLISHED" ? "Publicado" : status === "SOLD" ? "Vendido" : "Rascunho"}
@@ -68,12 +70,12 @@ export function PostPreview({
         </div>
       )}
 
-      {faq.some((f) => f.question.trim() || f.answer.trim()) && (
+      {safeFaq.some((f) => f.question.trim() || f.answer.trim()) && (
         <div className="mt-4 space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Perguntas e respostas
           </p>
-          {faq
+          {safeFaq
             .filter((f) => f.question.trim() || f.answer.trim())
             .map((f) => (
               <div key={f.id} className="rounded-xl bg-muted p-3">

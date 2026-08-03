@@ -9,13 +9,15 @@ export function BlogPreview({
   images,
   blocks,
 }: {
-  title: string;
-  excerpt: string;
-  content: string;
-  coverImage: string;
-  images: string[];
-  blocks: BlogBlock[];
+  title?: string;
+  excerpt?: string;
+  content?: string;
+  coverImage?: string;
+  images?: string[];
+  blocks?: BlogBlock[];
 }) {
+  const safeImages = Array.isArray(images) ? images.filter((image): image is string => typeof image === "string" && image.length > 0) : [];
+  const safeBlocks = Array.isArray(blocks) ? blocks.filter((block): block is BlogBlock => Boolean(block && typeof block.id === "string")) : [];
   return (
     <div className="rounded-2xl bg-card p-4 text-left shadow-[var(--shadow-soft)]">
       <div className="mb-3 flex items-center justify-between">
@@ -39,9 +41,9 @@ export function BlogPreview({
         <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-foreground/90">{content}</p>
       )}
 
-      {blocks.length > 0 && (
+      {safeBlocks.length > 0 && (
         <div className="mt-4 space-y-4">
-          {blocks.map((b) =>
+          {safeBlocks.map((b) =>
             b.type === "text" ? (
               b.text ? (
                 <p key={b.id} className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">
@@ -55,9 +57,9 @@ export function BlogPreview({
         </div>
       )}
 
-      {images.length > 0 && (
+      {safeImages.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-2">
-          {images.map((img, i) => (
+          {safeImages.map((img, i) => (
             <img key={i} src={img} alt="" className="aspect-[4/3] w-full rounded-xl object-cover" />
           ))}
         </div>

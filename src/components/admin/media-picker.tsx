@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Images, X } from "lucide-react";
 import { useStore } from "@/lib/mock-store";
+import { PreviewBoundary, SafeImagePreview } from "./preview-boundary";
 
 /**
  * Popup com a grade do Estoque de imagens. O admin clica numa imagem e ela é
@@ -17,7 +18,7 @@ export function MediaPickerDialog({
   onSelect: (image: string) => void;
   title?: string;
 }) {
-  const library = useStore((s) => s.mediaLibrary);
+  const library = useStore((s) => s.mediaLibrary) ?? [];
 
   useEffect(() => {
     if (!open) return;
@@ -68,7 +69,10 @@ export function MediaPickerDialog({
                   className="overflow-hidden rounded-xl border transition hover:ring-2 hover:ring-primary"
                   title="Usar esta imagem"
                 >
-                  <img src={img} alt="Imagem do estoque" className="h-24 w-full object-cover" />
+                  <PreviewBoundary>
+                    <SafeImagePreview src={img} alt="Imagem do estoque" className="h-24 w-full object-cover" />
+                    <span hidden className="h-24 w-full bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
+                  </PreviewBoundary>
                 </button>
               ))}
             </div>
