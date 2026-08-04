@@ -5,6 +5,7 @@ import { useStore, useCategories, categoryLabel, categoryImage, formatDate, rati
 import { HeroCarousel } from "@/components/site/hero-carousel";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
+import { AdSlot } from "@/components/site/ad-slot";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout } from "lucide-react";
 
