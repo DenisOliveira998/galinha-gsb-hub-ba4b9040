@@ -24,6 +24,10 @@ const LABELS: Record<keyof SiteSettings, string> = {
   email: "E-mail",
   aboutText: "Texto “Sobre”",
   brandColor: "Cor principal do site",
+  adsensePublisherId: "ID do publisher AdSense",
+  adsenseSlotHomeBanner: "Slot — Banner da Home",
+  adsenseSlotHomeRectangle: "Slot — Retângulo da Home",
+  adsenseSlotBlog: "Slot — Blog (vertical)",
 };
 
 const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F"];
@@ -38,6 +42,10 @@ function Settings() {
     email: settings?.email ?? "",
     aboutText: settings?.aboutText ?? "",
     brandColor: settings?.brandColor ?? DEFAULT_BRAND_COLOR,
+    adsensePublisherId: settings?.adsensePublisherId ?? "",
+    adsenseSlotHomeBanner: settings?.adsenseSlotHomeBanner ?? "",
+    adsenseSlotHomeRectangle: settings?.adsenseSlotHomeRectangle ?? "",
+    adsenseSlotBlog: settings?.adsenseSlotBlog ?? "",
   };
   const [form, setForm] = useState<SiteSettings>(safeSettings);
   const [confirming, setConfirming] = useState(false);
