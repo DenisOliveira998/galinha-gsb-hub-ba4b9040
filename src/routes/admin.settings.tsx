@@ -176,12 +176,6 @@ function Settings() {
           <F label="slot_blog"><input value={form.adsenseSlotBlog} onChange={(e) => set("adsenseSlotBlog", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Formato vertical na listagem e dentro das postagens do blog.</p></F>
         </div>
 
-        <div className="hidden">
-          <p className="text-xs text-muted-foreground">
-            As imagens do hero são gerenciadas em “Mídia do Site” → Carrossel.
-          </p>
-        </div>
-
         <div className="sticky bottom-4 flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
           <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50" disabled={!changes.length || !hexValid}>
             Aplicar alterações
