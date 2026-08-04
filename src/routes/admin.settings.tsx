@@ -24,6 +24,10 @@ const LABELS: Record<keyof SiteSettings, string> = {
   email: "E-mail",
   aboutText: "Texto “Sobre”",
   brandColor: "Cor principal do site",
+  adsensePublisherId: "ID do publisher AdSense",
+  adsenseSlotHomeBanner: "Slot — Banner da Home",
+  adsenseSlotHomeRectangle: "Slot — Retângulo da Home",
+  adsenseSlotBlog: "Slot — Blog (vertical)",
 };
 
 const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F"];
@@ -38,6 +42,10 @@ function Settings() {
     email: settings?.email ?? "",
     aboutText: settings?.aboutText ?? "",
     brandColor: settings?.brandColor ?? DEFAULT_BRAND_COLOR,
+    adsensePublisherId: settings?.adsensePublisherId ?? "",
+    adsenseSlotHomeBanner: settings?.adsenseSlotHomeBanner ?? "",
+    adsenseSlotHomeRectangle: settings?.adsenseSlotHomeRectangle ?? "",
+    adsenseSlotBlog: settings?.adsenseSlotBlog ?? "",
   };
   const [form, setForm] = useState<SiteSettings>(safeSettings);
   const [confirming, setConfirming] = useState(false);
@@ -151,6 +159,21 @@ function Settings() {
             As imagens do hero são gerenciadas em “Mídia do Site” → Carrossel.
           </p>
           <F label="texto_sobre"><textarea value={form.aboutText} onChange={(e) => set("aboutText", e.target.value)} rows={6} className="i" placeholder="Texto da página Sobre" /></F>
+        </div>
+
+        <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
+          <div>
+            <h3 className="font-display text-lg">Google AdSense</h3>
+            <p className="text-xs text-muted-foreground">
+              Enquanto o ID do publisher e o slot correspondente estiverem vazios, o site
+              continua exibindo os espaços publicitários mockados. Ao preencher, o bloco real
+              do AdSense é carregado automaticamente — sem mexer em código.
+            </p>
+          </div>
+          <F label="id_publisher"><input value={form.adsensePublisherId} onChange={(e) => set("adsensePublisherId", e.target.value.trim())} className="i font-mono" placeholder="ca-pub-XXXXXXXXXXXXXXXX" /></F>
+          <F label="slot_banner_home"><input value={form.adsenseSlotHomeBanner} onChange={(e) => set("adsenseSlotHomeBanner", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Banner horizontal, acima de “Últimos anúncios”.</p></F>
+          <F label="slot_retangulo_home"><input value={form.adsenseSlotHomeRectangle} onChange={(e) => set("adsenseSlotHomeRectangle", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Bloco antes de “Por que escolher a Galinha GSB”.</p></F>
+          <F label="slot_blog"><input value={form.adsenseSlotBlog} onChange={(e) => set("adsenseSlotBlog", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Formato vertical na listagem e dentro das postagens do blog.</p></F>
         </div>
 
         <div className="sticky bottom-4 flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">

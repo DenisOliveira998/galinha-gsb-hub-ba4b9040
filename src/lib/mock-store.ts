@@ -72,6 +72,14 @@ export interface SiteSettings {
   aboutText: string;
   /** Cor principal da marca (hex), configurável em Configurações -> Aparência. */
   brandColor: string;
+  /** ID do publisher do Google AdSense (ca-pub-XXXXXXXXXX). Vazio = placeholders. */
+  adsensePublisherId: string;
+  /** Slot do banner horizontal da Home. */
+  adsenseSlotHomeBanner: string;
+  /** Slot do retângulo da Home (antes de "Por que escolher"). */
+  adsenseSlotHomeRectangle: string;
+  /** Slot vertical usado nas páginas do blog. */
+  adsenseSlotBlog: string;
 }
 
 export interface HeroSlide {
@@ -187,6 +195,10 @@ const initialSettings: SiteSettings = {
   aboutText:
     "A Galinha GSB (Sertanejo Balão) é uma raça tradicional brasileira, criada com dedicação em nosso plantel há muitos anos. Trabalhamos com procedência garantida, suporte ao criador e amor pela avicultura sertaneja.",
   brandColor: DEFAULT_BRAND_COLOR,
+  adsensePublisherId: "",
+  adsenseSlotHomeBanner: "",
+  adsenseSlotHomeRectangle: "",
+  adsenseSlotBlog: "",
 };
 
 const initialHeroSlides: HeroSlide[] = [
@@ -543,7 +555,7 @@ export const useStore = create<State>()(
         myRatings: s.myRatings,
         favorites: s.favorites,
       }),
-      version: 7,
+      version: 8,
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -597,6 +609,9 @@ export const useStore = create<State>()(
           if (!persisted.settings.brandColor) {
             persisted.settings.brandColor = DEFAULT_BRAND_COLOR;
           }
+        }
+        if (version < 8) {
+          persisted.settings = { ...initialSettings, ...(persisted.settings ?? {}) };
         }
         return persisted;
       },

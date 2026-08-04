@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandTheme } from "@/components/site/brand-theme";
+import { AdsenseScript } from "@/components/site/ad-slot";
 import { THEME_INIT_SCRIPT } from "@/hooks/use-theme";
 
 function NotFoundComponent() {
@@ -134,6 +135,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <BrandTheme />
+      <AdsenseScript />
       <Outlet />
       <Toaster />
     </QueryClientProvider>

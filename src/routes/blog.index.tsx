@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useStore, formatDate } from "@/lib/mock-store";
+import { AdSlot } from "@/components/site/ad-slot";
 
 export const Route = createFileRoute("/blog/")({
   component: Blog,
@@ -39,18 +40,24 @@ function Blog() {
             ))}
           </div>
           <aside className="hidden lg:block">
-            <div
-              role="complementary"
-              aria-label="Espaço publicitário — formato vertical"
-              className="sticky top-24 flex min-h-[600px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center"
-            >
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">
-                Espaço publicitário
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Formato vertical (skyscraper) disponível para parceiros.
-              </p>
-            </div>
+            <AdSlot
+              slot="blog"
+              label="Espaço publicitário — formato vertical"
+              className="sticky top-24"
+              format="vertical"
+              fullWidthResponsive={false}
+              style={{ minHeight: 600 }}
+              placeholder={
+                <div className="flex min-h-[600px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center">
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">
+                    Espaço publicitário
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Formato vertical (skyscraper) disponível para parceiros.
+                  </p>
+                </div>
+              }
+            />
           </aside>
         </div>
       </section>
