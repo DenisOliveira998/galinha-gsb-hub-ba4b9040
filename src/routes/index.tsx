@@ -124,20 +124,22 @@ function Home() {
 
       {/* Espaço publicitário — formato horizontal (banner largo) */}
       <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
-        <div
-          role="complementary"
-          aria-label="Espaço publicitário — formato banner"
-          className="flex min-h-[80px] items-center justify-center rounded-2xl border-2 border-dashed border-accent/50 bg-accent/5 px-4 py-5 text-center md:min-h-[110px] md:rounded-3xl"
-        >
-          <div>
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-accent">
-              Espaço publicitário · Banner horizontal
+        <AdSlot
+          slot="homeBanner"
+          label="Espaço publicitário — formato banner"
+          placeholder={
+            <div className="flex min-h-[80px] items-center justify-center rounded-2xl border-2 border-dashed border-accent/50 bg-accent/5 px-4 py-5 text-center md:min-h-[110px] md:rounded-3xl">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-accent">
+                  Espaço publicitário · Banner horizontal
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Formato retangular largo disponível para parceiros.
+                </p>
+              </div>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Formato retangular largo disponível para parceiros.
-            </p>
-          </div>
-        </div>
+          }
+        />
       </section>
 
       {/* Destaques do catálogo */}
@@ -202,20 +204,22 @@ function Home() {
       )}
 
       <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
-        <div
-          role="complementary"
-          aria-label="Espaço publicitário"
-          className="grid min-h-[100px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-6 text-center md:min-h-[140px] md:rounded-3xl"
-        >
-          <div>
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">
-              Espaço publicitário
+        <AdSlot
+          slot="homeRectangle"
+          label="Espaço publicitário"
+          placeholder={
+            <div className="grid min-h-[100px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-6 text-center md:min-h-[140px] md:rounded-3xl">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">
+                  Espaço publicitário
+                </div>
+                <p className="mt-1.5 text-xs text-muted-foreground md:text-sm">
+                  Anuncie aqui — fale conosco para reservar este espaço.
+                </p>
+              </div>
             </div>
-            <p className="mt-1.5 text-xs text-muted-foreground md:text-sm">
-              Anuncie aqui — fale conosco para reservar este espaço.
-            </p>
-          </div>
-        </div>
+          }
+        />
       </section>
 
       {/* Por que escolher a GSB */}
