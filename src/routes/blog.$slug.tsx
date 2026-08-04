@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useStore, formatDate } from "@/lib/mock-store";
+import { AdSlot } from "@/components/site/ad-slot";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogDetail,
@@ -31,16 +32,19 @@ function BlogDetail() {
           <p className="mt-2 text-left text-sm text-muted-foreground md:text-base">{post.excerpt}</p>
 
           {/* Anúncio dentro do conteúdo — visível no mobile/tablet */}
-          <div
-            role="complementary"
-            aria-label="Espaço publicitário"
-            className="mt-5 grid min-h-[90px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-5 text-center lg:hidden"
-          >
-            <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
-              <p className="mt-1 text-xs text-muted-foreground">Reserve este espaço.</p>
-            </div>
-          </div>
+          <AdSlot
+            slot="blog"
+            label="Espaço publicitário"
+            className="mt-5 lg:hidden"
+            placeholder={
+              <div className="grid min-h-[90px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-5 text-center">
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
+                  <p className="mt-1 text-xs text-muted-foreground">Reserve este espaço.</p>
+                </div>
+              </div>
+            }
+          />
 
           <div className="mt-5 whitespace-pre-line text-left text-sm leading-relaxed text-foreground/90 md:text-base">{post.content}</div>
 
@@ -68,14 +72,20 @@ function BlogDetail() {
         </article>
 
         <aside className="hidden lg:block">
-          <div
-            role="complementary"
-            aria-label="Espaço publicitário — formato vertical"
-            className="sticky top-24 flex min-h-[600px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center"
-          >
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
-            <p className="mt-2 text-xs text-muted-foreground">Formato vertical (skyscraper) disponível para parceiros.</p>
-          </div>
+          <AdSlot
+            slot="blog"
+            label="Espaço publicitário — formato vertical"
+            className="sticky top-24"
+            format="vertical"
+            fullWidthResponsive={false}
+            style={{ minHeight: 600 }}
+            placeholder={
+              <div className="flex min-h-[600px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center">
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
+                <p className="mt-2 text-xs text-muted-foreground">Formato vertical (skyscraper) disponível para parceiros.</p>
+              </div>
+            }
+          />
         </aside>
       </div>
     </SiteLayout>
