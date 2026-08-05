@@ -1,0 +1,294 @@
+// ---------------------------------------------------------------------------
+// Schema Prisma — Galinha GSB
+// Banco: TiDB Cloud (MySQL-compatible)
+// Espelha 1:1 as entidades hoje mockadas em src/lib/mock-store.ts e
+// src/lib/shop-store.ts. Ver README.md nesta pasta para o passo a passo
+// de setup e migração.
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma" // TiDB Serverless: FKs geridas pelo Prisma, não pelo banco
+}
+
+// --------------------------------------------------------------- Categorias
+
+model CategoryItem {
+  id        String   @id // ex: "OVOS_FERTEIS" (slug em maiúsculas, gerado no admin)
+  label     String
+  image     String?  @db.Text
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images CategoryImage[]
+  posts  Post[]
+
+  @@map("categories")
+}
+
+// Galeria de imagens de uma categoria (o [0] é a imagem de destaque no card)
+model CategoryImage {
+  id         String       @id @default(cuid())
+  categoryId String
+  category   CategoryItem @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  url        String       @db.Text
+  order      Int          @default(0)
+
+  @@index([categoryId])
+  @@map("category_images")
+}
+
+// ------------------------------------------------------------- Anúncios/Posts
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  SOLD
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  categoryId  String
+  category    CategoryItem @relation(fields: [categoryId], references: [id])
+  description String     @db.Text
+  price       Decimal?   @db.Decimal(10, 2)
+  status      PostStatus @default(DRAFT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  images    PostImage[]
+  faqs      Faq[]
+  comments  Comment[]
+  ratings   Rating[]
+  favorites Favorite[]
+  cartItems CartItem[]
+
+  @@index([categoryId])
+  @@map("posts")
+}
+
+model PostImage {
+  id     String @id @default(cuid())
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url    String @db.Text
+  order  Int    @default(0)
+
+  @@index([postId])
+  @@map("post_images")
+}
+
+// Perguntas e respostas cadastradas manualmente pelo admin, por anúncio
+model Faq {
+  id       String  @id @default(cuid())
+  postId   String
+  post     Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  question String  @db.Text
+  answer   String? @db.Text
+  order    Int     @default(0)
+
+  @@index([postId])
+  @@map("faqs")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  name      String
+  text      String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+  @@map("comments")
+}
+
+// Avaliação 1–5 por anúncio. ownerKey identifica o visitante anônimo
+// (mesma estratégia usada antes no Supabase para Favoritos).
+model Rating {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ownerKey  String
+  value     Int // 1 a 5
+  createdAt DateTime @default(now())
+
+  @@unique([postId, ownerKey]) // 1 nota por visitante por anúncio
+  @@index([postId])
+  @@map("ratings")
+}
+
+model Favorite {
+  id       String @id @default(cuid())
+  postId   String
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ownerKey String
+
+  @@unique([postId, ownerKey])
+  @@index([postId])
+  @@map("favorites")
+}
+
+// ------------------------------------------------------------------- Blog
+
+model BlogPost {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  excerpt    String   @db.Text
+  content    String   @db.Text // corpo simples/legado, mantido por compatibilidade
+  coverImage String   @db.Text
+  published  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  images BlogImage[]
+  blocks BlogBlock[]
+
+  @@map("blog_posts")
+}
+
+model BlogImage {
+  id         String   @id @default(cuid())
+  blogPostId String
+  blogPost   BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  url        String   @db.Text
+  order      Int      @default(0)
+
+  @@index([blogPostId])
+  @@map("blog_images")
+}
+
+enum BlogBlockType {
+  TEXT
+  IMAGE
+}
+
+// Blocos alternados de texto/imagem que compõem o corpo do post, na
+// ordem definida pelo admin (drag and drop).
+model BlogBlock {
+  id         String        @id @default(cuid())
+  blogPostId String
+  blogPost   BlogPost      @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  type       BlogBlockType
+  text       String?       @db.Text
+  image      String?       @db.Text
+  order      Int           @default(0)
+
+  @@index([blogPostId])
+  @@map("blog_blocks")
+}
+
+// --------------------------------------------------------------- Hero/Mídia
+
+model HeroSlide {
+  id       String @id @default(cuid())
+  image    String @db.Text
+  title    String
+  subtitle String @db.Text
+  ctaLabel String
+  ctaTo    String
+  order    Int    @default(0)
+
+  @@map("hero_slides")
+}
+
+// Biblioteca central de mídia ("Estoque de imagens") — histórico de todas
+// as imagens já enviadas, reutilizáveis em qualquer campo de upload.
+model MediaLibraryItem {
+  id        String   @id @default(cuid())
+  url       String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("media_library")
+}
+
+// --------------------------------------------------------------- Config geral
+
+// Registro único (singleton) — sempre id = "main"
+model SiteSettings {
+  id                     String @id @default("main")
+  whatsapp               String @default("")
+  whatsappLink           String @default("")
+  instagram              String @default("")
+  email                  String @default("")
+  aboutText              String @db.Text
+  brandColor             String @default("#3F6B52")
+  adsensePublisherId     String @default("")
+  adsenseSlotHomeBanner  String @default("")
+  adsenseSlotHomeRectangle String @default("")
+  adsenseSlotBlog        String @default("")
+  updatedAt              DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+// --------------------------------------------------------- Admin (login)
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  @@map("admins")
+}
+
+// --------------------------------------------------- Loja (cliente/pedido)
+
+model Customer {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  orders    Order[]
+  cartItems CartItem[]
+
+  @@map("customers")
+}
+
+// Carrinho persistente por cliente logado (visitante anônimo continua
+// usando localStorage no client até fazer login/checkout).
+model CartItem {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  postId     String
+  post       Post     @relation(fields: [postId], references: [id])
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  @@unique([customerId, postId])
+  @@index([customerId])
+  @@map("cart_items")
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  itemsJson  Json // snapshot dos itens no momento da compra (title, price, qty, etc.)
+  total      Decimal  @db.Decimal(10, 2)
+  name       String
+  email      String
+  phone      String
+  address    String
+  city       String
+  state      String
+  zip        String
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([customerId])
+  @@map("orders")
+}
