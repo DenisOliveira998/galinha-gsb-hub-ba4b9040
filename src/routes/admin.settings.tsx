@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { useStore, type SiteSettings } from "@/lib/mock-store";
+import { type SiteSettings } from "@/lib/mock-store";
+import { useSettingsQuery, useUpdateSettingsMutation, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { DEFAULT_BRAND_COLOR, normalizeHex } from "@/lib/brand-color";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PreviewBoundary } from "@/components/admin/preview-boundary";
 
@@ -33,8 +34,8 @@ const LABELS: Record<keyof SiteSettings, string> = {
 const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F"];
 
 function Settings() {
-  const settings = useStore((s) => s.settings);
-  const update = useStore((s) => s.updateSettings);
+  const { data: settings, isLoading } = useSettingsQuery();
+  const updateMutation = useUpdateSettingsMutation();
   const safeSettings: SiteSettings = {
     whatsapp: settings?.whatsapp ?? "",
     whatsappLink: settings?.whatsappLink ?? "",
@@ -47,8 +48,15 @@ function Settings() {
     adsenseSlotHomeRectangle: settings?.adsenseSlotHomeRectangle ?? "",
     adsenseSlotBlog: settings?.adsenseSlotBlog ?? "",
   };
-  const [form, setForm] = useState<SiteSettings>(safeSettings);
+  const [form, setForm] = useState<SiteSettings>(EMPTY_SETTINGS);
   const [confirming, setConfirming] = useState(false);
+
+  // Sincroniza o formulário assim que os dados reais chegam do banco
+  // (a query é assíncrona — o primeiro render acontece antes disso).
+  useEffect(() => {
+    if (settings) setForm(safeSettings);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm({ ...form, [k]: v });
 
@@ -59,10 +67,25 @@ function Settings() {
   );
 
   const apply = () => {
-    update({ ...form, brandColor: normalizeHex(form.brandColor) ?? DEFAULT_BRAND_COLOR });
-    setConfirming(false);
-    toast.success("Alterações aplicadas no site");
+    const patch = { ...form, brandColor: normalizeHex(form.brandColor) ?? DEFAULT_BRAND_COLOR };
+    updateMutation.mutate(patch, {
+      onSuccess: () => {
+        setConfirming(false);
+        toast.success("Alterações aplicadas no site");
+      },
+      onError: () => {
+        toast.error("Não foi possível salvar. Tente novamente.");
+      },
+    });
   };
+
+  if (isLoading) {
+    return (
+      <AdminShell title="Configurações">
+        <p className="text-sm text-muted-foreground">Carregando configurações…</p>
+      </AdminShell>
+    );
+  }
 
   return (
     <AdminShell title="Configurações">
@@ -177,7 +200,7 @@ function Settings() {
         </div>
 
         <div className="sticky bottom-4 flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
-          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50" disabled={!changes.length || !hexValid}>
+          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50" disabled={!changes.length || !hexValid || updateMutation.isPending}>
             Aplicar alterações
           </button>
           <button type="button" onClick={() => setForm(safeSettings)} className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">

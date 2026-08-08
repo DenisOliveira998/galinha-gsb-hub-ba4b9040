@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useStore } from "@/lib/mock-store";
+import { useSettingsQuery } from "@/lib/hooks/use-settings";
 import { applyBrandColor, DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
 
 /**
@@ -8,13 +8,13 @@ import { applyBrandColor, DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
  * nem interfere no tema claro/escuro.
  */
 export function BrandTheme() {
-  const brandColor = useStore((s) => s.settings?.brandColor);
+  const { data: settings } = useSettingsQuery();
   useEffect(() => {
     try {
-      applyBrandColor(brandColor || DEFAULT_BRAND_COLOR);
+      applyBrandColor(settings?.brandColor || DEFAULT_BRAND_COLOR);
     } catch (err) {
       console.error("Falha ao aplicar a cor da marca", err);
     }
-  }, [brandColor]);
+  }, [settings?.brandColor]);
   return null;
 }

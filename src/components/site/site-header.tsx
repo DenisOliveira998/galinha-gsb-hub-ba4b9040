@@ -5,13 +5,15 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { useTheme } from "@/hooks/use-theme";
 import { cartCount, useShop } from "@/lib/shop-store";
 import { useStore, whatsappHref } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { CartDrawer } from "./cart-drawer";
 import { SearchBox } from "./search-box";
 
 export function SiteHeader() {
   const cart = useShop((s) => s.cart);
-  const settings = useStore((s) => s.settings);
+  const { data: settings } = useSettingsQuery();
   const currentCustomerId = useShop((s) => s.currentCustomerId);
+  // Favoritos ainda migram do localStorage no Bloco 5 (Social).
   const favorites = useStore((s) => s.favorites);
   const hydrated = useHydrated();
   const count = hydrated ? cartCount(cart) : 0;
@@ -55,7 +57,7 @@ export function SiteHeader() {
               {hydrated && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
             <a
-              href={whatsappHref(settings, "Olá! Preciso de ajuda.")}
+              href={whatsappHref(settings ?? EMPTY_SETTINGS, "Olá! Preciso de ajuda.")}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Falar no WhatsApp"

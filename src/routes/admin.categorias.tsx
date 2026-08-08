@@ -5,7 +5,14 @@ import { ArrowDown, ArrowUp, Images, Plus, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { MediaPickerDialog } from "@/components/admin/media-picker";
-import { useCategories, useStore } from "@/lib/mock-store";
+import { useStore } from "@/lib/mock-store";
+import {
+  useCategoriesQuery,
+  useAddCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+  useMoveCategoryMutation,
+} from "@/lib/hooks/use-categories";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 
 export const Route = createFileRoute("/admin/categorias")({
@@ -13,12 +20,13 @@ export const Route = createFileRoute("/admin/categorias")({
 });
 
 function CategoriesAdmin() {
-  const categories = useCategories();
+  const { data: categories = [], isLoading } = useCategoriesQuery();
+  // Contagem de anúncios por categoria ainda usa o mock local até o Bloco 2 (Posts) migrar.
   const posts = useStore((s) => s.posts);
-  const addCategory = useStore((s) => s.addCategory);
-  const updateCategory = useStore((s) => s.updateCategory);
-  const deleteCategory = useStore((s) => s.deleteCategory);
-  const moveCategory = useStore((s) => s.moveCategory);
+  const addCategoryMutation = useAddCategoryMutation();
+  const updateCategoryMutation = useUpdateCategoryMutation();
+  const deleteCategoryMutation = useDeleteCategoryMutation();
+  const moveCategoryMutation = useMoveCategoryMutation();
 
   const [newLabel, setNewLabel] = useState("");
   const [newImage, setNewImage] = useState("");
@@ -40,17 +48,23 @@ function CategoriesAdmin() {
     return (d.label !== undefined && d.label !== c.label) || (d.image !== undefined && d.image !== c.image);
   });
 
-  const applyChanges = () => {
-    pending.forEach((c) => {
-      const d = drafts[c.id]!;
-      const patch: { label?: string; image?: string } = {};
-      if (d.label !== undefined && d.label !== c.label) patch.label = d.label.trim() || c.label;
-      if (d.image !== undefined && d.image !== c.image) patch.image = d.image;
-      updateCategory(c.id, patch);
-    });
-    setDrafts({});
-    setConfirming(false);
-    toast.success("Alterações aplicadas");
+  const applyChanges = async () => {
+    try {
+      await Promise.all(
+        pending.map((c) => {
+          const d = drafts[c.id]!;
+          const patch: { id: string; label?: string; image?: string } = { id: c.id };
+          if (d.label !== undefined && d.label !== c.label) patch.label = d.label.trim() || c.label;
+          if (d.image !== undefined && d.image !== c.image) patch.image = d.image;
+          return updateCategoryMutation.mutateAsync(patch);
+        }),
+      );
+      setDrafts({});
+      setConfirming(false);
+      toast.success("Alterações aplicadas");
+    } catch {
+      toast.error("Não foi possível salvar. Tente novamente.");
+    }
   };
 
   const countOf = (id: string) => posts.filter((p) => p.category === id).length;
@@ -65,6 +79,14 @@ function CategoriesAdmin() {
     }
     setRemoving({ id, label });
   };
+
+  if (isLoading) {
+    return (
+      <AdminShell title="Categorias">
+        <p className="text-sm text-muted-foreground">Carregando categorias…</p>
+      </AdminShell>
+    );
+  }
 
   return (
     <AdminShell title="Categorias">
@@ -89,10 +111,17 @@ function CategoriesAdmin() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!newLabel.trim()) return;
-            addCategory(newLabel, newImage || undefined);
-            setNewLabel("");
-            setNewImage("");
-            toast.success("Categoria criada");
+            addCategoryMutation.mutate(
+              { label: newLabel, image: newImage || undefined },
+              {
+                onSuccess: () => {
+                  setNewLabel("");
+                  setNewImage("");
+                  toast.success("Categoria criada");
+                },
+                onError: () => toast.error("Não foi possível criar a categoria."),
+              },
+            );
           }}
           className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)] space-y-3"
         >
@@ -141,10 +170,10 @@ function CategoriesAdmin() {
                   <button type="button" onClick={() => setPicking(c.id)} className="cbtn">
                     <Images className="h-4 w-4" /> Estoque
                   </button>
-                  <button type="button" aria-label="Mover para cima" disabled={i === 0} onClick={() => moveCategory(c.id, -1)} className="rounded-lg border p-2 disabled:opacity-40">
+                  <button type="button" aria-label="Mover para cima" disabled={i === 0} onClick={() => moveCategoryMutation.mutate({ id: c.id, dir: -1 })} className="rounded-lg border p-2 disabled:opacity-40">
                     <ArrowUp className="h-4 w-4" />
                   </button>
-                  <button type="button" aria-label="Mover para baixo" disabled={i === categories.length - 1} onClick={() => moveCategory(c.id, 1)} className="rounded-lg border p-2 disabled:opacity-40">
+                  <button type="button" aria-label="Mover para baixo" disabled={i === categories.length - 1} onClick={() => moveCategoryMutation.mutate({ id: c.id, dir: 1 })} className="rounded-lg border p-2 disabled:opacity-40">
                     <ArrowDown className="h-4 w-4" />
                   </button>
                   <button type="button" aria-label="Remover categoria" onClick={() => askRemove(c.id, c.label)} className="rounded-lg border border-destructive/40 p-2 text-destructive">
@@ -208,9 +237,21 @@ function CategoriesAdmin() {
           confirmLabel="Remover"
           onCancel={() => setRemoving(null)}
           onConfirm={() => {
-            if (removing) deleteCategory(removing.id);
-            setRemoving(null);
-            toast.success("Categoria removida");
+            if (!removing) return;
+            deleteCategoryMutation.mutate(removing.id, {
+              onSuccess: (result) => {
+                setRemoving(null);
+                if (result.ok) {
+                  toast.success("Categoria removida");
+                } else {
+                  toast.error("Categoria em uso", { description: result.error });
+                }
+              },
+              onError: () => {
+                setRemoving(null);
+                toast.error("Não foi possível remover a categoria.");
+              },
+            });
           }}
         />
 

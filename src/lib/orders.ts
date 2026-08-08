@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 
 const cartItemSchema = z.object({
@@ -34,7 +35,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     const order = await prisma.order.create({
       data: {
         customerId: data.customerId,
-        itemsJson: data.items,
+        itemsJson: data.items as unknown as Prisma.InputJsonValue,
         total,
         name: data.name,
         email: data.email,
@@ -46,10 +47,13 @@ export const placeOrder = createServerFn({ method: "POST" })
         notes: data.notes,
       },
     });
-    return order;
+    // Decimal do Prisma não é serializável pela RPC do TanStack Start —
+    // converte para number antes de retornar ao client.
+    return { ...order, total: Number(order.total) };
   });
 
 // Lista pedidos para o admin (histórico de vendas).
 export const listOrders = createServerFn({ method: "GET" }).handler(async () => {
-  return prisma.order.findMany({ orderBy: { createdAt: "desc" } });
+  const orders = await prisma.order.findMany({ orderBy: { createdAt: "desc" } });
+  return orders.map((o) => ({ ...o, total: Number(o.total) }));
 });

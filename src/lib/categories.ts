@@ -67,3 +67,18 @@ export const deleteCategory = createServerFn({ method: "POST" })
     await prisma.categoryItem.delete({ where: { id: data.id } });
     return { ok: true };
   });
+
+// Troca a ordem entre a categoria e sua vizinha (dir: -1 sobe, 1 desce).
+export const moveCategory = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string(), dir: z.union([z.literal(-1), z.literal(1)]) }))
+  .handler(async ({ data }) => {
+    const cats = await prisma.categoryItem.findMany({ orderBy: { order: "asc" } });
+    const i = cats.findIndex((c) => c.id === data.id);
+    const j = i + data.dir;
+    if (i < 0 || j < 0 || j >= cats.length) return { ok: false };
+    await prisma.$transaction([
+      prisma.categoryItem.update({ where: { id: cats[i].id }, data: { order: cats[j].order } }),
+      prisma.categoryItem.update({ where: { id: cats[j].id }, data: { order: cats[i].order } }),
+    ]);
+    return { ok: true };
+  });

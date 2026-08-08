@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { useStore, whatsappHref } from "@/lib/mock-store";
+import { whatsappHref } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { Egg, Instagram, Mail, MessageCircle } from "lucide-react";
 import { CookieBanner } from "@/components/site/cookie-banner";
 
 export function SiteFooter() {
-  const s = useStore((x) => x.settings);
+  const { data: settings } = useSettingsQuery();
+  const s = settings ?? EMPTY_SETTINGS;
   return (
     <footer className="mt-24 bg-primary-deep text-primary-foreground">
       <CookieBanner />
