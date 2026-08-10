@@ -14,13 +14,18 @@ import { listCategories } from "@/lib/categories";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [posts, blog, heroSlides, categories] = await Promise.all([
+    const [postsRes, blogRes, heroSlidesRes, categoriesRes] = await Promise.allSettled([
       listPosts(),
       listBlogPosts(),
       listHeroSlides(),
       listCategories(),
     ]);
-    return { posts, blog, heroSlides, categories };
+    return {
+      posts: postsRes.status === "fulfilled" ? postsRes.value : [],
+      blog: blogRes.status === "fulfilled" ? blogRes.value : [],
+      heroSlides: heroSlidesRes.status === "fulfilled" ? heroSlidesRes.value : [],
+      categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
+    };
   },
   component: Home,
 });

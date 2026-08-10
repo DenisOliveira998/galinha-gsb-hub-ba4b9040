@@ -17,8 +17,11 @@ export const Route = createFileRoute("/catalogo/")({
     cat: typeof search.cat === "string" ? search.cat : undefined,
   }),
   loader: async () => {
-    const [posts, categories] = await Promise.all([listPosts(), listCategories()]);
-    return { posts, categories };
+    const [postsRes, categoriesRes] = await Promise.allSettled([listPosts(), listCategories()]);
+    return {
+      posts: postsRes.status === "fulfilled" ? postsRes.value : [],
+      categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
+    };
   },
   component: Catalog,
 });
