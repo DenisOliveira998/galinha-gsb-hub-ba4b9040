@@ -1,37 +1,60 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowDown, ArrowUp, Images, Repeat, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Images, Loader2, Repeat, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { MediaPickerDialog } from "@/components/admin/media-picker";
-import { useCategories, useStore, type Category } from "@/lib/mock-store";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
-import { toast } from "sonner";
 import { PreviewBoundary, SafeImagePreview } from "@/components/admin/preview-boundary";
+import { toast } from "sonner";
+import { useCategoriesQuery } from "@/lib/hooks/use-categories";
+import {
+  useHeroSlidesQuery,
+  useAddHeroSlidesBulkMutation,
+  useUpdateHeroSlideMutation,
+  useDeleteHeroSlideMutation,
+  useMoveHeroSlideMutation,
+} from "@/lib/hooks/use-hero-slides";
+import {
+  useMediaLibraryQuery,
+  useAddMediaMutation,
+  useDeleteMediaMutation,
+  useAddCategoryImagesMutation,
+  useDeleteCategoryImageMutation,
+  useUpdateCategoryImageMutation,
+  useMoveCategoryImageMutation,
+} from "@/lib/hooks/use-media-library";
 
 export const Route = createFileRoute("/admin/carrossel")({
   component: MediaAdmin,
 });
 
-type Target = { kind: "hero"; index: number } | { kind: "category"; category: Category; index: number };
+/** O "alvo" que aguarda uma imagem do estoque: um slide ou uma imagem de categoria. */
+type Target =
+  | { kind: "hero"; slideId: string }
+  | { kind: "category"; imageId: string };
 
 function MediaAdmin() {
-  const slides = useStore((s) => s.heroSlides) ?? [];
-  const categoryImages = useStore((s) => s.categoryImages) ?? {};
-  const library = useStore((s) => s.mediaLibrary) ?? [];
-  const updateSlide = useStore((s) => s.updateHeroSlide);
-  const deleteSlide = useStore((s) => s.deleteHeroSlide);
-  const moveSlide = useStore((s) => s.moveHeroSlide);
-  const addHeroSlides = useStore((s) => s.addHeroSlides);
-  const addCategoryImages = useStore((s) => s.addCategoryImages);
-  const updateCategoryImage = useStore((s) => s.updateCategoryImage);
-  const deleteCategoryImage = useStore((s) => s.deleteCategoryImage);
-  const moveCategoryImage = useStore((s) => s.moveCategoryImage);
-  const deleteMedia = useStore((s) => s.deleteMedia);
+  const { data: slides = [], isLoading: loadingSlides } = useHeroSlidesQuery();
+  const { data: categories = [], isLoading: loadingCats } = useCategoriesQuery();
+  const { data: library = [], isLoading: loadingLib } = useMediaLibraryQuery();
 
-  /** Slot que está aguardando uma imagem do estoque. */
+  const addSlidesBulk = useAddHeroSlidesBulkMutation();
+  const updateSlide = useUpdateHeroSlideMutation();
+  const deleteSlide = useDeleteHeroSlideMutation();
+  const moveSlide = useMoveHeroSlideMutation();
+
+  const addCatImages = useAddCategoryImagesMutation();
+  const deleteCatImage = useDeleteCategoryImageMutation();
+  const updateCatImage = useUpdateCategoryImageMutation();
+  const moveCatImage = useMoveCategoryImageMutation();
+
+  const addMedia = useAddMediaMutation();
+  const deleteMediaMut = useDeleteMediaMutation();
+
+  /** Slot aguardando imagem do estoque. */
   const [picking, setPicking] = useState<Target | null>(null);
-  /** Textos dos slides editados, aplicados apenas no botão "Aplicar alterações". */
+  /** Rascunhos de textos dos slides — aplicados pelo botão "Aplicar alterações". */
   const [drafts, setDrafts] = useState<Record<string, Partial<{ title: string; subtitle: string; ctaLabel: string; ctaTo: string }>>>({});
   const [confirming, setConfirming] = useState(false);
   const [removingSlide, setRemovingSlide] = useState<string | null>(null);
@@ -49,30 +72,39 @@ function MediaAdmin() {
     );
   });
 
-  const applyChanges = () => {
-    pending.forEach((s) => {
-      const draft = drafts[s.id];
-      if (draft) updateSlide(s.id, draft);
-    });
-    setDrafts({});
-    setConfirming(false);
-    toast.success("Alterações aplicadas no site");
+  const applyChanges = async () => {
+    try {
+      await Promise.all(
+        pending.map((s) => {
+          const draft = drafts[s.id] ?? {};
+          return updateSlide.mutateAsync({ id: s.id, ...draft });
+        }),
+      );
+      setDrafts({});
+      setConfirming(false);
+      toast.success("Alterações aplicadas no site");
+    } catch {
+      toast.error("Não foi possível salvar. Tente novamente.");
+    }
   };
 
   const applyFromLibrary = (image: string) => {
     if (!picking) return;
     if (picking.kind === "hero") {
-      const slide = slides[picking.index];
-      if (slide) updateSlide(slide.id, { image });
+      updateSlide.mutate(
+        { id: picking.slideId, image },
+        { onSuccess: () => toast.success("Imagem do slide atualizada") },
+      );
     } else {
-      updateCategoryImage(picking.category, picking.index, image);
+      updateCatImage.mutate(
+        { id: picking.imageId, url: image },
+        { onSuccess: () => toast.success("Imagem da categoria atualizada") },
+      );
     }
     setPicking(null);
   };
 
-  const categoryList = useCategories();
-  const categories = categoryList.map((c) => c.id);
-  const labelOf = (id: string) => categoryList.find((c) => c.id === id)?.label ?? id;
+  const isLoading = loadingSlides || loadingCats || loadingLib;
 
   return (
     <AdminShell title="Mídia do Site">
@@ -80,6 +112,12 @@ function MediaAdmin() {
         <p className="text-sm text-muted-foreground">
           Central de imagens do site. Tudo o que você alterar aqui aparece imediatamente nas páginas públicas.
         </p>
+
+        {isLoading && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Carregando mídia…
+          </div>
+        )}
 
         <MediaPickerDialog
           open={picking !== null}
@@ -97,11 +135,20 @@ function MediaAdmin() {
             <ImageDropzone
               multiple
               label="Clique para escolher ou arraste várias imagens aqui"
-              onFiles={(urls) => addHeroSlides(urls)}
+              onFiles={(urls) =>
+                addSlidesBulk.mutate(urls, {
+                  onSuccess: () => toast.success(`${urls.length} imagem(ns) adicionada(s) ao carrossel`),
+                })
+              }
             />
           </div>
           <div className="mt-2">
-            <ImageDropzone variant="plus" multiple label="Adicionar imagem" onFiles={(urls) => addHeroSlides(urls)} />
+            <ImageDropzone
+              variant="plus"
+              multiple
+              label="Adicionar imagem"
+              onFiles={(urls) => addSlidesBulk.mutate(urls)}
+            />
           </div>
 
           <div className="mt-4 space-y-4">
@@ -110,10 +157,10 @@ function MediaAdmin() {
                 <div className="flex flex-wrap gap-4">
                   <div className="shrink-0">
                     <div className="mb-1 text-xs font-semibold text-muted-foreground">Imagem {i + 1}</div>
-                     <PreviewBoundary>
-                       <SafeImagePreview src={s.image} alt={s.title || "Imagem do carrossel"} className="h-24 w-36 rounded-xl object-cover" />
-                       <span hidden className="h-24 w-36 rounded-xl bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
-                     </PreviewBoundary>
+                    <PreviewBoundary>
+                      <SafeImagePreview src={s.image} alt={s.title || "Imagem do carrossel"} className="h-24 w-36 rounded-xl object-cover" />
+                      <span hidden className="h-24 w-36 rounded-xl bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
+                    </PreviewBoundary>
                   </div>
                   <div className="min-w-[220px] flex-1 space-y-2">
                     <input value={val(s.id, "title", s.title)} onChange={(e) => setDraft(s.id, { title: e.target.value })} placeholder="Título" className="ci" />
@@ -131,18 +178,23 @@ function MediaAdmin() {
                       <ImageDropzone
                         multiple={false}
                         label="Trocar esta imagem"
-                        onFiles={(urls) => urls[0] && updateSlide(s.id, { image: urls[0] })}
+                        onFiles={(urls) =>
+                          urls[0] &&
+                          updateSlide.mutate({ id: s.id, image: urls[0] }, {
+                            onSuccess: () => toast.success("Imagem do slide atualizada"),
+                          })
+                        }
                       />
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col gap-1">
-                    <button type="button" title="Mover para cima" aria-label="Mover para cima" disabled={i === 0} onClick={() => moveSlide(s.id, -1)} className="rounded-lg border p-2 disabled:opacity-40">
+                    <button type="button" title="Mover para cima" aria-label="Mover para cima" disabled={i === 0} onClick={() => moveSlide.mutate({ id: s.id, dir: -1 })} className="rounded-lg border p-2 disabled:opacity-40">
                       <ArrowUp className="h-4 w-4" />
                     </button>
-                    <button type="button" title="Mover para baixo" aria-label="Mover para baixo" disabled={i === slides.length - 1} onClick={() => moveSlide(s.id, 1)} className="rounded-lg border p-2 disabled:opacity-40">
+                    <button type="button" title="Mover para baixo" aria-label="Mover para baixo" disabled={i === slides.length - 1} onClick={() => moveSlide.mutate({ id: s.id, dir: 1 })} className="rounded-lg border p-2 disabled:opacity-40">
                       <ArrowDown className="h-4 w-4" />
                     </button>
-                    <button type="button" title="Usar imagem do estoque" aria-label="Usar imagem do estoque" onClick={() => setPicking({ kind: "hero", index: i })} className="rounded-lg border p-2">
+                    <button type="button" title="Usar imagem do estoque" aria-label="Usar imagem do estoque" onClick={() => setPicking({ kind: "hero", slideId: s.id })} className="rounded-lg border p-2">
                       <Repeat className="h-4 w-4" />
                     </button>
                     <button
@@ -161,7 +213,7 @@ function MediaAdmin() {
             <div className="mt-4 flex flex-wrap items-center gap-3 border-t pt-4">
               <button
                 type="button"
-                disabled={!pending.length}
+                disabled={!pending.length || confirming}
                 onClick={() => setConfirming(true)}
                 className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50"
               >
@@ -183,7 +235,7 @@ function MediaAdmin() {
               onConfirm={applyChanges}
             >
               <ul className="space-y-2">
-                {pending.map((s, i) => (
+                {pending.map((s) => (
                   <li key={s.id}>
                     <span className="font-semibold">Imagem {slides.indexOf(s) + 1}</span>
                     <div className="text-xs text-muted-foreground">
@@ -201,12 +253,16 @@ function MediaAdmin() {
               confirmLabel="Remover"
               onCancel={() => setRemovingSlide(null)}
               onConfirm={() => {
-                if (removingSlide) deleteSlide(removingSlide);
+                if (removingSlide) {
+                  deleteSlide.mutate(removingSlide, {
+                    onSuccess: () => toast.success("Slide removido"),
+                  });
+                }
                 setRemovingSlide(null);
               }}
             />
 
-            {slides.length === 0 && (
+            {slides.length === 0 && !loadingSlides && (
               <p className="rounded-xl bg-muted p-6 text-center text-sm text-muted-foreground">Nenhuma imagem no carrossel.</p>
             )}
           </div>
@@ -214,10 +270,10 @@ function MediaAdmin() {
 
         {/* ------------------------------------------------ Categorias */}
         {categories.map((cat) => {
-          const list = categoryImages?.[cat] ?? [];
+          const imgs = cat.images; // { id, url }[]
           return (
-            <section key={cat} className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
-              <h2 className="font-display text-lg">{labelOf(cat)}</h2>
+            <section key={cat.id} className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
+              <h2 className="font-display text-lg">{cat.label}</h2>
               <p className="mt-1 text-xs text-muted-foreground">
                 Imagens usadas no card desta categoria. A primeira imagem é a exibida na home.
               </p>
@@ -225,38 +281,53 @@ function MediaAdmin() {
                 <ImageDropzone
                   multiple
                   label="Clique para escolher ou arraste várias imagens aqui"
-                  onFiles={(urls) => addCategoryImages(cat, urls)}
+                  onFiles={(urls) =>
+                    addCatImages.mutate({ categoryId: cat.id, images: urls }, {
+                      onSuccess: () => toast.success("Imagens adicionadas"),
+                    })
+                  }
                 />
               </div>
               <div className="mt-2">
-                <ImageDropzone variant="plus" multiple label="Adicionar imagem" onFiles={(urls) => addCategoryImages(cat, urls)} />
+                <ImageDropzone
+                  variant="plus"
+                  multiple
+                  label="Adicionar imagem"
+                  onFiles={(urls) => addCatImages.mutate({ categoryId: cat.id, images: urls })}
+                />
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {list.map((img, i) => (
-                  <div key={`${cat}-${i}`} className="flex gap-3 rounded-xl border p-3">
+                {imgs.map((img, i) => (
+                  <div key={img.id} className="flex gap-3 rounded-xl border p-3">
                     <div>
                       <div className="mb-1 text-xs font-semibold text-muted-foreground">Imagem {i + 1}</div>
-                       <PreviewBoundary>
-                         <SafeImagePreview src={img} alt={`${labelOf(cat)} ${i + 1}`} className="h-20 w-28 rounded-lg object-cover" />
-                         <span hidden className="h-20 w-28 rounded-lg bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
-                       </PreviewBoundary>
+                      <PreviewBoundary>
+                        <SafeImagePreview src={img.url} alt={`${cat.label} ${i + 1}`} className="h-20 w-28 rounded-lg object-cover" />
+                        <span hidden className="h-20 w-28 rounded-lg bg-muted p-2 text-xs text-muted-foreground">Imagem indisponível</span>
+                      </PreviewBoundary>
                     </div>
                     <div className="flex flex-1 flex-col gap-1">
                       <div className="flex gap-1">
-                        <button type="button" title="Mover para cima" aria-label="Mover para cima" disabled={i === 0} onClick={() => moveCategoryImage(cat, i, -1)} className="rounded-lg border p-2 disabled:opacity-40">
+                        <button type="button" title="Mover para cima" aria-label="Mover para cima" disabled={i === 0} onClick={() => moveCatImage.mutate({ id: img.id, dir: -1 })} className="rounded-lg border p-2 disabled:opacity-40">
                           <ArrowUp className="h-4 w-4" />
                         </button>
-                        <button type="button" title="Mover para baixo" aria-label="Mover para baixo" disabled={i === list.length - 1} onClick={() => moveCategoryImage(cat, i, 1)} className="rounded-lg border p-2 disabled:opacity-40">
+                        <button type="button" title="Mover para baixo" aria-label="Mover para baixo" disabled={i === imgs.length - 1} onClick={() => moveCatImage.mutate({ id: img.id, dir: 1 })} className="rounded-lg border p-2 disabled:opacity-40">
                           <ArrowDown className="h-4 w-4" />
                         </button>
-                        <button type="button" title="Usar imagem do estoque" aria-label="Usar imagem do estoque" onClick={() => setPicking({ kind: "category", category: cat, index: i })} className="rounded-lg border p-2">
+                        <button type="button" title="Usar imagem do estoque" aria-label="Usar imagem do estoque" onClick={() => setPicking({ kind: "category", imageId: img.id })} className="rounded-lg border p-2">
                           <Repeat className="h-4 w-4" />
                         </button>
                         <button
                           type="button"
                           title="Remover"
                           aria-label="Remover imagem"
-                          onClick={() => { if (confirm("Remover esta imagem da categoria?")) deleteCategoryImage(cat, i); }}
+                          onClick={() => {
+                            if (confirm("Remover esta imagem da categoria?")) {
+                              deleteCatImage.mutate(img.id, {
+                                onSuccess: () => toast.success("Imagem removida"),
+                              });
+                            }
+                          }}
                           className="rounded-lg border border-destructive/40 p-2 text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -265,12 +336,17 @@ function MediaAdmin() {
                       <ImageDropzone
                         multiple={false}
                         label="Trocar"
-                        onFiles={(urls) => urls[0] && updateCategoryImage(cat, i, urls[0])}
+                        onFiles={(urls) =>
+                          urls[0] &&
+                          updateCatImage.mutate({ id: img.id, url: urls[0] }, {
+                            onSuccess: () => toast.success("Imagem da categoria atualizada"),
+                          })
+                        }
                       />
                     </div>
                   </div>
                 ))}
-                {list.length === 0 && (
+                {imgs.length === 0 && !loadingCats && (
                   <p className="rounded-xl bg-muted p-6 text-center text-sm text-muted-foreground sm:col-span-2">
                     Nenhuma imagem nesta categoria.
                   </p>
@@ -292,11 +368,20 @@ function MediaAdmin() {
             <ImageDropzone
               multiple
               label="Adicionar imagens ao estoque"
-              onFiles={(urls) => useStore.getState().addMedia(urls)}
+              onFiles={(urls) =>
+                addMedia.mutate(urls, {
+                  onSuccess: () => toast.success("Imagens adicionadas ao estoque"),
+                })
+              }
             />
           </div>
           <div className="mt-2">
-            <ImageDropzone variant="plus" multiple label="Adicionar imagem" onFiles={(urls) => useStore.getState().addMedia(urls)} />
+            <ImageDropzone
+              variant="plus"
+              multiple
+              label="Adicionar imagem"
+              onFiles={(urls) => addMedia.mutate(urls)}
+            />
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {library.map((img) => (
@@ -311,7 +396,13 @@ function MediaAdmin() {
                     type="button"
                     title="Remover do estoque"
                     aria-label="Remover do estoque"
-                    onClick={() => { if (confirm("Remover esta imagem do estoque?")) deleteMedia(img); }}
+                    onClick={() => {
+                      if (confirm("Remover esta imagem do estoque?")) {
+                        deleteMediaMut.mutate(img, {
+                          onSuccess: () => toast.success("Imagem removida do estoque"),
+                        });
+                      }
+                    }}
                     className="text-destructive"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -319,7 +410,7 @@ function MediaAdmin() {
                 </div>
               </div>
             ))}
-            {library.length === 0 && (
+            {library.length === 0 && !loadingLib && (
               <p className="col-span-full rounded-xl bg-muted p-6 text-center text-sm text-muted-foreground">
                 Nenhuma imagem no estoque ainda.
               </p>

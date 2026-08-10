@@ -1,7 +1,8 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
-
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+
+// Supabase removido — autenticação migrada para cookie HTTP-only (admin-auth.ts)
+// e banco de dados migrado para TiDB Cloud via Prisma.
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -19,6 +20,5 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
   requestMiddleware: [errorMiddleware],
 }));

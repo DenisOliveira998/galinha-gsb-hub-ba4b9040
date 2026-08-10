@@ -3,11 +3,11 @@ import { useMemo } from "react";
 import { toast } from "sonner";
 import { ShoppingBag, Zap } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, categoryLabel, useCategories, ratingAverage, type Category } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
-import { useHydrated } from "@/hooks/use-hydrated";
+import { listPosts } from "@/lib/posts";
+import { listCategories } from "@/lib/categories";
 
 type CatalogSearch = { q?: string; cat?: string };
 
@@ -16,30 +16,34 @@ export const Route = createFileRoute("/catalogo/")({
     q: typeof search.q === "string" ? search.q : undefined,
     cat: typeof search.cat === "string" ? search.cat : undefined,
   }),
+  loader: async () => {
+    const [posts, categories] = await Promise.all([listPosts(), listCategories()]);
+    return { posts, categories };
+  },
   component: Catalog,
 });
 
 function Catalog() {
-  const posts = useStore((s) => s.posts).filter((p) => p.status !== "DRAFT");
-  const ratings = useStore((s) => s.ratings);
-  const hydrated = useHydrated();
+  const { posts: allPosts, categories } = Route.useLoaderData();
+  const posts = allPosts.filter((p) => p.status !== "DRAFT");
   const addToCart = useShop((s) => s.addToCart);
   const navigate = useNavigate();
   const { q, cat: catParam } = Route.useSearch();
-  const categories = useCategories();
-  const cat: Category | "ALL" = catParam ?? "ALL";
-  const setCat = (c: Category | "ALL") =>
+  const cat = catParam ?? "ALL";
+  const setCat = (c: string) =>
     navigate({
       to: "/catalogo",
       search: (prev: Record<string, unknown>) => ({ ...prev, cat: c === "ALL" ? undefined : c }),
     });
+
+  const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? id;
 
   const filtered = useMemo(() => {
     const term = (q ?? "").trim().toLowerCase();
     return posts.filter((p) => {
       if (cat !== "ALL" && p.category !== cat) return false;
       if (!term) return true;
-      const haystack = `${p.title} ${p.description} ${categoryLabel(categories, p.category)}`.toLowerCase();
+      const haystack = `${p.title} ${p.description} ${catLabel(p.category)}`.toLowerCase();
       return haystack.includes(term);
     });
   }, [posts, cat, q, categories]);
@@ -83,9 +87,7 @@ function Catalog() {
           </div>
         ) : (
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((p) => {
-              const r = hydrated ? ratingAverage(ratings, p.id) : { average: 0, count: 0 };
-              return (
+            {filtered.map((p) => (
               <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
                 <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
                 <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
@@ -95,12 +97,12 @@ function Catalog() {
                   )}
                 </Link>
                 <div className="flex flex-1 flex-col p-4 text-left md:p-5">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{categoryLabel(categories, p.category)}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{catLabel(p.category)}</div>
                   <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
                     {p.title}
                   </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
-                  <div className="mt-1.5"><StarsDisplay average={r.average} count={r.count} /></div>
+                  <div className="mt-1.5"><StarsDisplay average={0} count={0} /></div>
                   {p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
                   {p.status !== "SOLD" && (
                     <div className="mt-auto flex flex-col gap-2 pt-4">
@@ -128,8 +130,7 @@ function Catalog() {
                   )}
                 </div>
               </article>
-              );
-            })}
+            ))}
           </div>
         )}
       </section>

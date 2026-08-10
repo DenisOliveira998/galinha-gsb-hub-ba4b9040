@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Images, X } from "lucide-react";
-import { useStore } from "@/lib/mock-store";
+import { Loader2, Images, X } from "lucide-react";
+import { useMediaLibraryQuery } from "@/lib/hooks/use-media-library";
 import { PreviewBoundary, SafeImagePreview } from "./preview-boundary";
 
 /**
@@ -18,7 +18,7 @@ export function MediaPickerDialog({
   onSelect: (image: string) => void;
   title?: string;
 }) {
-  const library = useStore((s) => s.mediaLibrary) ?? [];
+  const { data: library = [], isLoading } = useMediaLibraryQuery();
 
   useEffect(() => {
     if (!open) return;
@@ -52,9 +52,13 @@ export function MediaPickerDialog({
           </button>
         </div>
         <div className="overflow-y-auto p-5">
-          {library.length === 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" /> Carregando estoque…
+            </div>
+          ) : library.length === 0 ? (
             <p className="rounded-xl bg-muted p-6 text-center text-sm text-muted-foreground">
-              Nenhuma imagem no estoque ainda. Envie imagens em “Mídia do Site”.
+              Nenhuma imagem no estoque ainda. Envie imagens em "Mídia do Site".
             </p>
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

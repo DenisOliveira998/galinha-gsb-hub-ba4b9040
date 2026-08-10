@@ -2,14 +2,24 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { HelpCircle, ShoppingBag, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, useCategoryLabel, ratingAverage, whatsappHref } from "@/lib/mock-store";
 import { useShop } from "@/lib/shop-store";
 import { CommentsSection } from "@/components/site/comments-section";
 import { FavoriteButton } from "@/components/site/favorite-button";
-import { StarsDisplay, StarsInput } from "@/components/site/star-rating";
-import { useHydrated } from "@/hooks/use-hydrated";
+import { StarsDisplay } from "@/components/site/star-rating";
+import { getPostBySlug, listPosts } from "@/lib/posts";
+import { listCategories } from "@/lib/categories";
+import { useSettingsQuery } from "@/lib/hooks/use-settings";
 
 export const Route = createFileRoute("/catalogo/$slug")({
+  loader: async ({ params }) => {
+    const [post, posts, categories] = await Promise.all([
+      getPostBySlug({ data: { slug: params.slug } }),
+      listPosts(),
+      listCategories(),
+    ]);
+    if (!post) throw notFound();
+    return { post, posts, categories };
+  },
   component: PostDetail,
   notFoundComponent: () => (
     <SiteLayout>
@@ -21,26 +31,24 @@ export const Route = createFileRoute("/catalogo/$slug")({
   ),
 });
 
+function whatsappHref(whatsapp: string, message: string) {
+  const num = whatsapp.replace(/\D/g, "");
+  return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+}
+
 function PostDetail() {
-  const { slug } = Route.useParams();
-  const post = useStore((s) => s.posts.find((p) => p.slug === slug));
-  const catLabel = useCategoryLabel();
-  const settings = useStore((s) => s.settings);
-  const allPosts = useStore((s) => s.posts);
-  const ratings = useStore((s) => s.ratings);
-  const myRatings = useStore((s) => s.myRatings);
-  const ratePost = useStore((s) => s.ratePost);
-  const hydrated = useHydrated();
+  const { post, posts, categories } = Route.useLoaderData();
+  const { data: settings } = useSettingsQuery();
   const addToCart = useShop((s) => s.addToCart);
   const navigate = useNavigate();
-  if (!post) throw notFound();
 
-  const { average, count } = hydrated ? ratingAverage(ratings, post.id) : { average: 0, count: 0 };
-  const myRating = hydrated ? (myRatings ?? {})[post.id] ?? 0 : 0;
+  const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? id;
   const faq = (post.faq ?? []).filter((f) => f.question.trim() || f.answer.trim());
-  const related = allPosts
+  const related = posts
     .filter((p) => p.id !== post.id && p.category === post.category && p.status !== "DRAFT")
     .slice(0, 3);
+
+  const waNumber = settings?.whatsappLink || settings?.whatsapp || "";
 
   return (
     <SiteLayout>
@@ -54,7 +62,7 @@ function PostDetail() {
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
             <h1 className="mt-2 font-display text-3xl md:text-4xl">{post.title}</h1>
-            <div className="mt-2"><StarsDisplay average={average} count={count} size="md" /></div>
+            <div className="mt-2"><StarsDisplay average={0} count={0} size="md" /></div>
             {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
             <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
             {post.status !== "SOLD" && post.price && (
@@ -82,27 +90,20 @@ function PostDetail() {
               </div>
             )}
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={whatsappHref(settings, `Olá! Tenho interesse em: ${post.title}`)} target="_blank" rel="noopener noreferrer" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
-                Falar no WhatsApp
-              </a>
-              <Link to="/contato" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">Ver contato ({settings.whatsapp})</Link>
+              {waNumber && (
+                <a
+                  href={whatsappHref(waNumber, `Olá! Tenho interesse em: ${post.title}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted"
+                >
+                  Falar no WhatsApp
+                </a>
+              )}
+              <Link to="/contato" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
+                {waNumber ? `Ver contato (${settings?.whatsapp ?? ""})` : "Entrar em contato"}
+              </Link>
               <FavoriteButton postId={post.id} title={post.title} withLabel />
-            </div>
-
-            <div className="mt-8 rounded-3xl bg-card p-5 text-left shadow-[var(--shadow-soft)]">
-              <h2 className="font-display text-lg">Avalie este anúncio</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {myRating ? `Sua avaliação: ${myRating} de 5.` : "Clique nas estrelas para avaliar."}
-              </p>
-              <div className="mt-2">
-                <StarsInput
-                  value={myRating}
-                  onRate={(v) => {
-                    ratePost(post.id, v);
-                    toast.success(`Avaliação registrada: ${v} estrela${v > 1 ? "s" : ""}`);
-                  }}
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -129,25 +130,22 @@ function PostDetail() {
           <section className="mt-12">
             <h2 className="font-display text-xl md:text-2xl">Você também pode gostar</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {related.map((p) => {
-                const r = hydrated ? ratingAverage(ratings, p.id) : { average: 0, count: 0 };
-                return (
-                  <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
-                    <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
-                    <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="aspect-[4/3] overflow-hidden">
-                      <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+              {related.map((p) => (
+                <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+                  <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
+                  <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="aspect-[4/3] overflow-hidden">
+                    <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                  </Link>
+                  <div className="flex flex-1 flex-col p-4 text-left">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
+                    <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1 line-clamp-2 font-display text-base hover:text-primary">
+                      {p.title}
                     </Link>
-                    <div className="flex flex-1 flex-col p-4 text-left">
-                      <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
-                      <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1 line-clamp-2 font-display text-base hover:text-primary">
-                        {p.title}
-                      </Link>
-                      <div className="mt-1.5"><StarsDisplay average={r.average} count={r.count} /></div>
-                      {p.price && <div className="mt-auto pt-3 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
-                    </div>
-                  </article>
-                );
-              })}
+                    <div className="mt-1.5"><StarsDisplay average={0} count={0} /></div>
+                    {p.price && <div className="mt-auto pt-3 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
+                  </div>
+                </article>
+              ))}
             </div>
           </section>
         )}

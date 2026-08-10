@@ -1,15 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { useStore } from "@/lib/mock-store";
-import { FileText, Newspaper, Eye, Plus } from "lucide-react";
+import { usePostsQuery } from "@/lib/hooks/use-posts";
+import { useBlogPostsQuery } from "@/lib/hooks/use-blog";
+import { FileText, Newspaper, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
   component: Dashboard,
 });
 
 function Dashboard() {
-  const posts = useStore((s) => s.posts);
-  const blog = useStore((s) => s.blog);
+  const { data: posts = [] } = usePostsQuery();
+  const { data: blog = [] } = useBlogPostsQuery();
   const published = posts.filter((p) => p.status === "PUBLISHED").length;
 
   return (
@@ -50,9 +51,11 @@ function Dashboard() {
               <Link to="/admin/posts/$id" params={{ id: p.id }} className="text-xs text-primary hover:underline">Editar</Link>
             </div>
           ))}
+          {posts.length === 0 && (
+            <p className="py-4 text-sm text-muted-foreground">Nenhum anúncio cadastrado ainda.</p>
+          )}
         </div>
       </div>
-      <p className="mt-8 text-xs text-muted-foreground"><Eye className="mr-1 inline h-3 w-3" /> Dados em memória (mock). Conecte ao TiDB Cloud/Prisma depois seguindo o schema documentado no prompt.</p>
     </AdminShell>
   );
 }

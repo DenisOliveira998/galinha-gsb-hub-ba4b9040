@@ -1,9 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, formatDate } from "@/lib/mock-store";
 import { AdSlot } from "@/components/site/ad-slot";
+import { getBlogPostBySlug } from "@/lib/blog";
 
 export const Route = createFileRoute("/blog/$slug")({
+  loader: async ({ params }) => {
+    const post = await getBlogPostBySlug({ data: { slug: params.slug } });
+    if (!post || !post.published) throw notFound();
+    return { post };
+  },
   component: BlogDetail,
   notFoundComponent: () => (
     <SiteLayout>
@@ -15,10 +20,12 @@ export const Route = createFileRoute("/blog/$slug")({
   ),
 });
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
+
 function BlogDetail() {
-  const { slug } = Route.useParams();
-  const post = useStore((s) => s.blog.find((p) => p.slug === slug));
-  if (!post) throw notFound();
+  const { post } = Route.useLoaderData();
   return (
     <SiteLayout>
       <div className="mx-auto grid max-w-6xl gap-6 px-3 py-6 text-left md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_240px]">

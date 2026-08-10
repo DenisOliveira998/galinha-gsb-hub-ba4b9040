@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useStore } from "@/lib/mock-store";
 
-export function HeroCarousel() {
-  const slides = useStore((s) => s.heroSlides);
+export interface HeroSlide {
+  id: string;
+  image: string;
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  ctaTo: string;
+}
+
+export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   const [i, setI] = useState(0);
 
   useEffect(() => {

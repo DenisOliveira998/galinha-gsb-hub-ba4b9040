@@ -1,10 +1,9 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { useStore } from "@/lib/mock-store";
+import { adminLogout } from "@/lib/admin-auth";
 import { Egg, LayoutDashboard, FileText, Newspaper, Settings, LogOut, GalleryHorizontal, Tags } from "lucide-react";
 
 export function AdminShell({ children, title }: { children: ReactNode; title: string }) {
-  const logout = useStore((s) => s.logout);
   const router = useRouter();
 
   const nav: Array<{ to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }> = [
@@ -43,8 +42,8 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
           ))}
         </nav>
         <button
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            await adminLogout();
             router.navigate({ to: "/admin/login" });
           }}
           className="m-3 flex items-center gap-2 rounded-lg px-3 py-2 text-sm opacity-80 hover:bg-sidebar-accent"

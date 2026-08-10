@@ -1,21 +1,27 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { PostForm } from "@/components/admin/post-form";
-import { useStore } from "@/lib/mock-store";
+import { useCreatePostMutation } from "@/lib/hooks/use-posts";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/posts/novo")({
   component: NewPost,
 });
 
 function NewPost() {
-  const add = useStore((s) => s.addPost);
+  const createMutation = useCreatePostMutation();
   const router = useRouter();
   return (
     <AdminShell title="Novo anúncio">
       <PostForm
         onSubmit={(v) => {
-          add(v);
-          router.navigate({ to: "/admin/posts" });
+          createMutation.mutate(v, {
+            onSuccess: () => {
+              toast.success("Anúncio criado com sucesso");
+              router.navigate({ to: "/admin/posts" });
+            },
+            onError: () => toast.error("Erro ao criar anúncio. Tente novamente."),
+          });
         }}
       />
     </AdminShell>

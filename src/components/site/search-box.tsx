@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, TrendingUp, Tag } from "lucide-react";
-import { categoryLabel, useCategories, useStore } from "@/lib/mock-store";
+import { useCategoriesQuery } from "@/lib/hooks/use-categories";
+import { usePostsQuery } from "@/lib/hooks/use-posts";
 
 /** Termos mais pesquisados (mock — trocar por métricas reais depois). */
 const POPULAR = [
@@ -17,8 +18,9 @@ const norm = (s: string) =>
 
 export function SearchBox() {
   const navigate = useNavigate();
-  const categories = useCategories();
-  const posts = useStore((s) => s.posts).filter((p) => p.status !== "DRAFT");
+  const { data: categories = [] } = useCategoriesQuery();
+  const { data: allPosts = [] } = usePostsQuery();
+  const posts = allPosts.filter((p) => p.status !== "DRAFT");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -48,7 +50,7 @@ export function SearchBox() {
       term
         ? posts
             .filter((p) =>
-              norm(`${p.title} ${p.description} ${categoryLabel(categories, p.category)}`).includes(term),
+              norm(`${p.title} ${p.description} ${categories.find((c) => c.id === p.category)?.label ?? p.category}`).includes(term),
             )
             .slice(0, 5)
         : [],
@@ -130,7 +132,7 @@ export function SearchBox() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate">{p.title}</span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {categoryLabel(categories, p.category)}
+                        {categories.find((c) => c.id === p.category)?.label ?? p.category}
                         {p.price ? ` · R$ ${p.price.toFixed(2)}` : ""}
                       </span>
                     </span>

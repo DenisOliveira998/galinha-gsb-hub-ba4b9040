@@ -5,7 +5,6 @@ import { ArrowDown, ArrowUp, Images, Plus, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { MediaPickerDialog } from "@/components/admin/media-picker";
-import { useStore } from "@/lib/mock-store";
 import {
   useCategoriesQuery,
   useAddCategoryMutation,
@@ -21,8 +20,6 @@ export const Route = createFileRoute("/admin/categorias")({
 
 function CategoriesAdmin() {
   const { data: categories = [], isLoading } = useCategoriesQuery();
-  // Contagem de anúncios por categoria ainda usa o mock local até o Bloco 2 (Posts) migrar.
-  const posts = useStore((s) => s.posts);
   const addCategoryMutation = useAddCategoryMutation();
   const updateCategoryMutation = useUpdateCategoryMutation();
   const deleteCategoryMutation = useDeleteCategoryMutation();
@@ -67,7 +64,7 @@ function CategoriesAdmin() {
     }
   };
 
-  const countOf = (id: string) => posts.filter((p) => p.category === id).length;
+  const countOf = (id: string) => categories.find((c) => c.id === id)?.postCount ?? 0;
 
   const askRemove = (id: string, label: string) => {
     const used = countOf(id);

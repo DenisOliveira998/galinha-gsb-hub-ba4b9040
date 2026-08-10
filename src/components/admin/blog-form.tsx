@@ -1,6 +1,25 @@
 import { useState } from "react";
-import type { BlogBlock, BlogPost } from "@/lib/mock-store";
 import { ImageDropzone } from "./image-dropzone";
+
+export interface BlogBlock {
+  id: string;
+  type: "text" | "image";
+  text?: string;
+  image?: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  published: boolean;
+  createdAt: string;
+  images?: string[];
+  blocks?: BlogBlock[];
+}
 import { MediaPickerDialog } from "./media-picker";
 import { BlogPreview } from "./blog-preview";
 import { PreviewBoundary, SafeImagePreview } from "./preview-boundary";

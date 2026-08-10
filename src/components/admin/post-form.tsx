@@ -1,18 +1,30 @@
 import { useState } from "react";
-import { categoryImage, useCategories, useStore, type Category, type FaqItem, type Post, type PostStatus } from "@/lib/mock-store";
+import type { FaqItem, Post, PostStatus } from "@/lib/mock-store";
+import { useCategoriesQuery } from "@/lib/hooks/use-categories";
 import { X, ClipboardPaste, Plus, Trash2, Images } from "lucide-react";
 import { ImageDropzone } from "./image-dropzone";
 import { MediaPickerDialog } from "./media-picker";
 import { PostPreview } from "./post-preview";
 import { PreviewBoundary } from "./preview-boundary";
 
+type Category = string;
+
 type FormValue = Omit<Post, "id" | "slug" | "createdAt">;
 
+/** Retorna a primeira imagem da categoria ou um placeholder. */
+function getCategoryFallbackImage(
+  categories: Array<{ id: string; images: { id: string; url: string }[]; image?: string | null }>,
+  categoryId: string,
+): string {
+  const cat = categories.find((c) => c.id === categoryId);
+  if (!cat) return "";
+  return cat.images[0]?.url ?? cat.image ?? "";
+}
+
 export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: FormValue) => void }) {
-  const categories = useCategories();
-  const categoryImages = useStore((s) => s.categoryImages);
+  const { data: categories = [] } = useCategoriesQuery();
   const [title, setTitle] = useState(initial?.title ?? "");
-  const [category, setCategory] = useState<Category>(initial?.category ?? categories[0]?.id ?? "OVOS_FERTEIS");
+  const [category, setCategory] = useState<Category>(initial?.category ?? categories[0]?.id ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [price, setPrice] = useState<string>(initial?.price?.toString() ?? "");
   const [status, setStatus] = useState<PostStatus>(initial?.status ?? "DRAFT");
@@ -20,6 +32,9 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
   const [newUrl, setNewUrl] = useState("");
   const [faq, setFaq] = useState<FaqItem[]>(Array.isArray(initial?.faq) ? initial.faq : []);
   const [picking, setPicking] = useState<null | { index: number | "new" }>(null);
+
+  // Garante que o select começa com a primeira categoria disponível
+  const effectiveCategory = category || categories[0]?.id || "";
 
   const pasteFromClipboard = async () => {
     try {
@@ -34,11 +49,11 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
     e.preventDefault();
     onSubmit({
       title,
-      category,
+      category: effectiveCategory,
       description,
       price: price ? parseFloat(price) : undefined,
       status,
-      images: images.length ? images : [categoryImage(categories, categoryImages, category)],
+      images: images.length ? images : [getCategoryFallbackImage(categories, effectiveCategory)],
       faq: faq.filter((f) => f.question.trim() || f.answer.trim()),
     });
   };
@@ -63,7 +78,11 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
         </Field>
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="categoria">
-            <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="input">
+            <select
+              value={effectiveCategory}
+              onChange={(e) => setCategory(e.target.value)}
+              className="input"
+            >
               {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </Field>
@@ -211,7 +230,7 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
           ))}
           {faq.length === 0 && (
             <p className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
-              Nenhuma pergunta cadastrada. Use o botão “+ Adicionar”.
+              Nenhuma pergunta cadastrada. Use o botão "+ Adicionar".
             </p>
           )}
         </div>
@@ -226,7 +245,7 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
         <PreviewBoundary>
           <PostPreview
             title={title}
-            categoryLabel={categories.find((c) => c.id === category)?.label ?? String(category || "Sem categoria")}
+            categoryLabel={categories.find((c) => c.id === effectiveCategory)?.label ?? String(effectiveCategory || "Sem categoria")}
             description={description}
             price={price}
             status={status}

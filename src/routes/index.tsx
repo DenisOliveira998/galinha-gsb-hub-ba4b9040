@@ -1,21 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, useCategories, categoryLabel, categoryImage, formatDate, ratingAverage } from "@/lib/mock-store";
 import { HeroCarousel } from "@/components/site/hero-carousel";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { AdSlot } from "@/components/site/ad-slot";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout } from "lucide-react";
+import { listPosts } from "@/lib/posts";
+import { listBlogPosts } from "@/lib/blog";
+import { listHeroSlides } from "@/lib/hero-slides";
+import { listCategories } from "@/lib/categories";
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    const [posts, blog, heroSlides, categories] = await Promise.all([
+      listPosts(),
+      listBlogPosts(),
+      listHeroSlides(),
+      listCategories(),
+    ]);
+    return { posts, blog, heroSlides, categories };
+  },
   component: Home,
 });
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
+
+function getCategoryLabel(categories: Array<{ id: string; label: string }>, id: string) {
+  return categories.find((c) => c.id === id)?.label ?? id;
+}
+
 function Home() {
-  const { posts, blog, categoryImages, ratings } = useStore();
-  const categories = useCategories();
+  const { posts, blog, heroSlides, categories } = Route.useLoaderData();
   const hydrated = useHydrated();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
   const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
@@ -53,7 +72,7 @@ function Home() {
             </div>
           </div>
           <div className="relative pb-6 md:pb-0">
-            <HeroCarousel />
+            <HeroCarousel slides={heroSlides} />
             <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm px-3 py-2 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 md:px-4 md:py-3">
               <div className="font-display text-lg font-semibold md:text-xl">+10 anos</div>
               <div className="text-[10px] md:text-xs">de tradição no plantel</div>
@@ -104,6 +123,7 @@ function Home() {
         <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-5 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
           {categories.map((c, i) => {
             const bg = ["bg-primary text-primary-foreground", "bg-accent text-accent-foreground", "bg-accent-warm text-accent-warm-foreground", "bg-primary-deep text-primary-foreground"][i % 4];
+            const coverUrl = c.images[0]?.url ?? c.image ?? "";
             return (
               <Link
                 key={c.id}
@@ -111,7 +131,9 @@ function Home() {
                 search={{ cat: c.id }}
                 className={`group relative h-[120px] w-[60%] shrink-0 snap-start overflow-hidden rounded-2xl p-3.5 text-left shadow-[var(--shadow-card)] md:h-[150px] md:w-auto md:rounded-3xl md:p-5 ${bg}`}
               >
-                <img src={categoryImage(categories, categoryImages, c.id)} alt={c.label} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
+                {coverUrl && (
+                  <img src={coverUrl} alt={c.label} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
+                )}
                 <div className="relative flex h-full flex-col">
                   <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">Categoria</div>
                   <div className="mt-1 line-clamp-2 font-display text-base md:text-xl">{c.label}</div>
@@ -148,30 +170,27 @@ function Home() {
         <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
           <h2 className="font-display text-xl md:text-2xl">Últimos anúncios</h2>
           <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-3 md:gap-4">
-            {destaques.map((p) => {
-              const r = hydrated ? ratingAverage(ratings, p.id) : { average: 0, count: 0 };
-              return (
+            {destaques.map((p) => (
               <div key={p.id} className="relative flex h-full w-[68%] shrink-0 snap-start sm:w-auto">
-              <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
-              <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:rounded-3xl">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                </div>
-                <div className="flex flex-1 flex-col p-3.5 text-left md:p-4">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{categoryLabel(categories, p.category)}</div>
-                  <h3 className="mt-1 line-clamp-2 font-display text-sm md:text-base">{p.title}</h3>
-                  <div className="mt-1"><StarsDisplay average={r.average} count={r.count} /></div>
-                  {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
-                </div>
-              </Link>
+                <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
+                <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:rounded-3xl">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                  </div>
+                  <div className="flex flex-1 flex-col p-3.5 text-left md:p-4">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
+                    <h3 className="mt-1 line-clamp-2 font-display text-sm md:text-base">{p.title}</h3>
+                    <div className="mt-1"><StarsDisplay average={0} count={0} /></div>
+                    {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
+                  </div>
+                </Link>
               </div>
-              );
-            })}
+            ))}
           </div>
         </section>
       )}
 
-      {/* Espaço publicitário — slot mockado, pronto para integração futura */}
+      {/* Blog */}
       {ultimosPosts.length > 0 && (
         <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
           <div className="flex items-end justify-between">

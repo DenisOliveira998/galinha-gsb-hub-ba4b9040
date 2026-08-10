@@ -56,3 +56,29 @@ export const deleteCategoryImage = createServerFn({ method: "POST" })
     await prisma.categoryImage.delete({ where: { id: data.id } });
     return { ok: true };
   });
+
+// Atualiza a URL de uma imagem de categoria pelo ID
+export const updateCategoryImage = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string(), url: z.string() }))
+  .handler(async ({ data }) => {
+    return prisma.categoryImage.update({ where: { id: data.id }, data: { url: data.url } });
+  });
+
+// Troca a ordem entre uma imagem e sua vizinha dentro da mesma categoria
+export const moveCategoryImage = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string(), dir: z.union([z.literal(-1), z.literal(1)]) }))
+  .handler(async ({ data }) => {
+    const image = await prisma.categoryImage.findUniqueOrThrow({ where: { id: data.id } });
+    const siblings = await prisma.categoryImage.findMany({
+      where: { categoryId: image.categoryId },
+      orderBy: { order: "asc" },
+    });
+    const i = siblings.findIndex((s) => s.id === data.id);
+    const j = i + data.dir;
+    if (i < 0 || j < 0 || j >= siblings.length) return { ok: false };
+    await prisma.$transaction([
+      prisma.categoryImage.update({ where: { id: siblings[i].id }, data: { order: siblings[j].order } }),
+      prisma.categoryImage.update({ where: { id: siblings[j].id }, data: { order: siblings[i].order } }),
+    ]);
+    return { ok: true };
+  });

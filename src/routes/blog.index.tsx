@@ -1,14 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, formatDate } from "@/lib/mock-store";
 import { AdSlot } from "@/components/site/ad-slot";
+import { listBlogPosts } from "@/lib/blog";
 
 export const Route = createFileRoute("/blog/")({
+  loader: async () => {
+    const all = await listBlogPosts();
+    return { posts: all.filter((p) => p.published) };
+  },
   component: Blog,
 });
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
+
 function Blog() {
-  const posts = useStore((s) => s.blog).filter((p) => p.published);
+  const { posts } = Route.useLoaderData();
   return (
     <SiteLayout>
       <section className="bg-primary-deep text-primary-foreground">
@@ -38,6 +46,11 @@ function Blog() {
                 </div>
               </Link>
             ))}
+            {posts.length === 0 && (
+              <p className="col-span-2 rounded-2xl bg-muted p-8 text-center text-sm text-muted-foreground">
+                Nenhum post publicado ainda.
+              </p>
+            )}
           </div>
           <aside className="hidden lg:block">
             <AdSlot

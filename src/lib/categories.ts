@@ -15,13 +15,18 @@ const slugify = (s: string) =>
 export const listCategories = createServerFn({ method: "GET" }).handler(async () => {
   const cats = await prisma.categoryItem.findMany({
     orderBy: { order: "asc" },
-    include: { images: { orderBy: { order: "asc" } } },
+    include: {
+      images: { orderBy: { order: "asc" } },
+      _count: { select: { posts: true } },
+    },
   });
   return cats.map((c) => ({
     id: c.id,
     label: c.label,
-    image: c.image,
-    images: c.images.map((i) => i.url),
+    image: c.image ?? null,
+    // Retorna objetos completos para o admin poder deletar por ID
+    images: c.images.map((i) => ({ id: i.id, url: i.url })),
+    postCount: c._count.posts,
   }));
 });
 

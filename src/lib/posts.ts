@@ -37,6 +37,16 @@ function toPostDTO(p: any) {
   };
 }
 
+export const getPostBySlug = createServerFn({ method: "GET" })
+  .validator(z.object({ slug: z.string() }))
+  .handler(async ({ data }) => {
+    const post = await prisma.post.findUnique({
+      where: { slug: data.slug },
+      include: postInclude,
+    });
+    return post ? toPostDTO(post) : null;
+  });
+
 export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
   const posts = await prisma.post.findMany({
     include: postInclude,
