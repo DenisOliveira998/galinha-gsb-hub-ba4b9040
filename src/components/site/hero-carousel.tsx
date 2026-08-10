@@ -28,7 +28,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
   return (
     <div className="relative w-full max-w-full overflow-hidden rounded-[2rem] shadow-[var(--shadow-card)] ring-4 ring-primary-glow/30">
-      <div className="relative aspect-[4/3] w-full bg-muted sm:aspect-[16/10] md:aspect-[16/9]">
+      <div className="relative aspect-[16/9] w-full bg-muted">
         {slides.map((s, idx) => (
           <img
             key={s.id}
