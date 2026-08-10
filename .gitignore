@@ -1,3 +1,8 @@
+# Env — NUNCA commitar credenciais reais
+.env
+.env.*
+!.env.example
+
 # Logs
 logs
 *.log

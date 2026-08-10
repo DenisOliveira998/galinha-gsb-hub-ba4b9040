@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "prisma generate && vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "seed": "tsx seed.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest"
+  },
+  "prisma": {
+    "schema": "schema.prisma"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
