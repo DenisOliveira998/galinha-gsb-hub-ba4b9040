@@ -5,11 +5,6 @@ import server from '../dist/server/server.js';
 export const config = {
   api: {
     bodyParser: false,
-    includeFiles: [
-      'dist/server/**',
-      'node_modules/.prisma/**',
-      'node_modules/@prisma/client/**',
-    ],
   },
 };
 
