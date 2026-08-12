@@ -19,24 +19,36 @@ function CustomerAuth() {
   const setSession = useShop((s) => s.setSession);
   const navigate = useNavigate();
 
+  const validate = (): string | null => {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    if (!emailOk) return "Digite um e-mail válido.";
+    if (password.length < 6) return "A senha deve ter pelo menos 6 caracteres.";
+    if (mode === "register" && !name.trim()) return "Digite seu nome.";
+    return null;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const validationError = validate();
+    if (validationError) { setError(validationError); return; }
     setError("");
     setLoading(true);
     try {
       if (mode === "register") {
-        const result = await registerCustomer({ data: { name, email, password } });
+        // Verifica no TiDB se já existe conta com este e-mail
+        const result = await registerCustomer({ data: { name: name.trim(), email: email.trim().toLowerCase(), password } });
         if (!result.ok) { setError(result.error ?? "Falha ao criar conta."); return; }
-        setSession(result.customerId!, name, email);
+        setSession(result.customerId!, name.trim(), email.trim().toLowerCase());
       } else {
-        const result = await loginCustomerFn({ data: { email, password } });
+        // Valida e-mail e senha contra o TiDB
+        const result = await loginCustomerFn({ data: { email: email.trim().toLowerCase(), password } });
         if (!result.ok) { setError(result.error ?? "E-mail ou senha inválidos."); return; }
-        setSession(result.customerId!, result.name!, email);
+        setSession(result.customerId!, result.name!, email.trim().toLowerCase());
       }
       toast.success(mode === "login" ? "Bem-vindo de volta!" : "Conta criada com sucesso!");
       navigate({ to: "/conta" });
     } catch {
-      setError("Erro ao conectar. Tente novamente.");
+      setError("Erro ao conectar ao servidor. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -55,7 +67,7 @@ function CustomerAuth() {
           </div>
           <h1 className="mt-6 font-display text-2xl">{mode === "login" ? "Entrar na sua conta" : "Criar uma conta"}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "login" ? "Acesse para acompanhar seus pedidos." : "É rápido — os dados ficam salvos apenas no seu navegador."}
+            {mode === "login" ? "Acesse para acompanhar seus pedidos." : "Preencha os dados abaixo para criar sua conta."}
           </p>
           <form onSubmit={submit} className="mt-6 space-y-4">
             {mode === "register" && (
@@ -67,7 +79,7 @@ function CustomerAuth() {
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputCls} />
             </label>
             <label className="block"><span className={labelCls}>Senha</span>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={4} className={inputCls} />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className={inputCls} />
             </label>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <button type="submit" disabled={loading} className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105 disabled:opacity-60">
