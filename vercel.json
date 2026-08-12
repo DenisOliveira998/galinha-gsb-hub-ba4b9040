@@ -1,5 +1,4 @@
 {
-  "outputDirectory": ".output/public",
   "build": {
     "env": {
       "DATABASE_URL": "mysql://placeholder:placeholder@localhost:4000/placeholder?sslaccept=strict"
