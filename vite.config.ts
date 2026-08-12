@@ -12,4 +12,13 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server", preset: "vercel" },
   },
+  vite: {
+    ssr: {
+      // Bundle todos os pacotes no server bundle para que a função Vercel
+      // seja auto-contida. Apenas @prisma/client fica externo porque usa
+      // binário nativo (.node) que não pode ser bundlado.
+      noExternal: true,
+      external: ["@prisma/client", "prisma"],
+    },
+  },
 });
