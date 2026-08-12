@@ -54,6 +54,8 @@ interface ShopState {
   clearCart: () => void;
   register: (name: string, email: string, password: string) => { ok: boolean; error?: string };
   loginCustomer: (email: string, password: string) => { ok: boolean; error?: string };
+  /** Define a sessão após autenticação real no servidor (TiDB). */
+  setSession: (id: string, name: string, email: string) => void;
   logoutCustomer: () => void;
   placeOrder: (customer: Order["customer"]) => Order;
 }
@@ -129,6 +131,17 @@ export const useShop = create<ShopState>()(
         if (!found) return { ok: false, error: "E-mail ou senha inválidos." };
         set({ currentCustomerId: found.id });
         return { ok: true };
+      },
+      setSession: (id, name, email) => {
+        // Garante que o cliente existe no array local para que conta.index e
+        // checkout possam encontrá-lo pelo id, sem precisar de senha local.
+        const already = get().customers.some((c) => c.id === id);
+        if (!already) {
+          set({
+            customers: [...get().customers, { id, name, email, password: "" }],
+          });
+        }
+        set({ currentCustomerId: id });
       },
       logoutCustomer: () => set({ currentCustomerId: null }),
       placeOrder: (customer) => {

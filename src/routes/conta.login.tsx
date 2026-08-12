@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useShop } from "@/lib/shop-store";
+import { registerCustomer, loginCustomer as loginCustomerFn } from "@/lib/customers";
 
 export const Route = createFileRoute("/conta/login")({
   component: CustomerAuth,
@@ -14,17 +15,31 @@ function CustomerAuth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const loginCustomer = useShop((s) => s.loginCustomer);
-  const register = useShop((s) => s.register);
+  const [loading, setLoading] = useState(false);
+  const setSession = useShop((s) => s.setSession);
   const navigate = useNavigate();
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const result = mode === "login" ? loginCustomer(email, password) : register(name, email, password);
-    if (!result.ok) { setError(result.error ?? "Falha ao continuar."); return; }
-    toast.success(mode === "login" ? "Bem-vindo de volta!" : "Conta criada com sucesso!");
-    navigate({ to: "/conta" });
+    setLoading(true);
+    try {
+      if (mode === "register") {
+        const result = await registerCustomer({ data: { name, email, password } });
+        if (!result.ok) { setError(result.error ?? "Falha ao criar conta."); return; }
+        setSession(result.customerId!, name, email);
+      } else {
+        const result = await loginCustomerFn({ data: { email, password } });
+        if (!result.ok) { setError(result.error ?? "E-mail ou senha inválidos."); return; }
+        setSession(result.customerId!, result.name!, email);
+      }
+      toast.success(mode === "login" ? "Bem-vindo de volta!" : "Conta criada com sucesso!");
+      navigate({ to: "/conta" });
+    } catch {
+      setError("Erro ao conectar. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputCls = "mt-1 w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring";
@@ -55,8 +70,8 @@ function CustomerAuth() {
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={4} className={inputCls} />
             </label>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <button type="submit" className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">
-              {mode === "login" ? "Entrar" : "Criar conta"}
+            <button type="submit" disabled={loading} className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105 disabled:opacity-60">
+              {loading ? "Aguarde..." : mode === "login" ? "Entrar" : "Criar conta"}
             </button>
           </form>
           <p className="mt-6 text-center text-xs text-muted-foreground">
