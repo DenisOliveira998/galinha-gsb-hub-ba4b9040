@@ -5,9 +5,13 @@ import { getBlogPostBySlug } from "@/lib/blog";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
-    const post = await getBlogPostBySlug({ data: { slug: params.slug } });
-    if (!post || !post.published) throw notFound();
-    return { post };
+    try {
+      const post = await getBlogPostBySlug({ data: { slug: params.slug } });
+      if (!post || !post.published) throw notFound();
+      return { post };
+    } catch (e) {
+      throw notFound();
+    }
   },
   component: BlogDetail,
   notFoundComponent: () => (

@@ -12,13 +12,18 @@ import { useSettingsQuery } from "@/lib/hooks/use-settings";
 
 export const Route = createFileRoute("/catalogo/$slug")({
   loader: async ({ params }) => {
-    const [post, posts, categories] = await Promise.all([
+    const [postRes, postsRes, categoriesRes] = await Promise.allSettled([
       getPostBySlug({ data: { slug: params.slug } }),
       listPosts(),
       listCategories(),
     ]);
+    const post = postRes.status === "fulfilled" ? postRes.value : null;
     if (!post) throw notFound();
-    return { post, posts, categories };
+    return {
+      post,
+      posts: postsRes.status === "fulfilled" ? postsRes.value : [],
+      categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
+    };
   },
   component: PostDetail,
   notFoundComponent: () => (

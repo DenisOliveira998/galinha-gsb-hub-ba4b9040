@@ -5,8 +5,12 @@ import { listBlogPosts } from "@/lib/blog";
 
 export const Route = createFileRoute("/blog/")({
   loader: async () => {
-    const all = await listBlogPosts();
-    return { posts: all.filter((p) => p.published) };
+    try {
+      const all = await listBlogPosts();
+      return { posts: all.filter((p) => p.published) };
+    } catch {
+      return { posts: [] };
+    }
   },
   component: Blog,
 });
