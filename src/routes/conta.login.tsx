@@ -81,11 +81,15 @@ function CustomerAuth() {
     setOtpLoading(true);
     try {
       const result = await authClient.emailOtp.sendVerificationOtp({ email: emailTrimmed, type: "sign-in" });
-      if (result.error) { setOtpError(result.error.message ?? "Erro ao enviar código."); return; }
+      if (result.error) {
+        const detail = result.error.message || (result.error as any).code || (result.error as any).statusText || JSON.stringify(result.error);
+        setOtpError(`Erro (${(result.error as any).status ?? "?"}): ${detail}`);
+        return;
+      }
       setOtpSent(true);
       toast.success("Código enviado! Verifique seu e-mail.");
     } catch (err) {
-      setOtpError(err instanceof Error ? err.message : "Erro ao enviar código.");
+      setOtpError(err instanceof Error ? `${err.name}: ${err.message}` : JSON.stringify(err));
     } finally {
       setOtpLoading(false);
     }
