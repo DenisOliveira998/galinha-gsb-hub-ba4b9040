@@ -16,6 +16,7 @@ export interface BlogPost {
   content: string;
   coverImage: string;
   published: boolean;
+  adSlot?: string;
   createdAt: string;
   images?: string[];
   blocks?: BlogBlock[];
@@ -35,6 +36,7 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
   const [content, setContent] = useState(initial?.content ?? "");
   const [coverImage, setCoverImage] = useState(initial?.coverImage ?? "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80");
   const [published, setPublished] = useState(initial?.published ?? false);
+  const [adSlot, setAdSlot] = useState(initial?.adSlot ?? "");
   const [images, setImages] = useState<string[]>(Array.isArray(initial?.images) ? initial.images : []);
   const [blocks, setBlocks] = useState<BlogBlock[]>(Array.isArray(initial?.blocks) ? initial.blocks : []);
   const [picking, setPicking] = useState<Picking | null>(null);
@@ -86,6 +88,7 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
           content,
           coverImage,
           published,
+          adSlot,
           images,
           blocks: blocks.filter((b) => (b.type === "text" ? b.text?.trim() : b.image?.trim())),
         });
@@ -97,6 +100,17 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
         <F label="titulo"><input value={title} onChange={(e) => setTitle(e.target.value)} required className="i" placeholder="Título do post" /></F>
         <F label="resumo"><textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} className="i" placeholder="Resumo curto" /></F>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} /> Publicado</label>
+        <F label="adsense_slot (opcional)">
+          <input
+            value={adSlot}
+            onChange={(e) => setAdSlot(e.target.value.trim())}
+            className="i"
+            placeholder="Ex: 1234567890 — deixe vazio para usar o slot global do blog"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Slot específico para este post. Substitui o <strong>SLOT_BLOG</strong> definido em Configurações.
+          </p>
+        </F>
       </div>
 
       {/* -------------------------------------------------------- Capa */}

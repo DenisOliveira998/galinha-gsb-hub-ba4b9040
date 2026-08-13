@@ -148,6 +148,7 @@ model BlogPost {
   content    String   @db.Text // corpo simples/legado, mantido por compatibilidade
   coverImage String   @db.Text
   published  Boolean  @default(false)
+  adSlot     String?  // slot AdSense específico deste post (substitui o slot global do blog)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

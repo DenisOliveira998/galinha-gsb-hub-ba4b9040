@@ -24,6 +24,7 @@ function toBlogDTO(b: any) {
     content: b.content,
     coverImage: b.coverImage,
     published: b.published,
+    adSlot: b.adSlot ?? "",
     createdAt: b.createdAt.toISOString(),
     images: b.images.map((i: any) => i.url),
     blocks: b.blocks.map((bl: any) => ({
@@ -65,6 +66,7 @@ const createBlogSchema = z.object({
   content: z.string().default(""),
   coverImage: z.string().default(""),
   published: z.boolean().default(false),
+  adSlot: z.string().default(""),
   images: z.array(z.string()).default([]),
   blocks: z.array(blockSchema).default([]),
 });
@@ -81,6 +83,7 @@ export const createBlogPost = createServerFn({ method: "POST" })
         content: data.content,
         coverImage: data.coverImage,
         published: data.published,
+        adSlot: data.adSlot || null,
         images: { create: data.images.map((url, order) => ({ url, order })) },
         blocks: {
           create: data.blocks.map((b, order) => ({
@@ -103,6 +106,7 @@ const updateBlogSchema = z.object({
   content: z.string().optional(),
   coverImage: z.string().optional(),
   published: z.boolean().optional(),
+  adSlot: z.string().optional(),
   images: z.array(z.string()).optional(),
   blocks: z.array(blockSchema).optional(),
 });
@@ -112,7 +116,10 @@ export const updateBlogPost = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { id, images, blocks, ...rest } = data;
 
-    await prisma.blogPost.update({ where: { id }, data: rest });
+    await prisma.blogPost.update({
+      where: { id },
+      data: { ...rest, ...(rest.adSlot !== undefined ? { adSlot: rest.adSlot || null } : {}) },
+    });
 
     if (images) {
       await prisma.blogImage.deleteMany({ where: { blogPostId: id } });
