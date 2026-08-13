@@ -45,6 +45,14 @@ export const auth = betterAuth({
     disableCSRFCheck: true,
   },
 
+  // Vinculação de contas: se o usuário entra com Google usando o mesmo e-mail
+  // que já foi usado via OTP (ou vice-versa), une as duas numa conta só.
+  // Google verifica o e-mail → seguro para confiar como provider.
+  accountLinking: {
+    enabled: true,
+    trustedProviders: ["google"],
+  },
+
   // Origens confiáveis (evita CSRF)
   trustedOrigins: [
     "http://localhost:3000",
