@@ -1,12 +1,67 @@
 import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { LogOut, Package, User, Save, KeyRound, ChevronRight, ShoppingBag } from "lucide-react";
+import { LogOut, Package, User, Save, KeyRound, ChevronRight, ShoppingBag, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useShop } from "@/lib/shop-store";
 import { getCustomerProfile, updateCustomerProfile, syncBetterAuthUser, changeCustomerPassword } from "@/lib/customers";
 import { authClient } from "@/lib/auth-client";
+
+// ─── Utilitários de formatação e validação ────────────────────────────────────
+
+/** Aplica máscara 000.000.000-00 */
+function formatCPF(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+}
+
+/** Valida CPF pelo algoritmo oficial (dígitos verificadores — Receita Federal) */
+function validateCPF(cpf: string): boolean {
+  const d = cpf.replace(/\D/g, "");
+  if (d.length !== 11) return false;
+  if (/^(\d)\1+$/.test(d)) return false; // todos iguais (ex: 111.111.111-11)
+  const sum = (digits: string, weights: number[]) =>
+    weights.reduce((acc, w, i) => acc + parseInt(digits[i]) * w, 0);
+  const r1 = sum(d, [10, 9, 8, 7, 6, 5, 4, 3, 2]) % 11;
+  if ((r1 < 2 ? 0 : 11 - r1) !== parseInt(d[9])) return false;
+  const r2 = sum(d, [11, 10, 9, 8, 7, 6, 5, 4, 3, 2]) % 11;
+  return (r2 < 2 ? 0 : 11 - r2) === parseInt(d[10]);
+}
+
+/** Aplica máscara (00) 0 0000-0000 celular / (00) 0000-0000 fixo */
+function formatPhone(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2)  return d.length ? `(${d}` : "";
+  if (d.length <= 6)  return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  // 11 dígitos → celular com 9
+  return `(${d.slice(0, 2)}) ${d.slice(2, 3)} ${d.slice(3, 7)}-${d.slice(7)}`;
+}
+
+/** Aplica máscara 00000-000 */
+function formatCEP(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 8);
+  return d.length <= 5 ? d : `${d.slice(0, 5)}-${d.slice(5)}`;
+}
+
+/** Busca endereço na API ViaCEP */
+async function fetchViaCEP(cep: string) {
+  const d = cep.replace(/\D/g, "");
+  if (d.length !== 8) return null;
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${d}/json/`);
+    if (!res.ok) return null;
+    const data = await res.json() as Record<string, string>;
+    if (data.erro) return null;
+    return { address: data.logradouro ?? "", city: data.localidade ?? "", state: data.uf ?? "" };
+  } catch {
+    return null;
+  }
+}
 
 export const Route = createFileRoute("/conta/")({
   head: () => ({ meta: [{ title: "Minha conta — Galinha GSB" }] }),
@@ -65,6 +120,16 @@ function Account() {
   const [saving, setSaving]               = useState(false);
   const [saveError, setSaveError]         = useState("");
 
+  // Validação CPF
+  const [cpfTouched, setCpfTouched] = useState(false);
+  const cpfValid = !profile?.cpf || !cpfTouched || profile.cpf.replace(/\D/g, "").length < 11
+    ? null // ainda digitando — sem feedback
+    : validateCPF(profile.cpf);
+
+  // CEP
+  const [cepLoading, setCepLoading]   = useState(false);
+  const [cepError, setCepError]       = useState("");
+
   // Card ativo (mobile: só um de cada vez)
   const [activeCard, setActiveCard] = useState<"orders" | "data" | "security" | null>(null);
 
@@ -89,10 +154,35 @@ function Account() {
 
   const myOrders = orders.filter((o) => o.customer.email === (profile?.email || me?.email));
 
+  const handleCepBlur = async () => {
+    if (!profile) return;
+    const digits = profile.zip.replace(/\D/g, "");
+    if (digits.length !== 8) return;
+    setCepLoading(true);
+    setCepError("");
+    const result = await fetchViaCEP(profile.zip);
+    setCepLoading(false);
+    if (!result) { setCepError("CEP não encontrado."); return; }
+    setProfile((p) => p ? {
+      ...p,
+      address: result.address || p.address,
+      city:    result.city    || p.city,
+      state:   result.state   || p.state,
+    } : p);
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile || !currentCustomerId) return;
     if (!profile.name.trim()) { setSaveError("Nome é obrigatório."); return; }
+    if (profile.cpf && profile.cpf.replace(/\D/g, "").length === 11 && !validateCPF(profile.cpf)) {
+      setSaveError("CPF inválido. Verifique os dígitos e tente novamente.");
+      return;
+    }
+    if (profile.zip && profile.zip.replace(/\D/g, "").length > 0 && profile.zip.replace(/\D/g, "").length !== 8) {
+      setSaveError("CEP deve ter 8 dígitos.");
+      return;
+    }
     setSaveError("");
     setSaving(true);
     try {
@@ -252,12 +342,78 @@ function Account() {
             ) : (
               <form onSubmit={handleSave} className="mt-5 grid gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">{field("Nome completo", "name", "Seu nome completo")}</div>
-                {field("CPF", "cpf", "000.000.000-00")}
-                {field("Telefone / WhatsApp", "phone", "(00) 00000-0000")}
+
+                {/* CPF com máscara e validação */}
+                <div>
+                  <label className={labelCls}>CPF</label>
+                  <div className="relative">
+                    <input
+                      value={profile.cpf}
+                      onChange={(e) => {
+                        setProfile((p) => p ? { ...p, cpf: formatCPF(e.target.value) } : p);
+                      }}
+                      onBlur={() => setCpfTouched(true)}
+                      placeholder="000.000.000-00"
+                      inputMode="numeric"
+                      maxLength={14}
+                      disabled={saving}
+                      className={`${inputCls} pr-9 ${
+                        cpfValid === false ? "border-destructive focus:ring-destructive/40" :
+                        cpfValid === true  ? "border-green-500 focus:ring-green-500/30" : ""
+                      }`}
+                    />
+                    {cpfValid === true  && <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-500 pointer-events-none" />}
+                    {cpfValid === false && <XCircle      className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-destructive pointer-events-none" />}
+                  </div>
+                  {cpfValid === false && (
+                    <p className="mt-1 text-xs text-destructive">CPF inválido — verifique os dígitos.</p>
+                  )}
+                </div>
+
+                {/* Telefone com máscara */}
+                <div>
+                  <label className={labelCls}>Telefone / WhatsApp</label>
+                  <input
+                    value={profile.phone}
+                    onChange={(e) => setProfile((p) => p ? { ...p, phone: formatPhone(e.target.value) } : p)}
+                    placeholder="(00) 0 0000-0000"
+                    inputMode="numeric"
+                    maxLength={16}
+                    disabled={saving}
+                    className={inputCls}
+                  />
+                </div>
+
+                {/* CEP com máscara e ViaCEP */}
+                <div className="md:col-span-2">
+                  <label className={labelCls}>CEP</label>
+                  <div className="relative">
+                    <input
+                      value={profile.zip}
+                      onChange={(e) => {
+                        const v = formatCEP(e.target.value);
+                        setProfile((p) => p ? { ...p, zip: v } : p);
+                        setCepError("");
+                      }}
+                      onBlur={handleCepBlur}
+                      placeholder="00000-000"
+                      inputMode="numeric"
+                      maxLength={9}
+                      disabled={saving}
+                      className={`${inputCls} pr-9 ${cepError ? "border-destructive focus:ring-destructive/40" : ""}`}
+                    />
+                    {cepLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground pointer-events-none" />}
+                  </div>
+                  {cepError && <p className="mt-1 text-xs text-destructive">{cepError}</p>}
+                  {!cepError && !cepLoading && profile.zip.replace(/\D/g, "").length === 8 && (
+                    <p className="mt-1 text-xs text-muted-foreground">Endereço preenchido automaticamente pelo CEP.</p>
+                  )}
+                </div>
+
                 <div className="md:col-span-2">{field("Endereço", "address", "Rua, número, complemento")}</div>
                 {field("Cidade", "city", "Sua cidade")}
                 {field("Estado", "state", "UF")}
-                {field("CEP", "zip", "00000-000")}
+
                 {saveError && <p className="md:col-span-2 text-sm text-destructive">{saveError}</p>}
                 <div className="md:col-span-2">
                   <button
