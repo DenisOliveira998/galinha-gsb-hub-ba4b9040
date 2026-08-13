@@ -26,8 +26,9 @@ function Login() {
       } else {
         setError(result.error ?? "Credenciais inválidas.");
       }
-    } catch {
-      setError("Erro ao conectar. Tente novamente.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Erro: ${msg}`);
     } finally {
       setLoading(false);
     }

@@ -10,21 +10,27 @@ import { prisma } from "./prisma";
 export const adminLogin = createServerFn({ method: "POST" })
   .validator(z.object({ email: z.string().email(), password: z.string().min(1) }))
   .handler(async ({ data }) => {
-    const admin = await prisma.admin.findUnique({ where: { email: data.email.toLowerCase() } });
-    if (!admin) return { ok: false as const, error: "E-mail ou senha inválidos." };
+    try {
+      const admin = await prisma.admin.findUnique({ where: { email: data.email.toLowerCase() } });
+      if (!admin) return { ok: false as const, error: "E-mail ou senha inválidos." };
 
-    const valid = await bcrypt.compare(data.password, admin.passwordHash);
-    if (!valid) return { ok: false as const, error: "E-mail ou senha inválidos." };
+      const valid = await bcrypt.compare(data.password, admin.passwordHash);
+      if (!valid) return { ok: false as const, error: "E-mail ou senha inválidos." };
 
-    setCookie("admin_session", admin.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 dias
-      path: "/",
-    });
+      setCookie("admin_session", admin.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7, // 7 dias
+        path: "/",
+      });
 
-    return { ok: true as const };
+      return { ok: true as const };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[adminLogin]", msg);
+      return { ok: false as const, error: `Erro interno: ${msg}` };
+    }
   });
 
 // ─── Verificar sessão ─────────────────────────────────────────────────────────
