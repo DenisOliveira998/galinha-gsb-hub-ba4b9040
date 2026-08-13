@@ -3,7 +3,8 @@ import { MessageCircle, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { buildOrderMessage, cartTotal, useShop } from "@/lib/shop-store";
-import { useStore, whatsappHref } from "@/lib/mock-store";
+import { whatsappHref } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 
 export const Route = createFileRoute("/carrinho")({
   head: () => ({ meta: [{ title: "Carrinho — Galinha GSB" }, { name: "robots", content: "noindex" }] }),
@@ -16,7 +17,7 @@ function CartPage() {
   const updateQuantity = useShop((s) => s.updateQuantity);
   const removeFromCart = useShop((s) => s.removeFromCart);
   const total = cartTotal(cart);
-  const settings = useStore((s) => s.settings);
+  const { data: settings = EMPTY_SETTINGS } = useSettingsQuery();
   const whatsappUrl = whatsappHref(settings, buildOrderMessage(cart));
 
   return (

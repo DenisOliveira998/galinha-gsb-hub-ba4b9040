@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useStore } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 
 type SlotKey = "homeBanner" | "homeRectangle" | "blog";
 
@@ -8,18 +8,15 @@ const ENV_PUBLISHER_ID: string =
 
 /** ID do publisher: admin (Configurações) tem prioridade, senão variável de ambiente. */
 export function useAdsensePublisherId(): string {
-  const fromSettings = useStore((s) => s.settings?.adsensePublisherId);
-  return (fromSettings || "").trim() || ENV_PUBLISHER_ID;
+  const { data: settings = EMPTY_SETTINGS } = useSettingsQuery();
+  return (settings.adsensePublisherId || "").trim() || ENV_PUBLISHER_ID;
 }
 
 function useSlotId(slot: SlotKey): string {
-  return useStore((s) => {
-    const st = s.settings;
-    if (!st) return "";
-    if (slot === "homeBanner") return st.adsenseSlotHomeBanner ?? "";
-    if (slot === "homeRectangle") return st.adsenseSlotHomeRectangle ?? "";
-    return st.adsenseSlotBlog ?? "";
-  });
+  const { data: settings = EMPTY_SETTINGS } = useSettingsQuery();
+  if (slot === "homeBanner") return settings.adsenseSlotHomeBanner ?? "";
+  if (slot === "homeRectangle") return settings.adsenseSlotHomeRectangle ?? "";
+  return settings.adsenseSlotBlog ?? "";
 }
 
 interface AdSlotProps {

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/sobre")({
 });
 
 function About() {
-  const s = useStore((x) => x.settings);
+  const { data: s = EMPTY_SETTINGS } = useSettingsQuery();
   return (
     <SiteLayout>
       <section className="bg-primary-deep text-primary-foreground">

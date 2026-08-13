@@ -3,10 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, Heart, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/site-layout";
-import { ratingAverage, useCategoryLabel, useStore } from "@/lib/mock-store";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
-import { useHydrated } from "@/hooks/use-hydrated";
+import { usePostsQuery } from "@/lib/hooks/use-posts";
+import { useFavoritesQuery, useToggleFavoriteMutation } from "@/lib/hooks/use-favorites";
+import { useRatingSummaryQuery } from "@/lib/hooks/use-ratings";
+import { listCategories } from "@/lib/categories";
 
 export const Route = createFileRoute("/favoritos")({
   head: () => ({
@@ -19,17 +21,26 @@ export const Route = createFileRoute("/favoritos")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: async () => {
+    const categories = await listCategories().catch(() => []);
+    return { categories };
+  },
   component: Favoritos,
 });
 
 function Favoritos() {
-  const hydrated = useHydrated();
-  const posts = useStore((s) => s.posts);
-  const catLabel = useCategoryLabel();
-  const favorites = useStore((s) => s.favorites);
-  const ratings = useStore((s) => s.ratings);
-  const toggleFavorite = useStore((s) => s.toggleFavorite);
-  const list = hydrated ? posts.filter((p) => (favorites ?? []).includes(p.id)) : [];
+  const { categories } = Route.useLoaderData();
+  const { data: allPosts = [] } = usePostsQuery();
+  const { data: favoriteIds = [] } = useFavoritesQuery();
+  const toggleMutation = useToggleFavoriteMutation();
+
+  const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? id;
+
+  const list = useMemo(
+    () => allPosts.filter((p) => favoriteIds.includes(p.id) && p.status !== "DRAFT"),
+    [allPosts, favoriteIds],
+  );
+
   const [selected, setSelected] = useState<string[]>([]);
   const ids = useMemo(() => list.map((p) => p.id).join(","), [list]);
 
@@ -45,32 +56,15 @@ function Favoritos() {
 
   const removeSelected = () => {
     const n = selected.length;
-    const removed = [...selected];
-    removed.forEach((id) => toggleFavorite(id));
+    selected.forEach((id) => toggleMutation.mutate(id));
     setSelected([]);
-    toast.success(n === 1 ? "1 anúncio removido" : `${n} anúncios removidos`, {
-      action: {
-        label: "Desfazer",
-        onClick: () => {
-          const favs = useStore.getState().favorites ?? [];
-          removed.filter((id) => !favs.includes(id)).forEach((id) => toggleFavorite(id));
-          toast.success("Remoção desfeita");
-        },
-      },
-    });
+    toast.success(n === 1 ? "1 anúncio removido" : `${n} anúncios removidos`);
   };
 
   const remove = (id: string, title: string) => {
-    toggleFavorite(id);
-    toast.success("Removido dos favoritos", {
-      description: title,
-      action: {
-        label: "Desfazer",
-        onClick: () => {
-          if (!(useStore.getState().favorites ?? []).includes(id)) toggleFavorite(id);
-          toast.success("Remoção desfeita");
-        },
-      },
+    toggleMutation.mutate(id, {
+      onSuccess: () =>
+        toast.success("Removido dos favoritos", { description: title }),
     });
   };
 
@@ -124,19 +118,9 @@ function Favoritos() {
             <button
               type="button"
               onClick={() => {
-                const removed = list.map((p) => p.id);
-                removed.forEach((id) => toggleFavorite(id));
+                list.forEach((p) => toggleMutation.mutate(p.id));
                 setSelected([]);
-                toast.success("Lista de favoritos limpa", {
-                  action: {
-                    label: "Desfazer",
-                    onClick: () => {
-                      const favs = useStore.getState().favorites ?? [];
-                      removed.filter((id) => !favs.includes(id)).forEach((id) => toggleFavorite(id));
-                      toast.success("Lista restaurada");
-                    },
-                  },
-                });
+                toast.success("Lista de favoritos limpa");
               }}
               className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:bg-muted"
             >
@@ -151,51 +135,78 @@ function Favoritos() {
           </div>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((p) => {
-              const r = ratingAverage(ratings, p.id);
-              return (
-                <article key={p.id} className={`group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] ${selected.includes(p.id) ? "ring-2 ring-primary" : ""}`}>
-                  <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
-                  <label className="absolute left-3 top-3 z-10 flex cursor-pointer items-center gap-2 rounded-full bg-background/85 px-2.5 py-1.5 text-xs font-semibold shadow-[var(--shadow-soft)] backdrop-blur-sm">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(p.id)}
-                      onChange={() => toggleSelected(p.id)}
-                      className="h-4 w-4 accent-[var(--color-primary)]"
-                    />
-                    Selecionar
-                  </label>
-                  <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="aspect-[4/3] overflow-hidden">
-                    <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  </Link>
-                  <div className="flex flex-1 flex-col p-4 text-left">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{catLabel(p.category)}</div>
-                    <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
-                      {p.title}
-                    </Link>
-                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
-                    <div className="mt-1.5"><StarsDisplay average={r.average} count={r.count} /></div>
-                    <div className="mt-auto flex items-center justify-between gap-3 pt-3">
-                      {p.price ? (
-                        <span className="text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</span>
-                      ) : (
-                        <span />
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => remove(p.id, p.title)}
-                        className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" /> Remover
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+            {list.map((p) => (
+              <FavCard
+                key={p.id}
+                post={p}
+                catLabel={catLabel}
+                selected={selected.includes(p.id)}
+                onToggleSelect={() => toggleSelected(p.id)}
+                onRemove={() => remove(p.id, p.title)}
+              />
+            ))}
           </div>
         )}
       </section>
     </SiteLayout>
+  );
+}
+
+type Post = ReturnType<typeof usePostsQuery>["data"] extends (infer T)[] | undefined ? T : never;
+
+function FavCard({
+  post: p,
+  catLabel,
+  selected,
+  onToggleSelect,
+  onRemove,
+}: {
+  post: NonNullable<Post>;
+  catLabel: (id: string) => string;
+  selected: boolean;
+  onToggleSelect: () => void;
+  onRemove: () => void;
+}) {
+  const { data: summary } = useRatingSummaryQuery(p.id);
+  return (
+    <article className={`group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] ${selected ? "ring-2 ring-primary" : ""}`}>
+      <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
+      <label className="absolute left-3 top-3 z-10 flex cursor-pointer items-center gap-2 rounded-full bg-background/85 px-2.5 py-1.5 text-xs font-semibold shadow-[var(--shadow-soft)] backdrop-blur-sm">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onToggleSelect}
+          className="h-4 w-4 accent-[var(--color-primary)]"
+        />
+        Selecionar
+      </label>
+      <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="aspect-[4/3] overflow-hidden">
+        <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+      </Link>
+      <div className="flex flex-1 flex-col p-4 text-left">
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{catLabel(p.category)}</div>
+        <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
+          {p.title}
+        </Link>
+        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+        <div className="mt-1.5">
+          <StarsDisplay average={summary?.average ?? 0} count={summary?.count ?? 0} />
+        </div>
+        <div className="mt-auto flex items-center justify-between gap-3 pt-3">
+          {p.price ? (
+            <span className="text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</span>
+          ) : (
+            <span />
+          )}
+          <button
+            type="button"
+            onClick={onRemove}
+            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/10"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Remover
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }

@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Check, ChevronRight } from "lucide-react";
-import { useStore, whatsappHref } from "@/lib/mock-store";
+import { whatsappHref } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { buildOrderMessage } from "@/lib/shop-store";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -48,7 +49,7 @@ function Steps({ current }: { current: Step }) {
 function Checkout() {
   const hydrated = useHydrated();
   const cart = useShop((s) => s.cart);
-  const settings = useStore((s) => s.settings);
+  const { data: settings = EMPTY_SETTINGS } = useSettingsQuery();
   const currentCustomerId = useShop((s) => s.currentCustomerId);
   const customers = useShop((s) => s.customers);
   const placeOrder = useShop((s) => s.placeOrder);

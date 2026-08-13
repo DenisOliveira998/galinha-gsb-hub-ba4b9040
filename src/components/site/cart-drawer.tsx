@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { MessageCircle, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useEffect } from "react";
 import { buildOrderMessage, cartCount, cartTotal, useShop } from "@/lib/shop-store";
-import { useStore, whatsappHref } from "@/lib/mock-store";
+import { whatsappHref } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 
 interface Props {
   open: boolean;
@@ -15,7 +16,7 @@ export function CartDrawer({ open, onClose }: Props) {
   const removeFromCart = useShop((s) => s.removeFromCart);
   const total = cartTotal(cart);
   const count = cartCount(cart);
-  const settings = useStore((s) => s.settings);
+  const { data: settings = EMPTY_SETTINGS } = useSettingsQuery();
   const whatsappUrl = whatsappHref(settings, buildOrderMessage(cart));
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useStore, whatsappHref } from "@/lib/mock-store";
+import { whatsappHref } from "@/lib/mock-store";
+import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { Instagram, Mail, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/contato")({
 });
 
 function Contact() {
-  const s = useStore((x) => x.settings);
+  const { data: s = EMPTY_SETTINGS } = useSettingsQuery();
   const [sent, setSent] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useTheme } from "@/hooks/use-theme";
 import { cartCount, useShop } from "@/lib/shop-store";
-import { useStore, whatsappHref } from "@/lib/mock-store";
+import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
+import { useFavoritesQuery } from "@/lib/hooks/use-favorites";
 import { CartDrawer } from "./cart-drawer";
 import { SearchBox } from "./search-box";
 
@@ -13,11 +14,10 @@ export function SiteHeader() {
   const cart = useShop((s) => s.cart);
   const { data: settings } = useSettingsQuery();
   const currentCustomerId = useShop((s) => s.currentCustomerId);
-  // Favoritos ainda migram do localStorage no Bloco 5 (Social).
-  const favorites = useStore((s) => s.favorites);
+  const { data: favorites = [] } = useFavoritesQuery();
   const hydrated = useHydrated();
   const count = hydrated ? cartCount(cart) : 0;
-  const favCount = hydrated ? (favorites ?? []).length : 0;
+  const favCount = hydrated ? favorites.length : 0;
   const [cartOpen, setCartOpen] = useState(false);
   const { theme, toggle: toggleTheme } = useTheme();
 
