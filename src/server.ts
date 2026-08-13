@@ -49,9 +49,26 @@ export default {
     try {
       // Better Auth intercepta /api/auth/* antes do roteador SSR
       const { pathname } = new URL(request.url);
+
+      // Debug temporário: lista endpoints registrados no Better Auth
+      if (pathname === "/api/auth-debug") {
+        const { auth } = await import("./lib/auth");
+        const apiKeys = Object.keys(auth.api ?? {});
+        return new Response(JSON.stringify({ endpoints: apiKeys, count: apiKeys.length }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+
       if (pathname.startsWith("/api/auth")) {
         const { auth } = await import("./lib/auth");
-        return auth.handler(request);
+        const response = await auth.handler(request);
+        // Log não-2xx para diagnóstico
+        if (response.status >= 300) {
+          const body = await response.clone().text();
+          console.error(`[auth] ${request.method} ${pathname} → ${response.status}: ${body.slice(0, 200)}`);
+        }
+        return response;
       }
 
       const handler = await getServerEntry();
