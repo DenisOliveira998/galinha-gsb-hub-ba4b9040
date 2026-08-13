@@ -11,6 +11,13 @@ export const listComments = createServerFn({ method: "GET" })
     });
   });
 
+export const listAllComments = createServerFn({ method: "GET" }).handler(async () => {
+  return prisma.comment.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { post: { select: { title: true, slug: true } } },
+  });
+});
+
 export const addComment = createServerFn({ method: "POST" })
   .validator(z.object({ postId: z.string(), name: z.string(), text: z.string().min(1) }))
   .handler(async ({ data }) => {
