@@ -116,6 +116,10 @@ writeFileSync(`${OUT}/functions/ssr.func/.vc-config.json`, JSON.stringify({
 }, null, 2));
 
 // 7. Roteamento: assets estáticos do CDN, tudo mais → SSR
+// NOTA: Vercel trata /api/* como namespace reservado para Serverless Functions.
+// Sem uma rota explícita antes do `handle: filesystem`, qualquer request para
+// /api/* retorna 404 do edge sem sequer chegar na nossa função SSR.
+// A rota explícita abaixo garante que /api/* é encaminhado para o SSR primeiro.
 writeFileSync(`${OUT}/config.json`, JSON.stringify({
   version: 3,
   routes: [
@@ -124,6 +128,9 @@ writeFileSync(`${OUT}/config.json`, JSON.stringify({
       headers: { 'cache-control': 'public, max-age=31536000, immutable' },
       continue: true,
     },
+    // Força /api/* para o SSR antes da checagem de filesystem,
+    // evitando que o Vercel intercepte o namespace reservado /api/
+    { src: '^/api/(.*)', dest: '/ssr' },
     { handle: 'filesystem' },
     { src: '/(.*)', dest: '/ssr' },
   ],
