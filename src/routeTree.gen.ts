@@ -28,7 +28,9 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminCarrosselRouteImport } from './routes/admin.carrossel'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
+import { Route as AdminClientesRouteImport } from './routes/admin.clientes'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -140,9 +142,19 @@ const AdminCategoriasRoute = AdminCategoriasRouteImport.update({
   path: '/categorias',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminClientesRoute = AdminClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPedidosRoute = AdminPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPostsRoute = AdminPostsRouteImport.update({
@@ -240,7 +252,9 @@ export interface FileRoutesByFullPath {
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/clientes': typeof AdminClientesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -272,7 +286,9 @@ export interface FileRoutesByTo {
   '/termos': typeof TermosRoute
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/clientes': typeof AdminClientesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -309,7 +325,9 @@ export interface FileRoutesById {
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/clientes': typeof AdminClientesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -348,7 +366,9 @@ export interface FileRouteTypes {
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
+    | '/admin/clientes'
     | '/admin/login'
+    | '/admin/pedidos'
     | '/admin/posts'
     | '/admin/settings'
     | '/blog/$slug'
@@ -380,7 +400,9 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin/carrossel'
     | '/admin/categorias'
+    | '/admin/clientes'
     | '/admin/login'
+    | '/admin/pedidos'
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
@@ -416,7 +438,9 @@ export interface FileRouteTypes {
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
+    | '/admin/clientes'
     | '/admin/login'
+    | '/admin/pedidos'
     | '/admin/posts'
     | '/admin/settings'
     | '/blog/$slug'
@@ -588,11 +612,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriasRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/clientes': {
+      id: '/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AdminClientesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pedidos': {
+      id: '/admin/pedidos'
+      path: '/pedidos'
+      fullPath: '/admin/pedidos'
+      preLoaderRoute: typeof AdminPedidosRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/posts': {
@@ -739,7 +777,9 @@ interface AdminRouteChildren {
   AdminBlogRoute: typeof AdminBlogRouteWithChildren
   AdminCarrosselRoute: typeof AdminCarrosselRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
+  AdminClientesRoute: typeof AdminClientesRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminPedidosRoute: typeof AdminPedidosRoute
   AdminPostsRoute: typeof AdminPostsRouteWithChildren
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -749,7 +789,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBlogRoute: AdminBlogRouteWithChildren,
   AdminCarrosselRoute: AdminCarrosselRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
+  AdminClientesRoute: AdminClientesRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminPedidosRoute: AdminPedidosRoute,
   AdminPostsRoute: AdminPostsRouteWithChildren,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
