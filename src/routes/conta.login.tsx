@@ -55,12 +55,20 @@ function CustomerAuth() {
   // ── Google OAuth ───────────────────────────────────────────────────────────
   const loginWithGoogle = async () => {
     setLoading(true);
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/conta",
-    });
-    // Após redirect, o syncBetterAuthUser é chamado em conta.index.tsx
-    setLoading(false);
+    try {
+      const result = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/conta",
+      });
+      if (result?.error) {
+        toast.error(`Erro Google: ${result.error.message ?? result.error.status ?? "desconhecido"}`);
+      }
+      // Se ok → Better Auth redireciona automaticamente para o Google
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao conectar com Google.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ── Email OTP — enviar código ──────────────────────────────────────────────
