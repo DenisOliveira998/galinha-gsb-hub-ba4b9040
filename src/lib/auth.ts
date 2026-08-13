@@ -40,6 +40,11 @@ export const auth = betterAuth({
   // URL base — usada para montar o callback do Google OAuth
   baseURL: process.env.BETTER_AUTH_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"),
 
+  // Opções avançadas — desativa CSRF check (API usada via fetch, não via form HTML)
+  advanced: {
+    disableCSRFCheck: true,
+  },
+
   // Origens confiáveis (evita CSRF)
   trustedOrigins: [
     "http://localhost:3000",
