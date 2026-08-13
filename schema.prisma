@@ -250,6 +250,12 @@ model Customer {
   name         String
   email        String   @unique
   passwordHash String
+  phone        String?
+  cpf          String?
+  address      String?
+  city         String?
+  state        String?
+  zip          String?
   createdAt    DateTime @default(now())
 
   orders    Order[]
@@ -288,6 +294,7 @@ model Order {
   state      String
   zip        String
   notes      String?  @db.Text
+  status     String   @default("PENDING")
   createdAt  DateTime @default(now())
 
   @@index([customerId])

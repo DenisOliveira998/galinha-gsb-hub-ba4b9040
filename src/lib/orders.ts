@@ -1,59 +1,117 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 
-const cartItemSchema = z.object({
+const itemSchema = z.object({
   postId: z.string(),
   title: z.string(),
-  slug: z.string(),
-  image: z.string(),
   price: z.number(),
   quantity: z.number(),
+  image: z.string().optional(),
+  slug: z.string().optional(),
 });
 
-// Espelha placeOrder() do shop-store.ts — grava um snapshot do pedido no
-// banco (histórico consultável no admin), mesmo o checkout finalizando
-// via WhatsApp sem gateway de pagamento.
-export const placeOrder = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      customerId: z.string().optional(),
-      items: z.array(cartItemSchema),
-      name: z.string(),
-      email: z.string(),
-      phone: z.string(),
-      address: z.string(),
-      city: z.string(),
-      state: z.string(),
-      zip: z.string(),
-      notes: z.string().optional(),
-    }),
-  )
+// Salva pedido no TiDB ao confirmar no checkout
+export const saveOrder = createServerFn({ method: "POST" })
+  .validator(z.object({
+    name: z.string(),
+    email: z.string(),
+    phone: z.string(),
+    address: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zip: z.string(),
+    notes: z.string().optional(),
+    total: z.number(),
+    items: z.array(itemSchema),
+    customerId: z.string().optional(),
+  }))
   .handler(async ({ data }) => {
-    const total = data.items.reduce((s, i) => s + i.price * i.quantity, 0);
-    const order = await prisma.order.create({
-      data: {
-        customerId: data.customerId,
-        itemsJson: data.items as unknown as Prisma.InputJsonValue,
-        total,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        zip: data.zip,
-        notes: data.notes,
-      },
-    });
-    // Decimal do Prisma não é serializável pela RPC do TanStack Start —
-    // converte para number antes de retornar ao client.
-    return { ...order, total: Number(order.total) };
+    try {
+      const order = await prisma.order.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zip: data.zip,
+          notes: data.notes ?? null,
+          total: data.total,
+          itemsJson: data.items,
+          customerId: data.customerId ?? null,
+          status: "PENDING",
+        },
+      });
+      return { ok: true as const, id: order.id };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[saveOrder]", msg);
+      return { ok: false as const, error: msg };
+    }
   });
 
-// Lista pedidos para o admin (histórico de vendas).
-export const listOrders = createServerFn({ method: "GET" }).handler(async () => {
-  const orders = await prisma.order.findMany({ orderBy: { createdAt: "desc" } });
-  return orders.map((o) => ({ ...o, total: Number(o.total) }));
-});
+// Lista todos os pedidos para o admin
+export const listOrders = createServerFn({ method: "GET" })
+  .handler(async () => {
+    try {
+      const orders = await prisma.order.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+      return orders.map((o) => ({
+        id: o.id,
+        name: o.name,
+        email: o.email,
+        phone: o.phone,
+        address: o.address,
+        city: o.city,
+        state: o.state,
+        zip: o.zip,
+        notes: o.notes ?? "",
+        total: Number(o.total),
+        status: o.status,
+        createdAt: o.createdAt.toISOString(),
+        items: o.itemsJson as Array<{ postId: string; title: string; price: number; quantity: number; image?: string }>,
+      }));
+    } catch (err) {
+      console.error("[listOrders]", err);
+      return [];
+    }
+  });
+
+// Marca pedido como concluído
+export const completeOrder = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    try {
+      await prisma.order.update({
+        where: { id: data.id },
+        data: { status: "COMPLETED" },
+      });
+      return { ok: true as const };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false as const, error: msg };
+    }
+  });
+
+// Lista clientes cadastrados para o admin
+export const listCustomers = createServerFn({ method: "GET" })
+  .handler(async () => {
+    try {
+      const customers = await prisma.customer.findMany({
+        orderBy: { createdAt: "desc" },
+        select: { id: true, name: true, email: true, createdAt: true },
+      });
+      return customers.map((c) => ({
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        createdAt: c.createdAt.toISOString(),
+      }));
+    } catch (err) {
+      console.error("[listCustomers]", err);
+      return [];
+    }
+  });

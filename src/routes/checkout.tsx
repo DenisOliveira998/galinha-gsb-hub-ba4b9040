@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, ChevronRight } from "lucide-react";
 import { useStore, whatsappHref } from "@/lib/mock-store";
 import { buildOrderMessage } from "@/lib/shop-store";
 import { SiteLayout } from "@/components/site/site-layout";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cartTotal, useShop } from "@/lib/shop-store";
+import { saveOrder } from "@/lib/orders";
+import { getCustomerProfile } from "@/lib/customers";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — Galinha GSB" }, { name: "robots", content: "noindex" }] }),
@@ -57,6 +59,24 @@ function Checkout() {
     name: me?.name ?? "", email: me?.email ?? "", phone: "",
     address: "", city: "", state: "", zip: "", notes: "",
   });
+
+  // Pré-preenche com dados do perfil quando logado
+  useEffect(() => {
+    if (!currentCustomerId) return;
+    getCustomerProfile({ data: { id: currentCustomerId } }).then((p) => {
+      if (!p) return;
+      setForm((prev) => ({
+        ...prev,
+        name:    p.name    || prev.name,
+        email:   p.email   || prev.email,
+        phone:   p.phone   || prev.phone,
+        address: p.address || prev.address,
+        city:    p.city    || prev.city,
+        state:   p.state   || prev.state,
+        zip:     p.zip     || prev.zip,
+      }));
+    }).catch(() => {});
+  }, [currentCustomerId]);
   const total = cartTotal(cart);
 
   if (hydrated && cart.length === 0) {
@@ -87,11 +107,20 @@ function Checkout() {
     return null;
   };
 
-  const submit = () => {
+  const submit = async () => {
     const err = validateShipping();
     if (err) { setFormError(err); setStep("shipping"); return; }
     setFormError("");
     const order = placeOrder(form);
+    // Salva no TiDB em background (não bloqueia o fluxo local)
+    saveOrder({
+      data: {
+        ...form,
+        total,
+        items: cart.map((i) => ({ postId: i.postId, title: i.title, price: i.price, quantity: i.quantity, image: i.image, slug: i.slug })),
+        customerId: currentCustomerId ?? undefined,
+      },
+    }).catch(console.error);
     navigate({ to: "/checkout/confirmado", search: { id: order.id } });
   };
 
