@@ -71,7 +71,26 @@ function Checkout() {
     );
   }
 
+  const [formError, setFormError] = useState("");
+
+  const validateShipping = (): string | null => {
+    if (!form.name.trim()) return "Informe o nome completo.";
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
+    if (!emailOk) return "Digite um e-mail válido.";
+    const phoneDigits = form.phone.replace(/\D/g, "");
+    if (phoneDigits.length < 10) return "Telefone inválido — mínimo 10 dígitos (DDD + número).";
+    const cepDigits = form.zip.replace(/\D/g, "");
+    if (cepDigits.length !== 8) return "CEP inválido — deve ter 8 dígitos.";
+    if (!form.address.trim()) return "Informe o endereço.";
+    if (!form.city.trim()) return "Informe a cidade.";
+    if (!form.state.trim()) return "Informe o estado.";
+    return null;
+  };
+
   const submit = () => {
+    const err = validateShipping();
+    if (err) { setFormError(err); setStep("shipping"); return; }
+    setFormError("");
     const order = placeOrder(form);
     navigate({ to: "/checkout/confirmado", search: { id: order.id } });
   };
@@ -106,7 +125,7 @@ function Checkout() {
             {step === "shipping" && (
               <>
                 <h2 className="font-display text-lg">Dados de entrega e contato</h2>
-                <form onSubmit={(e) => { e.preventDefault(); setStep("confirm"); }} className="mt-4 grid gap-4 md:grid-cols-2">
+                <form onSubmit={(e) => { e.preventDefault(); const err = validateShipping(); if (err) { setFormError(err); return; } setFormError(""); setStep("confirm"); }} className="mt-4 grid gap-4 md:grid-cols-2">
                   <TextField label="Nome completo" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
                   <TextField label="E-mail" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required />
                   <TextField label="Telefone / WhatsApp" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} required />
@@ -118,6 +137,7 @@ function Checkout() {
                     <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Observações</span>
                     <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} className="mt-1 w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring" />
                   </label>
+                  {formError && <p className="md:col-span-2 text-sm text-destructive">{formError}</p>}
                   <div className="md:col-span-2 flex items-center justify-between">
                     <button type="button" onClick={() => setStep("review")} className="text-sm text-muted-foreground hover:text-foreground">← Voltar</button>
                     <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)]">Revisar pedido <ChevronRight className="h-4 w-4" /></button>
@@ -136,6 +156,7 @@ function Checkout() {
                   {form.notes && <div><span className="text-muted-foreground">Obs.:</span> {form.notes}</div>}
                 </div>
                 <p className="mt-6 rounded-2xl bg-muted p-4 text-xs text-muted-foreground">Pagamento simulado — nenhum gateway real é acionado. O pedido fica registrado no seu navegador para demonstração.</p>
+                {formError && <p className="mt-2 text-sm text-destructive">{formError}</p>}
                 <div className="mt-6 flex items-center justify-between">
                   <button onClick={() => setStep("shipping")} className="text-sm text-muted-foreground hover:text-foreground">← Voltar</button>
                   <button onClick={submit} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">

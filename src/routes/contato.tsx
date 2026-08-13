@@ -19,6 +19,25 @@ export const Route = createFileRoute("/contato")({
 function Contact() {
   const s = useStore((x) => x.settings);
   const [sent, setSent] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) { setError("Informe seu nome."); return; }
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    if (!emailOk) { setError("Digite um e-mail válido."); return; }
+    if (!message.trim()) { setError("Escreva uma mensagem."); return; }
+    setError("");
+    setSent(true);
+  };
+
+  const inputCls = "mt-1 w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring";
+  const labelCls = "text-xs font-medium uppercase tracking-wider text-muted-foreground";
+
   return (
     <SiteLayout>
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:px-8">
@@ -31,33 +50,39 @@ function Contact() {
             <div className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><Mail className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">E-mail</div><div className="font-semibold">{s.email}</div></div></div>
           </div>
         </div>
-        <form
-          onSubmit={(e) => { e.preventDefault(); setSent(true); }}
-          className="rounded-3xl bg-card p-8 shadow-[var(--shadow-card)]"
-        >
-          <h2 className="font-display text-2xl">Envie uma mensagem</h2>
-          <div className="mt-6 space-y-4">
-            <Field label="nome_completo" placeholder="Nome do interessado" />
-            <Field label="email" placeholder="email@exemplo.com" type="email" />
-            <Field label="telefone" placeholder="(00) 00000-0000" />
-            <div>
-              <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">mensagem</label>
-              <textarea rows={4} placeholder="Escreva sua mensagem..." className="mt-1 w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring" />
-            </div>
-            <button type="submit" className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)]">Enviar</button>
-            {sent && <p className="text-sm text-primary">Mensagem simulada enviada! (mock — conecte ao backend depois)</p>}
+        {sent ? (
+          <div className="flex flex-col items-center justify-center rounded-3xl bg-card p-8 shadow-[var(--shadow-card)] text-center">
+            <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary text-2xl">✓</div>
+            <h2 className="mt-4 font-display text-2xl">Mensagem enviada!</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Obrigado por entrar em contato. Retornaremos em breve.</p>
+            <button onClick={() => { setSent(false); setName(""); setEmail(""); setPhone(""); setMessage(""); }} className="mt-6 rounded-full border px-6 py-2 text-sm font-semibold hover:bg-muted">Enviar outra mensagem</button>
           </div>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="rounded-3xl bg-card p-8 shadow-[var(--shadow-card)]">
+            <h2 className="font-display text-2xl">Envie uma mensagem</h2>
+            <div className="mt-6 space-y-4">
+              <div>
+                <label className={labelCls}>Nome completo *</label>
+                <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Nome do interessado" className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>E-mail *</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="email@exemplo.com" className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Telefone</label>
+                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(00) 00000-0000" className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Mensagem *</label>
+                <textarea value={message} onChange={(e) => setMessage(e.target.value)} required rows={4} placeholder="Escreva sua mensagem..." className={inputCls} />
+              </div>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <button type="submit" className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)]">Enviar</button>
+            </div>
+          </form>
+        )}
       </section>
     </SiteLayout>
-  );
-}
-
-function Field({ label, placeholder, type = "text" }: { label: string; placeholder: string; type?: string }) {
-  return (
-    <div>
-      <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</label>
-      <input type={type} placeholder={placeholder} className="mt-1 w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring" />
-    </div>
   );
 }
