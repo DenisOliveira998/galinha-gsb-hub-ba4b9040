@@ -97,7 +97,17 @@ export default async function handler(req, res) {
 }
 `);
 
-// 5. Configuração da função Vercel (Node.js runtime)
+// 5. Grava .env na função para que o Prisma leia DATABASE_URL em runtime
+//    (o build roda no CI da Vercel que tem acesso às env vars do projeto)
+const dbUrl = process.env.DATABASE_URL;
+if (dbUrl) {
+  writeFileSync(`${OUT}/functions/ssr.func/.env`, `DATABASE_URL="${dbUrl}"\n`);
+  console.log('✓ .env gravado na função com DATABASE_URL');
+} else {
+  console.warn('⚠ DATABASE_URL não encontrada no ambiente de build — .env não gerado');
+}
+
+// 6. Configuração da função Vercel (Node.js runtime)
 writeFileSync(`${OUT}/functions/ssr.func/.vc-config.json`, JSON.stringify({
   runtime: 'nodejs20.x',
   handler: 'adapter.mjs',
@@ -105,7 +115,7 @@ writeFileSync(`${OUT}/functions/ssr.func/.vc-config.json`, JSON.stringify({
   maxDuration: 30,
 }, null, 2));
 
-// 6. Roteamento: assets estáticos do CDN, tudo mais → SSR
+// 7. Roteamento: assets estáticos do CDN, tudo mais → SSR
 writeFileSync(`${OUT}/config.json`, JSON.stringify({
   version: 3,
   routes: [
