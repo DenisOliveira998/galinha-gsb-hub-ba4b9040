@@ -2,7 +2,6 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { auth } from "./lib/auth";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -50,6 +49,7 @@ export default {
     // ── Better Auth: intercepta /api/auth/* antes do SSR ──────────────────
     const { pathname } = new URL(request.url);
     if (pathname.startsWith("/api/auth")) {
+      const { auth } = await import("./lib/auth");
       return auth.handler(request);
     }
 
