@@ -72,6 +72,8 @@ function CustomerAuth() {
   };
 
   // ── Email OTP — enviar código ──────────────────────────────────────────────
+  // Usa /api/otp/send (chama auth.api.sendVerificationOTP diretamente no server,
+  // contornando o roteador HTTP do Better Auth que retorna 404 em produção)
   const sendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const emailTrimmed = otpEmail.trim().toLowerCase();
@@ -80,10 +82,14 @@ function CustomerAuth() {
     setOtpError("");
     setOtpLoading(true);
     try {
-      const result = await authClient.emailOtp.sendVerificationOtp({ email: emailTrimmed, type: "sign-in" });
-      if (result.error) {
-        const detail = result.error.message || (result.error as any).code || (result.error as any).statusText || JSON.stringify(result.error);
-        setOtpError(`Erro (${(result.error as any).status ?? "?"}): ${detail}`);
+      const res = await fetch("/api/otp/send", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: emailTrimmed, type: "sign-in" }),
+      });
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (!res.ok || data.error) {
+        setOtpError(data.error ?? `Erro ${res.status}`);
         return;
       }
       setOtpSent(true);
@@ -96,17 +102,26 @@ function CustomerAuth() {
   };
 
   // ── Email OTP — verificar código ───────────────────────────────────────────
+  // Usa /api/otp/verify que retorna a sessão + seta cookie via Better Auth
   const verifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.replace(/\D/g, "").length !== 6) { setOtpError("O código deve ter 6 dígitos."); return; }
     setOtpError("");
     setOtpLoading(true);
     try {
-      const result = await authClient.signIn.emailOtp({ email: otpEmail.trim().toLowerCase(), otp: otp.trim() });
-      if (result.error) { setOtpError(result.error.message ?? "Código inválido."); return; }
-      if (result.data?.user) {
-        const u = result.data.user;
-        await syncAndGo(u.id, u.name, u.email);
+      const res = await fetch("/api/otp/verify", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: otpEmail.trim().toLowerCase(), otp: otp.trim() }),
+        credentials: "include",
+      });
+      const data = await res.json() as { user?: { id: string; name: string; email: string }; token?: string; error?: string };
+      if (!res.ok || data.error) {
+        setOtpError(data.error ?? "Código inválido.");
+        return;
+      }
+      if (data.user) {
+        await syncAndGo(data.user.id, data.user.name, data.user.email);
       }
     } catch (err) {
       setOtpError(err instanceof Error ? err.message : "Erro ao verificar código.");

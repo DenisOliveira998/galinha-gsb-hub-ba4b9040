@@ -50,7 +50,7 @@ export default {
       // Better Auth intercepta /api/auth/* antes do roteador SSR
       const { pathname } = new URL(request.url);
 
-      // Debug temporário: lista endpoints registrados no Better Auth
+      // ── Debug: lista endpoints registrados ──────────────────────────────
       if (pathname === "/api/auth-debug") {
         const { auth } = await import("./lib/auth");
         const apiKeys = Object.keys(auth.api ?? {});
@@ -58,6 +58,41 @@ export default {
           status: 200,
           headers: { "content-type": "application/json" },
         });
+      }
+
+      // ── OTP bypass: chama auth.api.* diretamente sem passar pelo roteador HTTP
+      // (evita o bug de 404 no plugin emailOTP via auth.handler)
+      if (pathname === "/api/otp/send" && request.method === "POST") {
+        const { auth } = await import("./lib/auth");
+        const body = await request.json() as { email: string; type: string };
+        try {
+          await (auth.api as any).sendVerificationOTP({ body });
+          return new Response(JSON.stringify({ success: true }), {
+            headers: { "content-type": "application/json" },
+          });
+        } catch (e: any) {
+          const status = typeof e?.statusCode === "number" ? e.statusCode : 400;
+          return new Response(JSON.stringify({ error: e?.message ?? String(e) }), {
+            status,
+            headers: { "content-type": "application/json" },
+          });
+        }
+      }
+
+      if (pathname === "/api/otp/verify" && request.method === "POST") {
+        const { auth } = await import("./lib/auth");
+        const body = await request.json() as { email: string; otp: string };
+        try {
+          // asResponse: true → retorna Response com Set-Cookie
+          const response = await (auth.api as any).signInEmailOtp({ body, asResponse: true }) as Response;
+          return response;
+        } catch (e: any) {
+          const status = typeof e?.statusCode === "number" ? e.statusCode : 400;
+          return new Response(JSON.stringify({ error: e?.message ?? String(e) }), {
+            status,
+            headers: { "content-type": "application/json" },
+          });
+        }
       }
 
       if (pathname.startsWith("/api/auth")) {
