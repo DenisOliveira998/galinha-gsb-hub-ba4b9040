@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Mail, Chrome, KeyRound, ArrowLeft } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
@@ -40,6 +40,18 @@ function CustomerAuth() {
   const setSession  = useShop((s) => s.setSession);
   const navigate    = useNavigate();
 
+  // ── Ao montar: detecta sessão do Google OAuth (redirect 302 do callback) ──
+  // O cookie de sessão do Better Auth é setado pelo servidor, mas o shop store
+  // (Zustand) não é atualizado automaticamente — precisamos sincronizar aqui.
+  useEffect(() => {
+    authClient.getSession().then(({ data }) => {
+      if (data?.user) {
+        syncAndGo(data.user.id, data.user.name ?? data.user.email, data.user.email);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Helper: sync após Better Auth ─────────────────────────────────────────
   const syncAndGo = async (userId: string, userName: string, userEmail: string) => {
     const result = await syncBetterAuthUser({ data: { userId, name: userName, email: userEmail } });
@@ -58,7 +70,7 @@ function CustomerAuth() {
     try {
       const result = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/conta",
+        callbackURL: "/conta/login", // redireciona de volta aqui → useEffect sincroniza o store
       });
       if (result?.error) {
         toast.error(`Erro Google: ${result.error.message ?? result.error.status ?? "desconhecido"}`);
