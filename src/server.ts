@@ -46,13 +46,6 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    // ── Better Auth: intercepta /api/auth/* antes do SSR ──────────────────
-    const { pathname } = new URL(request.url);
-    if (pathname.startsWith("/api/auth")) {
-      const { auth } = await import("./lib/auth");
-      return auth.handler(request);
-    }
-
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
