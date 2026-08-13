@@ -32,6 +32,8 @@ interface AdSlotProps {
   /** Layout vertical (skyscraper) não deve usar full-width responsive. */
   fullWidthResponsive?: boolean;
   style?: React.CSSProperties;
+  /** Slot específico do post — sobrescreve o slot global quando preenchido. */
+  customSlotId?: string;
 }
 
 export function AdSlot({
@@ -42,9 +44,11 @@ export function AdSlot({
   format = "auto",
   fullWidthResponsive = true,
   style,
+  customSlotId,
 }: AdSlotProps) {
   const client = useAdsensePublisherId();
-  const slotId = (useSlotId(slot) || "").trim();
+  const globalSlotId = (useSlotId(slot) || "").trim();
+  const slotId = (customSlotId || "").trim() || globalSlotId;
   const ref = useRef<HTMLModElement | null>(null);
   const pushed = useRef(false);
   const active = Boolean(client && slotId);

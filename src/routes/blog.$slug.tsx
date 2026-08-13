@@ -47,6 +47,7 @@ function BlogDetail() {
             slot="blog"
             label="Espaço publicitário"
             className="mt-5 lg:hidden"
+            customSlotId={post.adSlot}
             placeholder={
               <div className="grid min-h-[90px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-5 text-center">
                 <div>
@@ -90,6 +91,7 @@ function BlogDetail() {
             format="vertical"
             fullWidthResponsive={false}
             style={{ minHeight: 600 }}
+            customSlotId={post.adSlot}
             placeholder={
               <div className="flex min-h-[600px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center">
                 <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
