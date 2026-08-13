@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { getCookie, setCookie, deleteCookie } from "vinxi/http";
+import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { prisma } from "./prisma";
 
 // ─── Login ────────────────────────────────────────────────────────────────────

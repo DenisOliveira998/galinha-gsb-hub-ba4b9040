@@ -47,6 +47,13 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      // Better Auth intercepta /api/auth/* antes do roteador SSR
+      const { pathname } = new URL(request.url);
+      if (pathname.startsWith("/api/auth")) {
+        const { auth } = await import("./lib/auth");
+        return auth.handler(request);
+      }
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
