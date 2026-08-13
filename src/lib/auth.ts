@@ -115,7 +115,7 @@ async function sendOTPEmail(email: string, otp: string, type: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Galinha GSB <noreply@galinhagsb.com.br>",
+        from: "Galinha GSB <onboarding@resend.dev>",
         to: email,
         subject,
         html,
