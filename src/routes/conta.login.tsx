@@ -62,8 +62,9 @@ function CustomerAuth() {
       }
       toast.success(mode === "login" ? "Bem-vindo de volta!" : "Conta criada com sucesso!");
       navigate({ to: "/conta" });
-    } catch {
-      setErrors({ general: "Erro ao conectar ao servidor. Tente novamente." });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : JSON.stringify(err);
+      setErrors({ general: `Erro: ${msg}` });
     } finally {
       setLoading(false);
     }
