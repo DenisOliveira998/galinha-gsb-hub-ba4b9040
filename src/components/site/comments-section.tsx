@@ -23,7 +23,7 @@ export function CommentsSection({ postId, isAdmin = false }: { postId: string; i
     e.preventDefault();
     if (!text.trim()) return;
     addMutation.mutate(
-      { name: session?.user?.name ?? "Visitante", text: text.trim() },
+      { name: session?.user?.name || session?.user?.email?.split("@")[0] || "Visitante", text: text.trim() },
       {
         onSuccess: () => {
           setText("");
