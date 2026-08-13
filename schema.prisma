@@ -243,20 +243,88 @@ model Admin {
   @@map("admins")
 }
 
+// --------------------------------------------------- Better Auth (sessão/OAuth)
+
+// Tabelas gerenciadas pelo Better Auth — não editar manualmente
+// SQL de criação: ver README.md ou rodar: npx @better-auth/cli generate
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+  customer      Customer?
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String    @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
 // --------------------------------------------------- Loja (cliente/pedido)
 
 model Customer {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   name         String
-  email        String   @unique
-  passwordHash String
+  email        String    @unique
+  passwordHash String?   // null para usuários OAuth/OTP
+  userId       String?   @unique // vínculo com Better Auth User
+  user         User?     @relation(fields: [userId], references: [id])
   phone        String?
   cpf          String?
   address      String?
   city         String?
   state        String?
   zip          String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
 
   orders    Order[]
   cartItems CartItem[]
