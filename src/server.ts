@@ -84,7 +84,7 @@ export default {
         const body = await request.json() as { email: string; otp: string };
         try {
           // asResponse: true → retorna Response com Set-Cookie
-          const response = await (auth.api as any).signInEmailOtp({ body, asResponse: true }) as Response;
+          const response = await (auth.api as any).signInEmailOTP({ body, asResponse: true }) as Response;
           return response;
         } catch (e: any) {
           const status = typeof e?.statusCode === "number" ? e.statusCode : 400;
