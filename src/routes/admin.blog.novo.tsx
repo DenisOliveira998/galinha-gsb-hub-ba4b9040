@@ -14,7 +14,9 @@ function NewBlog() {
   return (
     <AdminShell title="Novo post do blog">
       <BlogForm
+        loading={createMutation.isPending}
         onSubmit={(v) => {
+          if (createMutation.isPending) return;
           createMutation.mutate(v, {
             onSuccess: () => {
               toast.success("Post criado com sucesso");

@@ -34,7 +34,9 @@ function EditBlog() {
     <AdminShell title={`Editar: ${post.title}`}>
       <BlogForm
         initial={post}
+        loading={updateMutation.isPending}
         onSubmit={(v) => {
+          if (updateMutation.isPending) return;
           updateMutation.mutate(
             { id, ...v },
             {

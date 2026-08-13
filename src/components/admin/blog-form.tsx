@@ -30,7 +30,7 @@ type V = Omit<BlogPost, "id" | "slug" | "createdAt">;
 
 type Picking = { kind: "cover" } | { kind: "gallery"; index: number | "new" } | { kind: "block"; id: string };
 
-export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: (v: V) => void }) {
+export function BlogForm({ initial, onSubmit, loading = false }: { initial?: BlogPost; onSubmit: (v: V) => void; loading?: boolean }) {
   const [title, setTitle] = useState(initial?.title ?? "");
   const [excerpt, setExcerpt] = useState(initial?.excerpt ?? "");
   const [content, setContent] = useState(initial?.content ?? "");
@@ -217,7 +217,14 @@ export function BlogForm({ initial, onSubmit }: { initial?: BlogPost; onSubmit: 
 
       <MediaPickerDialog open={picking !== null} onClose={() => setPicking(null)} onSelect={applyPicked} />
 
-      <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Salvar</button>
+      <button
+        type="submit"
+        disabled={loading}
+        className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+      >
+        {loading && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
+        {loading ? "Salvando…" : "Salvar"}
+      </button>
       </div>
 
       <aside className="lg:sticky lg:top-24">

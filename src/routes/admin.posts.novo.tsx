@@ -14,7 +14,9 @@ function NewPost() {
   return (
     <AdminShell title="Novo anúncio">
       <PostForm
+        loading={createMutation.isPending}
         onSubmit={(v) => {
+          if (createMutation.isPending) return;
           createMutation.mutate(v, {
             onSuccess: () => {
               toast.success("Anúncio criado com sucesso");

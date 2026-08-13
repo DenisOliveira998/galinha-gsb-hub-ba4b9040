@@ -34,7 +34,9 @@ function EditPost() {
     <AdminShell title={`Editar: ${post.title}`}>
       <PostForm
         initial={post}
+        loading={updateMutation.isPending}
         onSubmit={(v) => {
+          if (updateMutation.isPending) return;
           updateMutation.mutate(
             { id, ...v },
             {

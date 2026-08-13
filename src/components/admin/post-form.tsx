@@ -21,7 +21,7 @@ function getCategoryFallbackImage(
   return cat.images[0]?.url ?? cat.image ?? "";
 }
 
-export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: FormValue) => void }) {
+export function PostForm({ initial, onSubmit, loading = false }: { initial?: Post; onSubmit: (v: FormValue) => void; loading?: boolean }) {
   const { data: categories = [] } = useCategoriesQuery();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [category, setCategory] = useState<Category>(initial?.category ?? categories[0]?.id ?? "");
@@ -237,7 +237,14 @@ export function PostForm({ initial, onSubmit }: { initial?: Post; onSubmit: (v: 
       </Card>
 
         <div className="flex gap-3">
-          <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Salvar</button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+          >
+            {loading && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
+            {loading ? "Salvando…" : "Salvar"}
+          </button>
         </div>
       </div>
 

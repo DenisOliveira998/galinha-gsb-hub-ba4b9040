@@ -136,8 +136,15 @@ function CategoriesAdmin() {
             </button>
             {newImage && <img src={newImage} alt="" className="h-14 w-20 rounded-lg object-cover" />}
           </div>
-          <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
-            <Plus className="h-4 w-4" /> Adicionar categoria
+          <button
+            type="submit"
+            disabled={addCategoryMutation.isPending}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+          >
+            {addCategoryMutation.isPending
+              ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              : <Plus className="h-4 w-4" />}
+            {addCategoryMutation.isPending ? "Criando…" : "Adicionar categoria"}
           </button>
         </form>
 
