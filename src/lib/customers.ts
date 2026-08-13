@@ -8,6 +8,12 @@ export const registerCustomer = createServerFn({ method: "POST" })
   .validator(z.object({ name: z.string(), email: z.string().email(), password: z.string().min(6) }))
   .handler(async ({ data }) => {
     try {
+      // DEBUG — remove depois de confirmar
+      if (!process.env.DATABASE_URL) {
+        const keys = Object.keys(process.env).filter(k => !/(secret|token|key|pass)/i.test(k)).slice(0, 30).join(', ');
+        return { ok: false as const, error: `DATABASE_URL ausente. Vars disponíveis: ${keys}` };
+      }
+
       const email = data.email.trim().toLowerCase();
       const existing = await prisma.customer.findUnique({ where: { email } });
       if (existing) return { ok: false as const, error: "Já existe uma conta com este e-mail." };
