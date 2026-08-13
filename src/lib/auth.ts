@@ -37,12 +37,16 @@ export const auth = betterAuth({
     }),
   ],
 
+  // URL base — usada para montar o callback do Google OAuth
+  baseURL: process.env.BETTER_AUTH_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"),
+
   // Origens confiáveis (evita CSRF)
   trustedOrigins: [
     "http://localhost:3000",
     "http://localhost:3001",
+    "https://galinha-blond.vercel.app",
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
-    ...(process.env.NEXT_PUBLIC_SITE_URL ? [process.env.NEXT_PUBLIC_SITE_URL] : []),
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
   ],
 
   // Hook: ao criar usuário via Google/OTP, cria ou vincula registro na tabela customers
