@@ -8,6 +8,7 @@ import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
+import { getRatingSummary } from "@/lib/ratings";
 
 type CatalogSearch = { q?: string; cat?: string };
 
@@ -18,16 +19,27 @@ export const Route = createFileRoute("/catalogo/")({
   }),
   loader: async () => {
     const [postsRes, categoriesRes] = await Promise.allSettled([listPosts(), listCategories()]);
+    const posts = postsRes.status === "fulfilled" ? postsRes.value : [];
+    // Busca média de avaliações de todos os anúncios em paralelo
+    const ratingsRes = await Promise.allSettled(
+      posts.map((p) => getRatingSummary({ data: { postId: p.id } })),
+    );
+    const ratingsMap: Record<string, { average: number; count: number }> = {};
+    posts.forEach((p, i) => {
+      const r = ratingsRes[i];
+      ratingsMap[p.id] = r.status === "fulfilled" ? r.value : { average: 0, count: 0 };
+    });
     return {
-      posts: postsRes.status === "fulfilled" ? postsRes.value : [],
+      posts,
       categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
+      ratingsMap,
     };
   },
   component: Catalog,
 });
 
 function Catalog() {
-  const { posts: allPosts, categories } = Route.useLoaderData();
+  const { posts: allPosts, categories, ratingsMap } = Route.useLoaderData();
   const posts = allPosts.filter((p) => p.status !== "DRAFT");
   const addToCart = useShop((s) => s.addToCart);
   const navigate = useNavigate();
@@ -105,7 +117,7 @@ function Catalog() {
                     {p.title}
                   </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
-                  <div className="mt-1.5"><StarsDisplay average={0} count={0} /></div>
+                  <div className="mt-1.5"><StarsDisplay average={ratingsMap[p.id]?.average ?? 0} count={ratingsMap[p.id]?.count ?? 0} /></div>
                   {p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
                   {p.status !== "SOLD" && (
                     <div className="mt-auto flex flex-col gap-2 pt-4">

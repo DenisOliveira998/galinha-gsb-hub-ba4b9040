@@ -5,17 +5,21 @@ import { SiteLayout } from "@/components/site/site-layout";
 import { useShop } from "@/lib/shop-store";
 import { CommentsSection } from "@/components/site/comments-section";
 import { FavoriteButton } from "@/components/site/favorite-button";
-import { StarsDisplay } from "@/components/site/star-rating";
+import { StarsDisplay, StarsInput } from "@/components/site/star-rating";
 import { getPostBySlug, listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
 import { useSettingsQuery } from "@/lib/hooks/use-settings";
+import { useRatingSummaryQuery, useMyRatingQuery, useRatePostMutation } from "@/lib/hooks/use-ratings";
+import { getAdminSession } from "@/lib/admin-auth";
+import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/catalogo/$slug")({
   loader: async ({ params }) => {
-    const [postRes, postsRes, categoriesRes] = await Promise.allSettled([
+    const [postRes, postsRes, categoriesRes, adminSessionRes] = await Promise.allSettled([
       getPostBySlug({ data: { slug: params.slug } }),
       listPosts(),
       listCategories(),
+      getAdminSession(),
     ]);
     const post = postRes.status === "fulfilled" ? postRes.value : null;
     if (!post) throw notFound();
@@ -23,6 +27,7 @@ export const Route = createFileRoute("/catalogo/$slug")({
       post,
       posts: postsRes.status === "fulfilled" ? postsRes.value : [],
       categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
+      isAdmin: !!(adminSessionRes.status === "fulfilled" && adminSessionRes.value),
     };
   },
   component: PostDetail,
@@ -42,10 +47,17 @@ function whatsappHref(whatsapp: string, message: string) {
 }
 
 function PostDetail() {
-  const { post, posts, categories } = Route.useLoaderData();
+  const { post, posts, categories, isAdmin } = Route.useLoaderData();
   const { data: settings } = useSettingsQuery();
   const addToCart = useShop((s) => s.addToCart);
   const navigate = useNavigate();
+
+  const { data: session } = authClient.useSession();
+  const loggedIn = !!session?.user;
+
+  const { data: summary } = useRatingSummaryQuery(post.id);
+  const { data: myRating } = useMyRatingQuery(post.id);
+  const rateMutation = useRatePostMutation(post.id);
 
   const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? id;
   const faq = (post.faq ?? []).filter((f) => f.question.trim() || f.answer.trim());
@@ -67,7 +79,30 @@ function PostDetail() {
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
             <h1 className="mt-2 font-display text-3xl md:text-4xl">{post.title}</h1>
-            <div className="mt-2"><StarsDisplay average={0} count={0} size="md" /></div>
+            <div className="mt-2 flex flex-col gap-1.5">
+              <StarsDisplay average={summary?.average ?? 0} count={summary?.count ?? 0} size="md" />
+              {loggedIn ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {myRating ? "Sua avaliação:" : "Avalie este anúncio:"}
+                  </span>
+                  <StarsInput
+                    value={myRating ?? 0}
+                    onRate={(v) => {
+                      rateMutation.mutate(v);
+                      toast.success("Avaliação enviada!");
+                    }}
+                  />
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  <Link to="/conta/login" className="font-semibold text-primary hover:underline">
+                    Faça login
+                  </Link>{" "}
+                  para avaliar este anúncio.
+                </p>
+              )}
+            </div>
             {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
             <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
             {post.status !== "SOLD" && post.price && (
@@ -129,7 +164,7 @@ function PostDetail() {
           </section>
         )}
 
-        <CommentsSection postId={post.id} />
+        <CommentsSection postId={post.id} isAdmin={isAdmin} />
 
         {related.length > 0 && (
           <section className="mt-12">
@@ -146,7 +181,7 @@ function PostDetail() {
                     <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1 line-clamp-2 font-display text-base hover:text-primary">
                       {p.title}
                     </Link>
-                    <div className="mt-1.5"><StarsDisplay average={0} count={0} /></div>
+                    <div className="mt-1.5"><StarsDisplay average={0} count={0} size="sm" /></div>
                     {p.price && <div className="mt-auto pt-3 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
                   </div>
                 </article>
