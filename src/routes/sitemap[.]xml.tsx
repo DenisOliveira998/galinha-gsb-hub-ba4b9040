@@ -7,15 +7,16 @@ const BASE = "https://galinhagsb.com.br";
 export const Route = createFileRoute("/sitemap.xml")({
   loader: async () => {
     const [posts, blogs] = await Promise.allSettled([listPosts(), listBlogPosts()]);
-    const postSlugs = posts.status === "fulfilled"
-      ? posts.value.filter((p) => p.status === "PUBLISHED").map((p) => p.slug)
-      : [];
-    const blogSlugs = blogs.status === "fulfilled"
-      ? blogs.value.filter((b) => b.published).map((b) => b.slug)
-      : [];
+    const postSlugs =
+      posts.status === "fulfilled"
+        ? posts.value.filter((p) => p.status === "PUBLISHED").map((p) => p.slug)
+        : [];
+    const blogSlugs =
+      blogs.status === "fulfilled"
+        ? blogs.value.filter((b) => b.published).map((b) => b.slug)
+        : [];
     return { postSlugs, blogSlugs };
   },
-  headers: () => ({ "content-type": "application/xml; charset=utf-8" }),
   component: Sitemap,
 });
 
