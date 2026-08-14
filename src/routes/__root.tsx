@@ -15,6 +15,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { BrandTheme } from "@/components/site/brand-theme";
 import { AdsenseScript } from "@/components/site/ad-slot";
 import { THEME_INIT_SCRIPT } from "@/hooks/use-theme";
+import { getSettings } from "@/lib/settings";
+
+const DEFAULT_DESCRIPTION = "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida.";
 
 function NotFoundComponent() {
   return (
@@ -77,19 +80,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  loader: async () => {
+    const settings = await getSettings().catch(() => null);
+    return { siteDescription: settings?.siteDescription || DEFAULT_DESCRIPTION };
+  },
+  head: ({ loaderData }) => {
+    const desc = loaderData?.siteDescription || DEFAULT_DESCRIPTION;
+    return {
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
-      { name: "description", content: "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida." },
+      { name: "description", content: desc },
       { name: "author", content: "Galinha GSB" },
       { property: "og:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
-      { property: "og:description", content: "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida." },
+      { property: "og:description", content: desc },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
-      { name: "twitter:description", content: "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida." },
+      { name: "twitter:description", content: desc },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4d8872f6-79cc-4566-9fb3-7c01832bf371/id-preview-59f11369--22283bae-4360-4524-8b15-cf24a08446a5.lovable.app-1784746833771.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4d8872f6-79cc-4566-9fb3-7c01832bf371/id-preview-59f11369--22283bae-4360-4524-8b15-cf24a08446a5.lovable.app-1784746833771.png" },
     ],
@@ -107,7 +116,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap",
       },
     ],
-  }),
+  };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

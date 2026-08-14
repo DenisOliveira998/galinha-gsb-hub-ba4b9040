@@ -12,6 +12,7 @@ export const EMPTY_SETTINGS: SiteSettings = {
   email: "",
   aboutText: "",
   brandColor: "",
+  siteDescription: "",
   adsensePublisherId: "",
   adsenseSlotHomeBanner: "",
   adsenseSlotHomeRectangle: "",

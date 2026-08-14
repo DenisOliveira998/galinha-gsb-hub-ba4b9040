@@ -224,6 +224,7 @@ model SiteSettings {
   email                  String @default("")
   aboutText              String @db.Text
   brandColor             String @default("#3F6B52")
+  siteDescription        String @default("Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida.") @db.Text
   adsensePublisherId     String @default("")
   adsenseSlotHomeBanner  String @default("")
   adsenseSlotHomeRectangle String @default("")

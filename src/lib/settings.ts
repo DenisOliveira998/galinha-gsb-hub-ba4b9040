@@ -24,6 +24,7 @@ const updateSettingsSchema = z.object({
   email: z.string().optional(),
   aboutText: z.string().optional(),
   brandColor: z.string().optional(),
+  siteDescription: z.string().optional(),
   adsensePublisherId: z.string().optional(),
   adsenseSlotHomeBanner: z.string().optional(),
   adsenseSlotHomeRectangle: z.string().optional(),

@@ -80,6 +80,8 @@ export interface SiteSettings {
   adsenseSlotHomeRectangle: string;
   /** Slot vertical usado nas páginas do blog. */
   adsenseSlotBlog: string;
+  /** Descrição do site exibida nos resultados de busca do Google. */
+  siteDescription?: string;
 }
 
 export interface HeroSlide {

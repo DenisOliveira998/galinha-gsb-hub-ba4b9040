@@ -19,16 +19,17 @@ export const Route = createFileRoute("/admin/settings")({
 });
 
 const LABELS: Record<keyof SiteSettings, string> = {
-  whatsapp: "WhatsApp exibido",
-  whatsappLink: "Link do WhatsApp",
-  instagram: "Instagram",
-  email: "E-mail",
-  aboutText: "Texto “Sobre”",
-  brandColor: "Cor principal do site",
-  adsensePublisherId: "ID do publisher AdSense",
-  adsenseSlotHomeBanner: "Slot — Banner da Home",
-  adsenseSlotHomeRectangle: "Slot — Retângulo da Home",
-  adsenseSlotBlog: "Slot — Blog (vertical)",
+  whatsapp: “WhatsApp exibido”,
+  whatsappLink: “Link do WhatsApp”,
+  instagram: “Instagram”,
+  email: “E-mail”,
+  aboutText: “Texto “Sobre””,
+  brandColor: “Cor principal do site”,
+  siteDescription: “Descrição do site (Google)”,
+  adsensePublisherId: “ID do publisher AdSense”,
+  adsenseSlotHomeBanner: “Slot — Banner da Home”,
+  adsenseSlotHomeRectangle: “Slot — Retângulo da Home”,
+  adsenseSlotBlog: “Slot — Blog (vertical)”,
 };
 
 const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F"];
@@ -47,6 +48,7 @@ function Settings() {
     adsenseSlotHomeBanner: settings?.adsenseSlotHomeBanner ?? "",
     adsenseSlotHomeRectangle: settings?.adsenseSlotHomeRectangle ?? "",
     adsenseSlotBlog: settings?.adsenseSlotBlog ?? "",
+    siteDescription: settings?.siteDescription ?? "",
   };
   const [form, setForm] = useState<SiteSettings>(EMPTY_SETTINGS);
   const [confirming, setConfirming] = useState(false);
@@ -176,12 +178,16 @@ function Settings() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
-          <h3 className="font-display text-lg">Conteúdo do site</h3>
-          <p className="text-xs text-muted-foreground">
+        <div className=”rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4”>
+          <h3 className=”font-display text-lg”>Conteúdo do site</h3>
+          <p className=”text-xs text-muted-foreground”>
             As imagens do hero são gerenciadas em “Mídia do Site” → Carrossel.
           </p>
-          <F label="texto_sobre"><textarea value={form.aboutText} onChange={(e) => set("aboutText", e.target.value)} rows={6} className="i" placeholder="Texto da página Sobre" /></F>
+          <F label=”descricao_google”>
+            <textarea value={form.siteDescription ?? “”} onChange={(e) => set(“siteDescription”, e.target.value)} rows={3} className=”i” placeholder=”Texto exibido abaixo do título nos resultados do Google” />
+            <p className=”mt-1 text-xs text-muted-foreground”>Aparece como subtítulo nos resultados de busca. Ideal entre 120 e 160 caracteres. <span className={`font-semibold ${(form.siteDescription ?? “”).length > 160 ? “text-destructive” : “”}`}>{(form.siteDescription ?? “”).length}/160</span></p>
+          </F>
+          <F label=”texto_sobre”><textarea value={form.aboutText} onChange={(e) => set(“aboutText”, e.target.value)} rows={6} className=”i” placeholder=”Texto da página Sobre” /></F>
         </div>
 
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
