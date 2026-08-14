@@ -10,6 +10,16 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
+async function uniqueBlogSlug(base: string, excludeId?: string): Promise<string> {
+  let slug = base;
+  let n = 1;
+  while (true) {
+    const existing = await prisma.blogPost.findUnique({ where: { slug } });
+    if (!existing || existing.id === excludeId) return slug;
+    slug = `${base}-${++n}`;
+  }
+}
+
 const blogInclude = {
   images: { orderBy: { order: "asc" as const } },
   blocks: { orderBy: { order: "asc" as const } },
@@ -74,7 +84,7 @@ const createBlogSchema = z.object({
 export const createBlogPost = createServerFn({ method: "POST" })
   .validator(createBlogSchema)
   .handler(async ({ data }) => {
-    const slug = `${slugify(data.title)}-${Math.random().toString(36).slice(2, 6)}`;
+    const slug = await uniqueBlogSlug(slugify(data.title));
     const post = await prisma.blogPost.create({
       data: {
         title: data.title,
@@ -116,9 +126,15 @@ export const updateBlogPost = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { id, images, blocks, ...rest } = data;
 
+    const newSlug = rest.title ? await uniqueBlogSlug(slugify(rest.title), id) : undefined;
+
     await prisma.blogPost.update({
       where: { id },
-      data: { ...rest, ...(rest.adSlot !== undefined ? { adSlot: rest.adSlot || null } : {}) },
+      data: {
+        ...rest,
+        ...(rest.adSlot !== undefined ? { adSlot: rest.adSlot || null } : {}),
+        ...(newSlug ? { slug: newSlug } : {}),
+      },
     });
 
     if (images) {

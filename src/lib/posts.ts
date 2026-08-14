@@ -22,6 +22,16 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
+async function uniquePostSlug(base: string, excludeId?: string): Promise<string> {
+  let slug = base;
+  let n = 1;
+  while (true) {
+    const existing = await prisma.post.findUnique({ where: { slug } });
+    if (!existing || existing.id === excludeId) return slug;
+    slug = `${base}-${++n}`;
+  }
+}
+
 function toPostDTO(p: any) {
   return {
     id: p.id,
@@ -68,7 +78,7 @@ const createPostSchema = z.object({
 export const createPost = createServerFn({ method: "POST" })
   .validator(createPostSchema)
   .handler(async ({ data }) => {
-    const slug = `${slugify(data.title)}-${Math.random().toString(36).slice(2, 6)}`;
+    const slug = await uniquePostSlug(slugify(data.title));
     const post = await prisma.post.create({
       data: {
         title: data.title,
@@ -107,11 +117,14 @@ export const updatePost = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { id, images, faq, category, ...rest } = data;
 
+    const newSlug = rest.title ? await uniquePostSlug(slugify(rest.title), id) : undefined;
+
     await prisma.post.update({
       where: { id },
       data: {
         ...rest,
         ...(category ? { categoryId: category } : {}),
+        ...(newSlug ? { slug: newSlug } : {}),
       },
     });
 
