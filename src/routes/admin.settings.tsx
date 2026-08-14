@@ -19,17 +19,17 @@ export const Route = createFileRoute("/admin/settings")({
 });
 
 const LABELS: Record<keyof SiteSettings, string> = {
-  whatsapp: “WhatsApp exibido”,
-  whatsappLink: “Link do WhatsApp”,
-  instagram: “Instagram”,
-  email: “E-mail”,
-  aboutText: “Texto “Sobre””,
-  brandColor: “Cor principal do site”,
-  siteDescription: “Descrição do site (Google)”,
-  adsensePublisherId: “ID do publisher AdSense”,
-  adsenseSlotHomeBanner: “Slot — Banner da Home”,
-  adsenseSlotHomeRectangle: “Slot — Retângulo da Home”,
-  adsenseSlotBlog: “Slot — Blog (vertical)”,
+  whatsapp: "WhatsApp exibido",
+  whatsappLink: "Link do WhatsApp",
+  instagram: "Instagram",
+  email: "E-mail",
+  aboutText: 'Texto "Sobre"',
+  brandColor: "Cor principal do site",
+  siteDescription: "Descricao do site (Google)",
+  adsensePublisherId: "ID do publisher AdSense",
+  adsenseSlotHomeBanner: "Slot - Banner da Home",
+  adsenseSlotHomeRectangle: "Slot - Retangulo da Home",
+  adsenseSlotBlog: "Slot - Blog (vertical)",
 };
 
 const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F"];
@@ -178,16 +178,16 @@ function Settings() {
           </div>
         </div>
 
-        <div className=”rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4”>
-          <h3 className=”font-display text-lg”>Conteúdo do site</h3>
-          <p className=”text-xs text-muted-foreground”>
-            As imagens do hero são gerenciadas em “Mídia do Site” → Carrossel.
+        <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
+          <h3 className="font-display text-lg">Conteúdo do site</h3>
+          <p className="text-xs text-muted-foreground">
+            As imagens do hero são gerenciadas em "Mídia do Site" → Carrossel.
           </p>
-          <F label=”descricao_google”>
-            <textarea value={form.siteDescription ?? “”} onChange={(e) => set(“siteDescription”, e.target.value)} rows={3} className=”i” placeholder=”Texto exibido abaixo do título nos resultados do Google” />
-            <p className=”mt-1 text-xs text-muted-foreground”>Aparece como subtítulo nos resultados de busca. Ideal entre 120 e 160 caracteres. <span className={`font-semibold ${(form.siteDescription ?? “”).length > 160 ? “text-destructive” : “”}`}>{(form.siteDescription ?? “”).length}/160</span></p>
+          <F label="descricao_google">
+            <textarea value={form.siteDescription ?? ""} onChange={(e) => set("siteDescription", e.target.value)} rows={3} className="i" placeholder="Texto exibido abaixo do título nos resultados do Google" />
+            <p className="mt-1 text-xs text-muted-foreground">Aparece como subtítulo nos resultados de busca. Ideal entre 120 e 160 caracteres. <span className={`font-semibold ${(form.siteDescription ?? "").length > 160 ? "text-destructive" : ""}`}>{(form.siteDescription ?? "").length}/160</span></p>
           </F>
-          <F label=”texto_sobre”><textarea value={form.aboutText} onChange={(e) => set(“aboutText”, e.target.value)} rows={6} className=”i” placeholder=”Texto da página Sobre” /></F>
+          <F label="texto_sobre"><textarea value={form.aboutText} onChange={(e) => set("aboutText", e.target.value)} rows={6} className="i" placeholder="Texto da página Sobre" /></F>
         </div>
 
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
@@ -200,8 +200,8 @@ function Settings() {
             </p>
           </div>
           <F label="id_publisher"><input value={form.adsensePublisherId} onChange={(e) => set("adsensePublisherId", e.target.value.trim())} className="i font-mono" placeholder="ca-pub-XXXXXXXXXXXXXXXX" /></F>
-          <F label="slot_banner_home"><input value={form.adsenseSlotHomeBanner} onChange={(e) => set("adsenseSlotHomeBanner", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Banner horizontal, acima de “Últimos anúncios”.</p></F>
-          <F label="slot_retangulo_home"><input value={form.adsenseSlotHomeRectangle} onChange={(e) => set("adsenseSlotHomeRectangle", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Bloco antes de “Por que escolher a Galinha GSB”.</p></F>
+          <F label="slot_banner_home"><input value={form.adsenseSlotHomeBanner} onChange={(e) => set("adsenseSlotHomeBanner", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Banner horizontal, acima de "Últimos anúncios".</p></F>
+          <F label="slot_retangulo_home"><input value={form.adsenseSlotHomeRectangle} onChange={(e) => set("adsenseSlotHomeRectangle", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Bloco antes de "Por que escolher a Galinha GSB".</p></F>
           <F label="slot_blog"><input value={form.adsenseSlotBlog} onChange={(e) => set("adsenseSlotBlog", e.target.value.trim())} className="i font-mono" placeholder="1234567890" /><p className="mt-1 text-xs text-muted-foreground">Formato vertical na listagem e dentro das postagens do blog.</p></F>
         </div>
 
