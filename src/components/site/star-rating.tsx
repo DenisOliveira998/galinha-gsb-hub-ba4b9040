@@ -23,7 +23,7 @@ export function StarsDisplay({
         ))}
       </div>
       <span className="text-[11px] text-muted-foreground">
-        {count ? `${average.toFixed(1)} (${count})` : "sem avaliações"}
+        {count ? `${average.toFixed(1)} (${count})` : "(0)"}
       </span>
     </div>
   );
