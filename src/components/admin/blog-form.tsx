@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ImageDropzone } from "./image-dropzone";
+import { listAuthors } from "@/lib/authors";
 
 export interface BlogBlock {
   id: string;
@@ -17,6 +19,7 @@ export interface BlogPost {
   coverImage: string;
   published: boolean;
   adSlot?: string;
+  authorId?: string | null;
   createdAt: string;
   images?: string[];
   blocks?: BlogBlock[];
@@ -37,8 +40,10 @@ export function BlogForm({ initial, onSubmit, loading = false }: { initial?: Blo
   const [coverImage, setCoverImage] = useState(initial?.coverImage ?? "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80");
   const [published, setPublished] = useState(initial?.published ?? false);
   const [adSlot, setAdSlot] = useState(initial?.adSlot ?? "");
+  const [authorId, setAuthorId] = useState<string | null>(initial?.authorId ?? null);
   const [images, setImages] = useState<string[]>(Array.isArray(initial?.images) ? initial.images : []);
   const [blocks, setBlocks] = useState<BlogBlock[]>(Array.isArray(initial?.blocks) ? initial.blocks : []);
+  const { data: authors = [] } = useQuery({ queryKey: ["authors"], queryFn: () => listAuthors() });
   const [picking, setPicking] = useState<Picking | null>(null);
 
   const addBlock = (type: BlogBlock["type"]) =>
@@ -89,6 +94,7 @@ export function BlogForm({ initial, onSubmit, loading = false }: { initial?: Blo
           coverImage,
           published,
           adSlot,
+          authorId,
           images,
           blocks: blocks.filter((b) => (b.type === "text" ? b.text?.trim() : b.image?.trim())),
         });
@@ -100,6 +106,18 @@ export function BlogForm({ initial, onSubmit, loading = false }: { initial?: Blo
         <F label="titulo"><input value={title} onChange={(e) => setTitle(e.target.value)} required className="i" placeholder="Título do post" /></F>
         <F label="resumo"><textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} className="i" placeholder="Resumo curto" /></F>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} /> Publicado</label>
+        <F label="autor">
+          <select
+            value={authorId ?? ""}
+            onChange={(e) => setAuthorId(e.target.value || null)}
+            className="i"
+          >
+            <option value="">Sem autor</option>
+            {authors.map((a) => (
+              <option key={a.id} value={a.id}>{a.name}</option>
+            ))}
+          </select>
+        </F>
         <F label="adsense_slot (opcional)">
           <input
             value={adSlot}

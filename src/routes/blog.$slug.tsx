@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
 import { AdSlot } from "@/components/site/ad-slot";
+import { BlogLikeButton } from "@/components/site/blog-like-button";
+import { UserCircle2 } from "lucide-react";
 import { getBlogPostBySlug } from "@/lib/blog";
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -38,9 +40,29 @@ function BlogDetail() {
           <div className="mt-3 overflow-hidden rounded-2xl shadow-[var(--shadow-card)] md:mt-4 md:rounded-3xl">
             <img src={post.coverImage} alt={post.title} className="aspect-[16/9] w-full object-cover" />
           </div>
-          <div className="mt-4 text-[11px] text-muted-foreground md:text-xs">{formatDate(post.createdAt)}</div>
+          <div className="mt-4 flex items-center justify-between gap-4">
+            <div className="text-[11px] text-muted-foreground md:text-xs">{formatDate(post.createdAt)}</div>
+            <BlogLikeButton postId={post.id} initialCount={post.likeCount ?? 0} />
+          </div>
           <h1 className="mt-1 text-left font-display text-xl md:text-2xl">{post.title}</h1>
           <p className="mt-2 text-left text-sm text-muted-foreground md:text-base">{post.excerpt}</p>
+
+          {/* Autor */}
+          {post.author && (
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+              {post.author.avatar ? (
+                <img src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full object-cover shrink-0" />
+              ) : (
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                  <UserCircle2 className="h-5 w-5" />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold">{post.author.name}</p>
+                {post.author.bio && <p className="text-xs text-muted-foreground line-clamp-2">{post.author.bio}</p>}
+              </div>
+            </div>
+          )}
 
           {/* Anúncio dentro do conteúdo — visível no mobile/tablet */}
           <AdSlot

@@ -140,6 +140,18 @@ model Favorite {
 
 // ------------------------------------------------------------------- Blog
 
+model Author {
+  id        String     @id @default(cuid())
+  name      String
+  avatar    String?    @db.Text
+  bio       String?    @db.Text
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  posts     BlogPost[]
+
+  @@map("authors")
+}
+
 model BlogPost {
   id         String   @id @default(cuid())
   title      String
@@ -149,13 +161,29 @@ model BlogPost {
   coverImage String   @db.Text
   published  Boolean  @default(false)
   adSlot     String?  // slot AdSense específico deste post (substitui o slot global do blog)
+  authorId   String?
+  author     Author?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   images BlogImage[]
   blocks BlogBlock[]
+  likes  BlogLike[]
 
+  @@index([authorId])
   @@map("blog_posts")
+}
+
+model BlogLike {
+  id         String   @id @default(cuid())
+  blogPostId String
+  blogPost   BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  ownerKey   String
+  createdAt  DateTime @default(now())
+
+  @@unique([blogPostId, ownerKey])
+  @@index([blogPostId])
+  @@map("blog_likes")
 }
 
 model BlogImage {

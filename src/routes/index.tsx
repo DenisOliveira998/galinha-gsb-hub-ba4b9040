@@ -6,7 +6,7 @@ import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { AdSlot } from "@/components/site/ad-slot";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout } from "lucide-react";
+import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout, UserCircle2 } from "lucide-react";
 import { listPosts } from "@/lib/posts";
 import { listBlogPosts } from "@/lib/blog";
 import { listHeroSlides } from "@/lib/hero-slides";
@@ -174,19 +174,20 @@ function Home() {
       {destaques.length > 0 && (
         <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
           <h2 className="font-display text-xl md:text-2xl">Últimos anúncios</h2>
-          <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-3 md:gap-4">
+          <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-4 md:gap-3">
             {destaques.map((p) => (
-              <div key={p.id} className="relative flex h-full w-[68%] shrink-0 snap-start sm:w-auto">
-                <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
-                <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:rounded-3xl">
-                  <div className="aspect-[4/3] overflow-hidden">
+              <div key={p.id} className="relative flex h-full w-[52%] shrink-0 snap-start sm:w-auto">
+                <FavoriteButton postId={p.id} title={p.title} className="absolute right-2 top-2 z-10" />
+                <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full w-full flex-col overflow-hidden rounded-xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+                  {/* proporção quadrada igual ao carrossel de destaque */}
+                  <div className="aspect-square overflow-hidden">
                     <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   </div>
-                  <div className="flex flex-1 flex-col p-3.5 text-left md:p-4">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
-                    <h3 className="mt-1 line-clamp-2 font-display text-sm md:text-base">{p.title}</h3>
-                    <div className="mt-1"><StarsDisplay average={0} count={0} /></div>
-                    {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
+                  <div className="flex flex-1 flex-col p-2.5 text-left">
+                    <div className="text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
+                    <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+                    <div className="mt-0.5"><StarsDisplay average={0} count={0} /></div>
+                    {p.price && <div className="mt-auto pt-1.5 text-xs font-semibold">R$ {p.price.toFixed(2)}</div>}
                   </div>
                 </Link>
               </div>
@@ -205,22 +206,34 @@ function Home() {
             </div>
             <Link to="/blog" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
           </div>
-          <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-3 md:gap-4">
+          <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-4 md:gap-3">
             {ultimosPosts.map((p) => (
               <Link
                 key={p.id}
                 to="/blog/$slug"
                 params={{ slug: p.slug }}
-                className="group flex h-full w-[68%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] sm:w-auto md:rounded-3xl"
+                className="group flex h-full w-[52%] shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] sm:w-auto"
               >
-                <div className="aspect-[16/9] overflow-hidden">
+                <div className="aspect-video overflow-hidden">
                   <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </div>
-                <div className="flex flex-1 flex-col p-3.5 text-left md:p-4">
+                <div className="flex flex-1 flex-col p-2.5 text-left">
                   <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
-                  <h3 className="mt-1 line-clamp-2 font-display text-sm md:text-base">{p.title}</h3>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{p.excerpt}</p>
-                  <div className="mt-auto pt-3 text-xs font-semibold text-primary md:text-sm">Ler mais →</div>
+                  <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+                  <div className="mt-auto flex items-center justify-between pt-2">
+                    {p.author ? (
+                      <div className="flex items-center gap-1 min-w-0">
+                        {p.author.avatar ? (
+                          <img src={p.author.avatar} alt={p.author.name} className="h-4 w-4 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <UserCircle2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        )}
+                        <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] font-semibold text-primary">Ler →</span>
+                    )}
+                  </div>
                 </div>
               </Link>
             ))}

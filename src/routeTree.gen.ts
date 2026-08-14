@@ -22,6 +22,7 @@ import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PublicidadeRouteImport } from './routes/publicidade'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -29,6 +30,7 @@ import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminCarrosselRouteImport } from './routes/admin.carrossel'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminClientesRouteImport } from './routes/admin.clientes'
+import { Route as AdminComentariosRouteImport } from './routes/admin.comentarios'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
@@ -112,6 +114,11 @@ const PublicidadeRoute = PublicidadeRouteImport.update({
   path: '/publicidade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
@@ -145,6 +152,11 @@ const AdminCategoriasRoute = AdminCategoriasRouteImport.update({
 const AdminClientesRoute = AdminClientesRouteImport.update({
   id: '/clientes',
   path: '/clientes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminComentariosRoute = AdminComentariosRouteImport.update({
+  id: '/comentarios',
+  path: '/comentarios',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -247,12 +259,14 @@ export interface FileRoutesByFullPath {
   '/favoritos': typeof FavoritosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/comentarios': typeof AdminComentariosRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
@@ -282,11 +296,13 @@ export interface FileRoutesByTo {
   '/favoritos': typeof FavoritosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/comentarios': typeof AdminComentariosRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -320,12 +336,14 @@ export interface FileRoutesById {
   '/favoritos': typeof FavoritosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/comentarios': typeof AdminComentariosRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
@@ -361,12 +379,14 @@ export interface FileRouteTypes {
     | '/favoritos'
     | '/privacidade'
     | '/publicidade'
+    | '/sitemap.xml'
     | '/sobre'
     | '/termos'
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
     | '/admin/clientes'
+    | '/admin/comentarios'
     | '/admin/login'
     | '/admin/pedidos'
     | '/admin/posts'
@@ -396,11 +416,13 @@ export interface FileRouteTypes {
     | '/favoritos'
     | '/privacidade'
     | '/publicidade'
+    | '/sitemap.xml'
     | '/sobre'
     | '/termos'
     | '/admin/carrossel'
     | '/admin/categorias'
     | '/admin/clientes'
+    | '/admin/comentarios'
     | '/admin/login'
     | '/admin/pedidos'
     | '/admin/settings'
@@ -433,12 +455,14 @@ export interface FileRouteTypes {
     | '/favoritos'
     | '/privacidade'
     | '/publicidade'
+    | '/sitemap.xml'
     | '/sobre'
     | '/termos'
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
     | '/admin/clientes'
+    | '/admin/comentarios'
     | '/admin/login'
     | '/admin/pedidos'
     | '/admin/posts'
@@ -473,6 +497,7 @@ export interface RootRouteChildren {
   FavoritosRoute: typeof FavoritosRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   PublicidadeRoute: typeof PublicidadeRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
   TermosRoute: typeof TermosRoute
 }
@@ -570,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sobre': {
       id: '/sobre'
       path: '/sobre'
@@ -617,6 +649,13 @@ declare module '@tanstack/react-router' {
       path: '/clientes'
       fullPath: '/admin/clientes'
       preLoaderRoute: typeof AdminClientesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/comentarios': {
+      id: '/admin/comentarios'
+      path: '/comentarios'
+      fullPath: '/admin/comentarios'
+      preLoaderRoute: typeof AdminComentariosRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/login': {
@@ -778,6 +817,7 @@ interface AdminRouteChildren {
   AdminCarrosselRoute: typeof AdminCarrosselRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
   AdminClientesRoute: typeof AdminClientesRoute
+  AdminComentariosRoute: typeof AdminComentariosRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminPedidosRoute: typeof AdminPedidosRoute
   AdminPostsRoute: typeof AdminPostsRouteWithChildren
@@ -790,6 +830,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCarrosselRoute: AdminCarrosselRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
   AdminClientesRoute: AdminClientesRoute,
+  AdminComentariosRoute: AdminComentariosRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminPedidosRoute: AdminPedidosRoute,
   AdminPostsRoute: AdminPostsRouteWithChildren,
@@ -863,6 +904,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavoritosRoute: FavoritosRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   PublicidadeRoute: PublicidadeRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
   TermosRoute: TermosRoute,
 }

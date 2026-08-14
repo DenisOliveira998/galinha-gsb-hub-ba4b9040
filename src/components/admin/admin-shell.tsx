@@ -1,7 +1,7 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { adminLogout } from "@/lib/admin-auth";
-import { ExternalLink, FileText, GalleryHorizontal, LayoutDashboard, LogOut, MessageSquare, Newspaper, Settings, ShoppingBag, Tags, Users } from "lucide-react";
+import { ExternalLink, FileText, GalleryHorizontal, LayoutDashboard, LogOut, MessageSquare, Newspaper, Settings, ShoppingBag, Tags, UserCircle2, Users } from "lucide-react";
 
 export function AdminShell({ children, title }: { children: ReactNode; title: string }) {
   const router = useRouter();
@@ -11,6 +11,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
     { to: "/admin/posts", label: "Anúncios", icon: FileText },
     { to: "/admin/categorias", label: "Categorias", icon: Tags },
     { to: "/admin/blog", label: "Blog", icon: Newspaper },
+    { to: "/admin/autores", label: "Autores", icon: UserCircle2 },
     { to: "/admin/comentarios", label: "Comentários", icon: MessageSquare },
     { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
     { to: "/admin/clientes", label: "Clientes", icon: Users },
