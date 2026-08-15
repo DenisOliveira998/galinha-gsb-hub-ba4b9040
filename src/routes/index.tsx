@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useRef } from "react";
 import { SiteLayout } from "@/components/site/site-layout";
 import { HeroCarousel } from "@/components/site/hero-carousel";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { AdSlot } from "@/components/site/ad-slot";
+import { BlogLikeButton } from "@/components/site/blog-like-button";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout, UserCircle2 } from "lucide-react";
+import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout, UserCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { listPosts } from "@/lib/posts";
 import { listBlogPosts } from "@/lib/blog";
 import { listHeroSlides } from "@/lib/hero-slides";
@@ -38,11 +40,85 @@ function getCategoryLabel(categories: Array<{ id: string; label: string }>, id: 
   return categories.find((c) => c.id === id)?.label ?? id;
 }
 
+/** Slider horizontal com setas e arrastar com mouse */
+function DragScroller({ children, scrollAmount = 320 }: { children: React.ReactNode; scrollAmount?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+  const isDragging = useRef(false);
+  const moved = useRef(false);
+
+  const scroll = (dir: number) => {
+    ref.current?.scrollBy({ left: dir * scrollAmount, behavior: "smooth" });
+  };
+
+  return (
+    <div className="relative">
+      {/* Seta esquerda */}
+      <button
+        type="button"
+        onClick={() => scroll(-1)}
+        className="absolute -left-3 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border bg-card text-foreground shadow-[var(--shadow-card)] transition hover:bg-muted md:-left-5"
+        aria-label="Anterior"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+
+      <div
+        ref={ref}
+        className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-0.5 pb-2 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden select-none"
+        style={{ cursor: "grab" }}
+        onMouseDown={(e) => {
+          isDragging.current = true;
+          moved.current = false;
+          startX.current = e.pageX - (ref.current?.offsetLeft ?? 0);
+          scrollLeft.current = ref.current?.scrollLeft ?? 0;
+          if (ref.current) ref.current.style.cursor = "grabbing";
+        }}
+        onMouseMove={(e) => {
+          if (!isDragging.current) return;
+          e.preventDefault();
+          moved.current = true;
+          const x = e.pageX - (ref.current?.offsetLeft ?? 0);
+          if (ref.current) ref.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.2;
+        }}
+        onMouseUp={() => {
+          isDragging.current = false;
+          if (ref.current) ref.current.style.cursor = "grab";
+        }}
+        onMouseLeave={() => {
+          isDragging.current = false;
+          if (ref.current) ref.current.style.cursor = "grab";
+        }}
+        onClickCapture={(e) => {
+          if (moved.current) {
+            e.preventDefault();
+            e.stopPropagation();
+            moved.current = false;
+          }
+        }}
+      >
+        {children}
+      </div>
+
+      {/* Seta direita */}
+      <button
+        type="button"
+        onClick={() => scroll(1)}
+        className="absolute -right-3 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border bg-card text-foreground shadow-[var(--shadow-card)] transition hover:bg-muted md:-right-5"
+        aria-label="Próximo"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
 function Home() {
   const { posts, blog, heroSlides, categories } = Route.useLoaderData();
   const hydrated = useHydrated();
-  const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 3);
-  const ultimosPosts = blog.filter((p) => p.published).slice(0, 3);
+  const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 8);
+  const ultimosPosts = blog.filter((p) => p.published).slice(0, 8);
 
   return (
     <SiteLayout>
@@ -90,10 +166,7 @@ function Home() {
           preserveAspectRatio="none"
           className="pointer-events-none absolute inset-x-0 bottom-0 h-10 w-full text-background md:h-14"
         >
-          <path
-            fill="currentColor"
-            d="M0,50 C240,95 480,10 720,38 C960,66 1200,96 1440,52 L1440,90 L0,90 Z"
-          />
+          <path fill="currentColor" d="M0,50 C240,95 480,10 720,38 C960,66 1200,96 1440,52 L1440,90 L0,90 Z" />
         </svg>
       </section>
 
@@ -150,7 +223,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Espaço publicitário — formato horizontal (banner largo) */}
+      {/* Espaço publicitário */}
       <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
         <AdSlot
           slot="homeBanner"
@@ -158,85 +231,91 @@ function Home() {
           placeholder={
             <div className="flex min-h-[80px] items-center justify-center rounded-2xl border-2 border-dashed border-accent/50 bg-accent/5 px-4 py-5 text-center md:min-h-[110px] md:rounded-3xl">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-accent">
-                  Espaço publicitário · Banner horizontal
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Formato retangular largo disponível para parceiros.
-                </p>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-accent">Espaço publicitário · Banner horizontal</div>
+                <p className="mt-1 text-xs text-muted-foreground">Formato retangular largo disponível para parceiros.</p>
               </div>
             </div>
           }
         />
       </section>
 
-      {/* Destaques do catálogo */}
+      {/* Últimos anúncios — slider */}
       {destaques.length > 0 && (
-        <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
-          <h2 className="font-display text-xl md:text-2xl">Últimos anúncios</h2>
-          <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-4 md:gap-3">
-            {destaques.map((p) => (
-              <div key={p.id} className="relative flex h-full w-[52%] shrink-0 snap-start sm:w-auto">
-                <FavoriteButton postId={p.id} title={p.title} className="absolute right-2 top-2 z-10" />
-                <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full w-full flex-col overflow-hidden rounded-xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
-                  {/* proporção quadrada igual ao carrossel de destaque */}
-                  <div className="aspect-square overflow-hidden">
-                    <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  </div>
-                  <div className="flex flex-1 flex-col p-2.5 text-left">
-                    <div className="text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
-                    <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
-                    <div className="mt-0.5"><StarsDisplay average={0} count={0} /></div>
-                    {p.price && <div className="mt-auto pt-1.5 text-xs font-semibold">R$ {p.price.toFixed(2)}</div>}
-                  </div>
-                </Link>
-              </div>
-            ))}
+        <section className="mx-auto mt-8 max-w-7xl px-6 md:mt-12 md:px-12">
+          <div className="flex items-end justify-between">
+            <h2 className="font-display text-xl md:text-2xl">Últimos anúncios</h2>
+            <Link to="/catalogo" className="text-sm font-semibold text-primary hover:underline">Ver todos →</Link>
+          </div>
+          <div className="mt-4 md:mt-5">
+            <DragScroller>
+              {destaques.map((p) => (
+                <div key={p.id} className="relative w-36 shrink-0 snap-start md:w-44">
+                  <FavoriteButton postId={p.id} title={p.title} className="absolute right-1.5 top-1.5 z-10" />
+                  <Link
+                    to="/catalogo/$slug"
+                    params={{ slug: p.slug }}
+                    className="group flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
+                  >
+                    <div className="aspect-square overflow-hidden">
+                      <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                    </div>
+                    <div className="flex flex-col p-2 text-left">
+                      <div className="text-[9px] font-semibold uppercase tracking-wider text-primary line-clamp-1">{getCategoryLabel(categories, p.category)}</div>
+                      <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+                      {p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>}
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </DragScroller>
           </div>
         </section>
       )}
 
-      {/* Blog */}
+      {/* Blog — slider */}
       {ultimosPosts.length > 0 && (
-        <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
+        <section className="mx-auto mt-8 max-w-7xl px-6 md:mt-12 md:px-12">
           <div className="flex items-end justify-between">
             <div>
               <h2 className="font-display text-xl md:text-2xl">Do nosso blog</h2>
               <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">Dicas de manejo e novidades do plantel.</p>
             </div>
-            <Link to="/blog" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
+            <Link to="/blog" className="text-sm font-semibold text-primary hover:underline">Ver todos →</Link>
           </div>
-          <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 md:mt-5 md:grid-cols-4 md:gap-3">
-            {ultimosPosts.map((p) => (
-              <Link
-                key={p.id}
-                to="/blog/$slug"
-                params={{ slug: p.slug }}
-                className="group flex h-full w-[52%] shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] sm:w-auto"
-              >
-                <div className="aspect-video overflow-hidden">
-                  <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                </div>
-                <div className="flex flex-1 flex-col p-2.5 text-left">
-                  <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
-                  <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
-                  <div className="mt-auto flex items-center justify-between pt-2">
-                    {p.author ? (
-                      <div className="flex items-center gap-1 min-w-0">
-                        {p.author.avatar ? (
-                          <img src={p.author.avatar} alt={p.author.name} className="h-4 w-4 rounded-full object-cover shrink-0" />
-                        ) : (
-                          <UserCircle2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                        )}
-                        <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
-                      </div>
-                    ) : (
-                      <span className="text-[10px] font-semibold text-primary">Ler →</span>
-                    )}
+          <div className="mt-4 md:mt-5">
+            <DragScroller>
+              {ultimosPosts.map((p) => (
+                <Link
+                  key={p.id}
+                  to="/blog/$slug"
+                  params={{ slug: p.slug }}
+                  className="group flex w-36 shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:w-44"
+                >
+                  <div className="aspect-square overflow-hidden">
+                    <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   </div>
-                </div>
-              </Link>
-            ))}
+                  <div className="flex flex-1 flex-col p-2 text-left">
+                    <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
+                    <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+                    <div className="mt-auto flex items-center justify-between pt-1.5">
+                      {p.author ? (
+                        <div className="flex min-w-0 items-center gap-1">
+                          {p.author.avatar ? (
+                            <img src={p.author.avatar} alt={p.author.name} className="h-3.5 w-3.5 shrink-0 rounded-full object-cover" />
+                          ) : (
+                            <UserCircle2 className="h-3 w-3 shrink-0 text-muted-foreground" />
+                          )}
+                          <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-semibold text-primary">Ler →</span>
+                      )}
+                      <BlogLikeButton postId={p.id} initialCount={p.likeCount} />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </DragScroller>
           </div>
         </section>
       )}
@@ -248,12 +327,8 @@ function Home() {
           placeholder={
             <div className="grid min-h-[100px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-6 text-center md:min-h-[140px] md:rounded-3xl">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">
-                  Espaço publicitário
-                </div>
-                <p className="mt-1.5 text-xs text-muted-foreground md:text-sm">
-                  Anuncie aqui — fale conosco para reservar este espaço.
-                </p>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
+                <p className="mt-1.5 text-xs text-muted-foreground md:text-sm">Anuncie aqui — fale conosco para reservar este espaço.</p>
               </div>
             </div>
           }
