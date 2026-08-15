@@ -44,6 +44,43 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+async function handleSitemap(): Promise<Response> {
+  const BASE = "https://galinhagsb.com.br";
+  const now = new Date().toISOString().split("T")[0];
+
+  let postSlugs: string[] = [];
+  let blogSlugs: string[] = [];
+
+  try {
+    const { prisma } = await import("./lib/prisma");
+    const [posts, blogs] = await Promise.all([
+      prisma.post.findMany({ where: { status: "PUBLISHED" }, select: { slug: true } }),
+      prisma.blogPost.findMany({ where: { published: true }, select: { slug: true } }),
+    ]);
+    postSlugs = posts.map((p) => p.slug);
+    blogSlugs = blogs.map((b) => b.slug);
+  } catch {
+    // se falhar retorna sitemap estático
+  }
+
+  const staticRoutes = ["/", "/catalogo", "/blog", "/sobre", "/contato"];
+  const urls = [
+    ...staticRoutes.map((r) => `  <url><loc>${BASE}${r}</loc><lastmod>${now}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`),
+    ...postSlugs.map((s) => `  <url><loc>${BASE}/catalogo/${s}</loc><lastmod>${now}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
+    ...blogSlugs.map((s) => `  <url><loc>${BASE}/blog/${s}</loc><lastmod>${now}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>`;
+
+  return new Response(xml, {
+    status: 200,
+    headers: {
+      "content-type": "application/xml; charset=utf-8",
+      "cache-control": "public, max-age=3600, s-maxage=3600",
+    },
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
@@ -88,6 +125,10 @@ export default {
       if (pathname.startsWith("/api/auth")) {
         const { auth } = await import("./lib/auth");
         return auth.handler(request);
+      }
+
+      if (pathname === "/sitemap.xml") {
+        return handleSitemap();
       }
 
       const handler = await getServerEntry();
