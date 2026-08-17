@@ -40,6 +40,62 @@ function getCategoryLabel(categories: Array<{ id: string; label: string }>, id: 
   return categories.find((c) => c.id === id)?.label ?? id;
 }
 
+type Post = { id: string; slug: string; title: string; images: string[]; price?: number | null; category: string; status: string };
+type BlogPost = { id: string; slug: string; title: string; coverImage: string; createdAt: string; likeCount: number; author?: { name: string; avatar: string | null } | null };
+
+function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ id: string; label: string }>; slider?: boolean }) {
+  const cls = slider ? "relative w-36 shrink-0 snap-start md:w-44" : "relative";
+  return (
+    <div className={cls}>
+      <FavoriteButton postId={p.id} title={p.title} className="absolute right-1.5 top-1.5 z-10" />
+      <Link
+        to="/catalogo/$slug"
+        params={{ slug: p.slug }}
+        className="group flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
+      >
+        <div className="aspect-square overflow-hidden">
+          <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+        </div>
+        <div className="flex flex-col p-2 text-left">
+          <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
+          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+          {p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>}
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+function BlogCard({ p, hydrated, slider }: { p: BlogPost; hydrated: boolean; slider?: boolean }) {
+  const cls = slider ? "group flex w-36 shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:w-44" : "group flex flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]";
+  return (
+    <Link to="/blog/$slug" params={{ slug: p.slug }} className={cls}>
+      <div className="aspect-square overflow-hidden">
+        <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+      </div>
+      <div className="flex flex-1 flex-col p-2 text-left">
+        <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
+        <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+        <div className="mt-auto flex items-center justify-between pt-1.5">
+          {p.author ? (
+            <div className="flex min-w-0 items-center gap-1">
+              {p.author.avatar ? (
+                <img src={p.author.avatar} alt={p.author.name} className="h-3.5 w-3.5 shrink-0 rounded-full object-cover" />
+              ) : (
+                <UserCircle2 className="h-3 w-3 shrink-0 text-muted-foreground" />
+              )}
+              <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
+            </div>
+          ) : (
+            <span className="text-[10px] font-semibold text-primary">Ler →</span>
+          )}
+          <BlogLikeButton postId={p.id} initialCount={p.likeCount} />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 /** Slider horizontal com setas e arrastar com mouse */
 function DragScroller({ children, scrollAmount = 320 }: { children: React.ReactNode; scrollAmount?: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -239,7 +295,7 @@ function Home() {
         />
       </section>
 
-      {/* Últimos anúncios — slider */}
+      {/* Últimos anúncios */}
       {destaques.length > 0 && (
         <section className="mx-auto mt-8 max-w-7xl px-6 md:mt-12 md:px-12">
           <div className="flex items-end justify-between">
@@ -247,32 +303,20 @@ function Home() {
             <Link to="/catalogo" className="text-sm font-semibold text-primary hover:underline">Ver todos →</Link>
           </div>
           <div className="mt-4 md:mt-5">
-            <DragScroller>
-              {destaques.map((p) => (
-                <div key={p.id} className="relative w-36 shrink-0 snap-start md:w-44">
-                  <FavoriteButton postId={p.id} title={p.title} className="absolute right-1.5 top-1.5 z-10" />
-                  <Link
-                    to="/catalogo/$slug"
-                    params={{ slug: p.slug }}
-                    className="group flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
-                  >
-                    <div className="aspect-square overflow-hidden">
-                      <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                    </div>
-                    <div className="flex flex-col p-2 text-left">
-                      <div className="text-[9px] font-semibold uppercase tracking-wider text-primary line-clamp-1">{getCategoryLabel(categories, p.category)}</div>
-                      <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
-                      {p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>}
-                    </div>
-                  </Link>
-                </div>
-              ))}
-            </DragScroller>
+            {destaques.length > 4 ? (
+              <DragScroller>
+                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} slider />)}
+              </DragScroller>
+            ) : (
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} />)}
+              </div>
+            )}
           </div>
         </section>
       )}
 
-      {/* Blog — slider */}
+      {/* Blog */}
       {ultimosPosts.length > 0 && (
         <section className="mx-auto mt-8 max-w-7xl px-6 md:mt-12 md:px-12">
           <div className="flex items-end justify-between">
@@ -283,39 +327,15 @@ function Home() {
             <Link to="/blog" className="text-sm font-semibold text-primary hover:underline">Ver todos →</Link>
           </div>
           <div className="mt-4 md:mt-5">
-            <DragScroller>
-              {ultimosPosts.map((p) => (
-                <Link
-                  key={p.id}
-                  to="/blog/$slug"
-                  params={{ slug: p.slug }}
-                  className="group flex w-36 shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:w-44"
-                >
-                  <div className="aspect-square overflow-hidden">
-                    <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  </div>
-                  <div className="flex flex-1 flex-col p-2 text-left">
-                    <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
-                    <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
-                    <div className="mt-auto flex items-center justify-between pt-1.5">
-                      {p.author ? (
-                        <div className="flex min-w-0 items-center gap-1">
-                          {p.author.avatar ? (
-                            <img src={p.author.avatar} alt={p.author.name} className="h-3.5 w-3.5 shrink-0 rounded-full object-cover" />
-                          ) : (
-                            <UserCircle2 className="h-3 w-3 shrink-0 text-muted-foreground" />
-                          )}
-                          <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[10px] font-semibold text-primary">Ler →</span>
-                      )}
-                      <BlogLikeButton postId={p.id} initialCount={p.likeCount} />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </DragScroller>
+            {ultimosPosts.length > 4 ? (
+              <DragScroller>
+                {ultimosPosts.map((p) => <BlogCard key={p.id} p={p} hydrated={hydrated} slider />)}
+              </DragScroller>
+            ) : (
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+                {ultimosPosts.map((p) => <BlogCard key={p.id} p={p} hydrated={hydrated} />)}
+              </div>
+            )}
           </div>
         </section>
       )}
