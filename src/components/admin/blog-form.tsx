@@ -43,7 +43,7 @@ export function BlogForm({ initial, onSubmit, loading = false }: { initial?: Blo
   const [authorId, setAuthorId] = useState<string | null>(initial?.authorId ?? null);
   const [images, setImages] = useState<string[]>(Array.isArray(initial?.images) ? initial.images : []);
   const [blocks, setBlocks] = useState<BlogBlock[]>(Array.isArray(initial?.blocks) ? initial.blocks : []);
-  const { data: authors = [] } = useQuery({ queryKey: ["authors"], queryFn: () => listAuthors() });
+  const { data: authors = [] } = useQuery<Array<{ id: string; name: string }>>({ queryKey: ["authors"], queryFn: () => listAuthors() });
   const [picking, setPicking] = useState<Picking | null>(null);
 
   const addBlock = (type: BlogBlock["type"]) =>

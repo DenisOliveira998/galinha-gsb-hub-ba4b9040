@@ -54,8 +54,8 @@ export function SiteHeader() {
               <MessageCircle className="h-5 w-5" />
             </a>
             <Link
-              to={currentCustomerId ? "/conta" : "/conta/login"}
-              aria-label={currentCustomerId ? "Minha conta" : "Entrar"}
+              to="/conta/login"
+              aria-label="Entrar"
               className="grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10"
             >
               <User className="h-5 w-5" />
