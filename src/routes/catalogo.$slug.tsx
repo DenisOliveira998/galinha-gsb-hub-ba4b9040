@@ -1,10 +1,7 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { HelpCircle, ShoppingBag, Zap } from "lucide-react";
-import { toast } from "sonner";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { HelpCircle } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useShop } from "@/lib/shop-store";
 import { CommentsSection } from "@/components/site/comments-section";
-import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay, StarsInput } from "@/components/site/star-rating";
 import { getPostBySlug, listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
@@ -45,8 +42,6 @@ export const Route = createFileRoute("/catalogo/$slug")({
 function PostDetail() {
   const { post, posts, categories, isAdmin } = Route.useLoaderData();
   const { data: settings } = useSettingsQuery();
-  const addToCart = useShop((s) => s.addToCart);
-  const navigate = useNavigate();
 
   const { data: session } = authClient.useSession();
   const loggedIn = !!session?.user;
@@ -58,8 +53,8 @@ function PostDetail() {
   const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? id;
   const faq = (post.faq ?? []).filter((f) => f.question.trim() || f.answer.trim());
   const related = posts
-    .filter((p) => p.id !== post.id && p.category === post.category && p.status !== "DRAFT")
-    .slice(0, 3);
+    .filter((p) => p.id !== post.id && p.status !== "DRAFT")
+    .slice(0, 6);
 
   const waNumber = settings?.whatsappLink || settings?.whatsapp || "";
 
@@ -68,9 +63,8 @@ function PostDetail() {
       <div className="mx-auto max-w-6xl px-4 py-12 md:px-8">
         <Link to="/catalogo" className="text-sm text-muted-foreground hover:text-foreground">← Voltar ao catálogo</Link>
         <div className="mt-6 grid gap-10 md:grid-cols-2">
-          <div className="relative overflow-hidden rounded-3xl shadow-[var(--shadow-card)]">
+          <div className="overflow-hidden rounded-3xl shadow-[var(--shadow-card)]">
             <img src={post.images[0]} alt={post.title} className="aspect-square w-full object-cover" />
-            <FavoriteButton postId={post.id} title={post.title} className="absolute right-3 top-3" />
           </div>
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
@@ -101,46 +95,18 @@ function PostDetail() {
             </div>
             {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
             <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
-            {post.status !== "SOLD" && post.price && (
-              <div className="mt-8 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    addToCart(post);
-                    toast.success("Adicionado ao carrinho", { description: post.title });
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-3 text-sm font-semibold text-primary hover:bg-primary/15"
-                >
-                  <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    addToCart(post);
-                    navigate({ to: "/checkout" });
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
-                >
-                  <Zap className="h-4 w-4" /> Comprar agora
-                </button>
-              </div>
-            )}
-            <div className="mt-6 flex flex-wrap gap-3">
-              {waNumber && (
+            {waNumber && (
+              <div className="mt-6 flex flex-wrap gap-3">
                 <a
                   href={whatsappHref(settings ?? { whatsappLink: waNumber, whatsapp: waNumber }, `Olá! Tenho interesse em: ${post.title}`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
                 >
                   Falar no WhatsApp
                 </a>
-              )}
-              <Link to="/contato" className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted">
-                {waNumber ? `Ver contato (${settings?.whatsapp ?? ""})` : "Entrar em contato"}
-              </Link>
-              <FavoriteButton postId={post.id} title={post.title} withLabel />
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -165,22 +131,18 @@ function PostDetail() {
         {related.length > 0 && (
           <section className="mt-12">
             <h2 className="font-display text-xl md:text-2xl">Você também pode gostar</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {related.map((p) => (
-                <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
-                  <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
-                  <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="aspect-[4/3] overflow-hidden">
+                <Link key={p.id} to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
+                  <div className="aspect-square overflow-hidden">
                     <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  </Link>
-                  <div className="flex flex-1 flex-col p-4 text-left">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
-                    <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1 line-clamp-2 font-display text-base hover:text-primary">
-                      {p.title}
-                    </Link>
-                    <div className="mt-1.5"><StarsDisplay average={0} count={0} size="sm" /></div>
-                    {p.price && <div className="mt-auto pt-3 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
                   </div>
-                </article>
+                  <div className="flex flex-1 flex-col p-3 text-left">
+                    <div className="text-[9px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
+                    <div className="mt-0.5 line-clamp-2 font-display text-sm">{p.title}</div>
+                    {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
+                  </div>
+                </Link>
               ))}
             </div>
           </section>

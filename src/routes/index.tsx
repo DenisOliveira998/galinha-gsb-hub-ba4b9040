@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { useRef } from "react";
 import { SiteLayout } from "@/components/site/site-layout";
 import { HeroCarousel } from "@/components/site/hero-carousel";
-import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { AdSlot } from "@/components/site/ad-slot";
 import { BlogLikeButton } from "@/components/site/blog-like-button";
@@ -47,7 +46,6 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
   const cls = slider ? "relative w-36 shrink-0 snap-start md:w-44" : "relative";
   return (
     <div className={cls}>
-      <FavoriteButton postId={p.id} title={p.title} className="absolute right-1.5 top-1.5 z-10" />
       <Link
         to="/catalogo/$slug"
         params={{ slug: p.slug }}

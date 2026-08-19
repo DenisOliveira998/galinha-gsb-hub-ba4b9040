@@ -1,10 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { toast } from "sonner";
-import { ShoppingBag, Zap } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
-import { useShop } from "@/lib/shop-store";
-import { FavoriteButton } from "@/components/site/favorite-button";
 import { StarsDisplay } from "@/components/site/star-rating";
 import { listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
@@ -41,7 +37,6 @@ export const Route = createFileRoute("/catalogo/")({
 function Catalog() {
   const { posts: allPosts, categories, ratingsMap } = Route.useLoaderData();
   const posts = allPosts.filter((p) => p.status !== "DRAFT");
-  const addToCart = useShop((s) => s.addToCart);
   const navigate = useNavigate();
   const { q, cat: catParam } = Route.useSearch();
   const cat = catParam ?? "ALL";
@@ -104,7 +99,6 @@ function Catalog() {
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p) => (
               <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
-                <FavoriteButton postId={p.id} title={p.title} className="absolute right-3 top-3 z-10" />
                 <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                   {p.status === "SOLD" && (
@@ -119,30 +113,6 @@ function Catalog() {
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
                   <div className="mt-1.5"><StarsDisplay average={ratingsMap[p.id]?.average ?? 0} count={ratingsMap[p.id]?.count ?? 0} /></div>
                   {p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
-                  {p.status !== "SOLD" && (
-                    <div className="mt-auto flex flex-col gap-2 pt-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          addToCart(p);
-                          toast.success("Adicionado ao carrinho", { description: p.title });
-                        }}
-                        className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/15"
-                      >
-                        <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          addToCart(p);
-                          navigate({ to: "/checkout" });
-                        }}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
-                      >
-                        <Zap className="h-4 w-4" /> Comprar agora
-                      </button>
-                    </div>
-                  )}
                 </div>
               </article>
             ))}
