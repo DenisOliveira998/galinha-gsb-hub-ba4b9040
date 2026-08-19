@@ -10,6 +10,7 @@ import { getPostBySlug, listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
 import { useSettingsQuery } from "@/lib/hooks/use-settings";
 import { useRatingSummaryQuery, useMyRatingQuery, useRatePostMutation } from "@/lib/hooks/use-ratings";
+import { whatsappHref } from "@/lib/mock-store";
 import { getAdminSession } from "@/lib/admin-auth";
 import { authClient } from "@/lib/auth-client";
 
@@ -40,11 +41,6 @@ export const Route = createFileRoute("/catalogo/$slug")({
     </SiteLayout>
   ),
 });
-
-function whatsappHref(whatsapp: string, message: string) {
-  const num = whatsapp.replace(/\D/g, "");
-  return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
-}
 
 function PostDetail() {
   const { post, posts, categories, isAdmin } = Route.useLoaderData();
@@ -132,7 +128,7 @@ function PostDetail() {
             <div className="mt-6 flex flex-wrap gap-3">
               {waNumber && (
                 <a
-                  href={whatsappHref(waNumber, `Olá! Tenho interesse em: ${post.title}`)}
+                  href={whatsappHref(settings ?? { whatsappLink: waNumber, whatsapp: waNumber }, `Olá! Tenho interesse em: ${post.title}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-full border px-6 py-3 text-sm font-semibold hover:bg-muted"
