@@ -56,7 +56,7 @@ function PostDetail() {
     .filter((p) => p.id !== post.id && p.status !== "DRAFT")
     .slice(0, 6);
 
-  const waNumber = settings?.whatsappLink || settings?.whatsapp || "";
+  const waHref = settings ? whatsappHref(settings, `Olá! Tenho interesse em: ${post.title}`) : null;
 
   return (
     <SiteLayout>
@@ -95,10 +95,10 @@ function PostDetail() {
             </div>
             {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
             <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
-            {waNumber && (
-              <div className="mt-6 flex flex-wrap gap-3">
+            {waHref && (
+              <div className="mt-6">
                 <a
-                  href={whatsappHref(settings ?? { whatsappLink: waNumber, whatsapp: waNumber }, `Olá! Tenho interesse em: ${post.title}`)}
+                  href={waHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
