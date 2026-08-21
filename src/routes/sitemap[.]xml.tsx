@@ -22,7 +22,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 
 function Sitemap() {
   const { postSlugs, blogSlugs } = Route.useLoaderData();
-  const staticRoutes = ["/", "/catalogo", "/blog", "/sobre", "/contato", "/favoritos"];
+  const staticRoutes = ["/", "/catalogo", "/blog", "/sobre", "/contato"];
   const now = new Date().toISOString().split("T")[0];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

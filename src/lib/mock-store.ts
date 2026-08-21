@@ -627,13 +627,22 @@ export const useStore = create<State>()(
 /** Normaliza o link do WhatsApp configurado no admin (aceita link ou número). */
 export function whatsappHref(settings: SiteSettings, text?: string): string {
   const raw = (settings.whatsappLink || "").trim();
-  let base: string;
+
+  // Extrai o número de qualquer formato:
+  // - número puro: "5511999999999"
+  // - wa.me/5511999999999
+  // - api.whatsapp.com/send?phone=5511999999999
+  // - (11) 99999-9999 (sem DDI)
+  let phone: string;
   if (/^https?:\/\//i.test(raw)) {
-    base = raw.split("?")[0].replace(/\/$/, "");
+    const fromPhone = raw.match(/[?&]phone=(\d+)/i);
+    const fromWame = raw.match(/wa\.me\/(\d+)/i);
+    phone = (fromPhone?.[1] ?? fromWame?.[1] ?? "").replace(/\D/g, "");
   } else {
-    const digits = (raw || settings.whatsapp || "").replace(/\D/g, "");
-    base = `https://wa.me/${digits || "5500000000000"}`;
+    phone = (raw || settings.whatsapp || "").replace(/\D/g, "");
   }
+
+  const base = `https://wa.me/${phone || "5500000000000"}`;
   return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 

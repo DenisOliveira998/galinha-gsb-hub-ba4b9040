@@ -15,11 +15,9 @@ import { Route as AfiliadosRouteImport } from './routes/afiliados'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
-import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CookiesRouteImport } from './routes/cookies'
-import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PublicidadeRouteImport } from './routes/publicidade'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -39,7 +37,6 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
 import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
-import { Route as CheckoutConfirmadoRouteImport } from './routes/checkout.confirmado'
 import { Route as ContaIndexRouteImport } from './routes/conta.index'
 import { Route as ContaLoginRouteImport } from './routes/conta.login'
 import { Route as AdminBlogIndexRouteImport } from './routes/admin.blog.index'
@@ -79,11 +76,6 @@ const CatalogoRoute = CatalogoRouteImport.update({
   path: '/catalogo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ContaRoute = ContaRouteImport.update({
   id: '/conta',
   path: '/conta',
@@ -97,11 +89,6 @@ const ContatoRoute = ContatoRouteImport.update({
 const CookiesRoute = CookiesRouteImport.update({
   id: '/cookies',
   path: '/cookies',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FavoritosRoute = FavoritosRouteImport.update({
-  id: '/favoritos',
-  path: '/favoritos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -199,11 +186,6 @@ const CatalogoSlugRoute = CatalogoSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CatalogoRoute,
 } as any)
-const CheckoutConfirmadoRoute = CheckoutConfirmadoRouteImport.update({
-  id: '/confirmado',
-  path: '/confirmado',
-  getParentRoute: () => CheckoutRoute,
-} as any)
 const ContaIndexRoute = ContaIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -252,11 +234,9 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
-  '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/cookies': typeof CookiesRoute
-  '/favoritos': typeof FavoritosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -273,7 +253,6 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
-  '/checkout/confirmado': typeof CheckoutConfirmadoRoute
   '/conta/login': typeof ContaLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -290,10 +269,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/afiliados': typeof AfiliadosRoute
   '/carrinho': typeof CarrinhoRoute
-  '/checkout': typeof CheckoutRouteWithChildren
   '/contato': typeof ContatoRoute
   '/cookies': typeof CookiesRoute
-  '/favoritos': typeof FavoritosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -308,7 +285,6 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
-  '/checkout/confirmado': typeof CheckoutConfirmadoRoute
   '/conta/login': typeof ContaLoginRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
@@ -329,11 +305,9 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
-  '/checkout': typeof CheckoutRouteWithChildren
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/cookies': typeof CookiesRoute
-  '/favoritos': typeof FavoritosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -350,7 +324,6 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
-  '/checkout/confirmado': typeof CheckoutConfirmadoRoute
   '/conta/login': typeof ContaLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -372,11 +345,9 @@ export interface FileRouteTypes {
     | '/blog'
     | '/carrinho'
     | '/catalogo'
-    | '/checkout'
     | '/conta'
     | '/contato'
     | '/cookies'
-    | '/favoritos'
     | '/privacidade'
     | '/publicidade'
     | '/sitemap.xml'
@@ -393,7 +364,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
-    | '/checkout/confirmado'
     | '/conta/login'
     | '/admin/'
     | '/blog/'
@@ -413,7 +383,6 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contato'
     | '/cookies'
-    | '/favoritos'
     | '/privacidade'
     | '/publicidade'
     | '/sitemap.xml'
@@ -428,7 +397,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
-    | '/checkout/confirmado'
     | '/conta/login'
     | '/admin'
     | '/blog'
@@ -448,11 +416,9 @@ export interface FileRouteTypes {
     | '/blog'
     | '/carrinho'
     | '/catalogo'
-    | '/checkout'
     | '/conta'
     | '/contato'
     | '/cookies'
-    | '/favoritos'
     | '/privacidade'
     | '/publicidade'
     | '/sitemap.xml'
@@ -469,7 +435,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/catalogo/$slug'
-    | '/checkout/confirmado'
     | '/conta/login'
     | '/admin/'
     | '/blog/'
@@ -490,11 +455,9 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   CarrinhoRoute: typeof CarrinhoRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
-  CheckoutRoute: typeof CheckoutRouteWithChildren
   ContaRoute: typeof ContaRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   CookiesRoute: typeof CookiesRoute
-  FavoritosRoute: typeof FavoritosRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   PublicidadeRoute: typeof PublicidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -546,13 +509,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/conta': {
       id: '/conta'
       path: '/conta'
@@ -572,13 +528,6 @@ declare module '@tanstack/react-router' {
       path: '/cookies'
       fullPath: '/cookies'
       preLoaderRoute: typeof CookiesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/favoritos': {
-      id: '/favoritos'
-      path: '/favoritos'
-      fullPath: '/favoritos'
-      preLoaderRoute: typeof FavoritosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -713,13 +662,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/catalogo/$slug'
       preLoaderRoute: typeof CatalogoSlugRouteImport
       parentRoute: typeof CatalogoRoute
-    }
-    '/checkout/confirmado': {
-      id: '/checkout/confirmado'
-      path: '/confirmado'
-      fullPath: '/checkout/confirmado'
-      preLoaderRoute: typeof CheckoutConfirmadoRouteImport
-      parentRoute: typeof CheckoutRoute
     }
     '/conta/': {
       id: '/conta/'
@@ -866,18 +808,6 @@ const CatalogoRouteWithChildren = CatalogoRoute._addFileChildren(
   CatalogoRouteChildren,
 )
 
-interface CheckoutRouteChildren {
-  CheckoutConfirmadoRoute: typeof CheckoutConfirmadoRoute
-}
-
-const CheckoutRouteChildren: CheckoutRouteChildren = {
-  CheckoutConfirmadoRoute: CheckoutConfirmadoRoute,
-}
-
-const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
-  CheckoutRouteChildren,
-)
-
 interface ContaRouteChildren {
   ContaLoginRoute: typeof ContaLoginRoute
   ContaIndexRoute: typeof ContaIndexRoute
@@ -897,11 +827,9 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   CarrinhoRoute: CarrinhoRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
-  CheckoutRoute: CheckoutRouteWithChildren,
   ContaRoute: ContaRouteWithChildren,
   ContatoRoute: ContatoRoute,
   CookiesRoute: CookiesRoute,
-  FavoritosRoute: FavoritosRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   PublicidadeRoute: PublicidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
