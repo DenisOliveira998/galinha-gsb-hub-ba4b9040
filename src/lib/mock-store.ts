@@ -82,6 +82,8 @@ export interface SiteSettings {
   adsenseSlotBlog: string;
   /** Descrição do site exibida nos resultados de busca do Google. */
   siteDescription?: string;
+  /** Imagem exibida na moldura colada ao carrossel da home. */
+  badgeImage?: string;
 }
 
 export interface HeroSlide {

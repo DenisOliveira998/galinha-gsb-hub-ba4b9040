@@ -257,6 +257,7 @@ model SiteSettings {
   adsenseSlotHomeBanner  String @default("")
   adsenseSlotHomeRectangle String @default("")
   adsenseSlotBlog        String @default("")
+  badgeImage             String @default("/substituto.png")
   updatedAt              DateTime @updatedAt
 
   @@map("site_settings")

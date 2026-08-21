@@ -29,6 +29,7 @@ const updateSettingsSchema = z.object({
   adsenseSlotHomeBanner: z.string().optional(),
   adsenseSlotHomeRectangle: z.string().optional(),
   adsenseSlotBlog: z.string().optional(),
+  badgeImage: z.string().optional(),
 });
 
 export const updateSettings = createServerFn({ method: "POST" })

@@ -12,6 +12,7 @@ import { listPosts } from "@/lib/posts";
 import { listBlogPosts } from "@/lib/blog";
 import { listHeroSlides } from "@/lib/hero-slides";
 import { listCategories } from "@/lib/categories";
+import { useSettingsQuery } from "@/lib/hooks/use-settings";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -171,6 +172,7 @@ function DragScroller({ children, scrollAmount = 320 }: { children: React.ReactN
 function Home() {
   const { posts, blog, heroSlides, categories } = Route.useLoaderData();
   const hydrated = useHydrated();
+  const { data: settings } = useSettingsQuery();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 8);
   const ultimosPosts = blog.filter((p) => p.published).slice(0, 8);
 
@@ -208,9 +210,11 @@ function Home() {
           </div>
           <div className="relative pb-6 md:pb-0">
             <HeroCarousel slides={heroSlides} />
-            <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 overflow-hidden">
-              <img src="/substituto.png" alt="+10 anos de tradição no plantel" className="h-16 w-auto md:h-20 object-contain" />
-            </div>
+            {(settings?.badgeImage ?? "/substituto.png") && (
+              <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 overflow-hidden">
+                <img src={settings?.badgeImage ?? "/substituto.png"} alt="Distintivo do plantel" className="h-16 w-auto md:h-20 object-contain" />
+              </div>
+            )}
           </div>
         </div>
         <svg

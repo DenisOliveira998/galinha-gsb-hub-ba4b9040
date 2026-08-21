@@ -8,6 +8,7 @@ import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { PreviewBoundary, SafeImagePreview } from "@/components/admin/preview-boundary";
 import { toast } from "sonner";
 import { useCategoriesQuery } from "@/lib/hooks/use-categories";
+import { useSettingsQuery, useUpdateSettingsMutation } from "@/lib/hooks/use-settings";
 import {
   useHeroSlidesQuery,
   useAddHeroSlidesBulkMutation,
@@ -38,6 +39,8 @@ function MediaAdmin() {
   const { data: slides = [], isLoading: loadingSlides } = useHeroSlidesQuery();
   const { data: categories = [], isLoading: loadingCats } = useCategoriesQuery();
   const { data: library = [], isLoading: loadingLib } = useMediaLibraryQuery();
+  const { data: settings } = useSettingsQuery();
+  const updateSettings = useUpdateSettingsMutation();
 
   const addSlidesBulk = useAddHeroSlidesBulkMutation();
   const updateSlide = useUpdateHeroSlideMutation();
@@ -124,6 +127,44 @@ function MediaAdmin() {
           onClose={() => setPicking(null)}
           onSelect={applyFromLibrary}
         />
+
+        {/* ------------------------------------------ Distintivo (moldura home) */}
+        <section className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
+          <h2 className="font-display text-lg">Distintivo do carrossel</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Imagem exibida na moldura colada ao carrossel da home (canto inferior esquerdo).
+          </p>
+          <div className="mt-4 flex flex-wrap items-start gap-6">
+            {/* Preview atual */}
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-xs font-semibold text-muted-foreground">Atual</span>
+              <div className="overflow-hidden rounded-2xl bg-accent-warm shadow-[var(--shadow-card)]">
+                <img
+                  src={settings?.badgeImage ?? "/substituto.png"}
+                  alt="Distintivo atual"
+                  className="h-20 w-auto object-contain"
+                />
+              </div>
+            </div>
+            {/* Upload */}
+            <div className="flex-1 space-y-2">
+              <ImageDropzone
+                multiple={false}
+                label="Enviar nova imagem para o distintivo"
+                onFiles={(urls) =>
+                  urls[0] &&
+                  updateSettings.mutate(
+                    { badgeImage: urls[0] },
+                    { onSuccess: () => toast.success("Distintivo atualizado") },
+                  )
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Recomendado: PNG transparente, aprox. 160 × 80 px.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* ------------------------------------------------ Carrossel */}
         <section className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
