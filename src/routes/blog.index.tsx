@@ -14,6 +14,19 @@ export const Route = createFileRoute("/blog/")({
       return { posts: [] };
     }
   },
+  head: () => ({
+    meta: [
+      { title: "Blog — Galinha GSB" },
+      { name: "description", content: "Artigos sobre criação de galinhas Sertanejo Balão (GSB), manejo, saúde e dicas para criadores." },
+      { property: "og:title", content: "Blog — Galinha GSB" },
+      { property: "og:description", content: "Artigos sobre criação de galinhas Sertanejo Balão (GSB), manejo, saúde e dicas para criadores." },
+      { property: "og:image", content: "/logo.png" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Blog — Galinha GSB" },
+      { name: "twitter:description", content: "Artigos sobre criação de galinhas Sertanejo Balão (GSB), manejo, saúde e dicas para criadores." },
+    ],
+  }),
   component: Blog,
 });
 
