@@ -40,6 +40,7 @@ function toPostDTO(p: any) {
     category: p.categoryId,
     description: p.description,
     price: p.price ? Number(p.price) : undefined,
+    inStock: p.inStock ?? true,
     status: p.status,
     images: p.images.map((i: any) => i.url),
     createdAt: p.createdAt.toISOString(),
@@ -71,6 +72,7 @@ const createPostSchema = z.object({
   description: z.string().min(1),
   price: z.number().optional(),
   status: z.enum(["DRAFT", "PUBLISHED", "SOLD"]).default("DRAFT"),
+  inStock: z.boolean().default(true),
   images: z.array(z.string()).default([]),
   faq: z.array(z.object({ question: z.string(), answer: z.string().optional() })).default([]),
 });
@@ -86,6 +88,7 @@ export const createPost = createServerFn({ method: "POST" })
         categoryId: data.category,
         description: data.description,
         price: data.price,
+        inStock: data.inStock,
         status: data.status,
         images: { create: data.images.map((url, order) => ({ url, order })) },
         faqs: {
@@ -108,6 +111,7 @@ const updatePostSchema = z.object({
   description: z.string().optional(),
   price: z.number().nullable().optional(),
   status: z.enum(["DRAFT", "PUBLISHED", "SOLD"]).optional(),
+  inStock: z.boolean().optional(),
   images: z.array(z.string()).optional(),
   faq: z.array(z.object({ question: z.string(), answer: z.string().optional() })).optional(),
 });

@@ -34,6 +34,8 @@ export interface Post {
   category: Category;
   description: string;
   price?: number;
+  /** true = disponível; false = esgotado */
+  inStock: boolean;
   status: PostStatus;
   images: string[];
   createdAt: string;

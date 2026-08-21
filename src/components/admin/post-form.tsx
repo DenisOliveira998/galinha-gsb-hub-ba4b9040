@@ -28,6 +28,7 @@ export function PostForm({ initial, onSubmit, loading = false }: { initial?: Pos
   const [description, setDescription] = useState(initial?.description ?? "");
   const [price, setPrice] = useState<string>(initial?.price?.toString() ?? "");
   const [status, setStatus] = useState<PostStatus>(initial?.status ?? "DRAFT");
+  const [inStock, setInStock] = useState<boolean>(initial?.inStock ?? true);
   const [images, setImages] = useState<string[]>(Array.isArray(initial?.images) ? initial.images : []);
   const [newUrl, setNewUrl] = useState("");
   const [faq, setFaq] = useState<FaqItem[]>(Array.isArray(initial?.faq) ? initial.faq : []);
@@ -52,6 +53,7 @@ export function PostForm({ initial, onSubmit, loading = false }: { initial?: Pos
       category: effectiveCategory,
       description,
       price: price ? parseFloat(price) : undefined,
+      inStock,
       status,
       images: images.length ? images : [getCategoryFallbackImage(categories, effectiveCategory)],
       faq: faq.filter((f) => f.question.trim() || f.answer.trim()),
@@ -94,6 +96,24 @@ export function PostForm({ initial, onSubmit, loading = false }: { initial?: Pos
             </select>
           </Field>
         </div>
+        <Field label="estoque">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setInStock(true)}
+              className={`flex-1 rounded-xl border py-2 text-sm font-semibold transition ${inStock ? "border-primary bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+            >
+              ✓ Com estoque
+            </button>
+            <button
+              type="button"
+              onClick={() => setInStock(false)}
+              className={`flex-1 rounded-xl border py-2 text-sm font-semibold transition ${!inStock ? "border-destructive bg-destructive text-destructive-foreground" : "hover:bg-muted"}`}
+            >
+              ✕ Sem estoque
+            </button>
+          </div>
+        </Field>
         <Field label="preco_opcional">
           <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" step="0.01" className="input" placeholder="0.00" />
         </Field>

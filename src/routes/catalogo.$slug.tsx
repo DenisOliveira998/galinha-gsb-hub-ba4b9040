@@ -68,7 +68,12 @@ function PostDetail() {
             <img src={post.images[0]} alt={post.title} className="aspect-square w-full object-cover" />
           </div>
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
+              {!post.inStock && (
+                <span className="rounded-full bg-destructive px-2.5 py-0.5 text-[11px] font-semibold text-destructive-foreground">Esgotado</span>
+              )}
+            </div>
             <h1 className="mt-2 font-display text-3xl md:text-4xl">{post.title}</h1>
             <div className="mt-2 flex flex-col gap-1.5">
               <StarsDisplay average={summary?.average ?? 0} count={summary?.count ?? 0} size="md" />
