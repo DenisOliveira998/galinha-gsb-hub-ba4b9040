@@ -138,11 +138,11 @@ function MediaAdmin() {
             {/* Preview atual */}
             <div className="flex flex-col items-center gap-2">
               <span className="text-xs font-semibold text-muted-foreground">Atual</span>
-              <div className="overflow-hidden rounded-2xl bg-accent-warm shadow-[var(--shadow-card)]">
+              <div>
                 <img
-                  src={settings?.badgeImage ?? "/substituto.png"}
+                  src={settings?.badgeImage ?? "/badge.png"}
                   alt="Distintivo atual"
-                  className="h-20 w-auto object-contain"
+                  className="h-20 w-auto object-contain drop-shadow-md"
                 />
               </div>
             </div>
