@@ -219,6 +219,32 @@ function Settings() {
             <textarea value={form.heroSubtitle ?? ""} onChange={(e) => set("heroSubtitle", e.target.value)} rows={3} className="i" placeholder="Ovos férteis, galinhas e reprodutores..." />
             <p className="mt-1 text-xs text-muted-foreground">Parágrafo de apoio abaixo do título.</p>
           </F>
+          {/* Pré-visualização do hero */}
+          <div className="mt-2">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">pré-visualização</p>
+            <div className="overflow-hidden rounded-2xl bg-primary px-6 py-8 text-primary-foreground">
+              {(form.heroEyebrow ?? "").trim() && (
+                <span className="inline-flex rounded-full bg-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-white/25">
+                  {form.heroEyebrow}
+                </span>
+              )}
+              <div
+                className="mt-3 font-display text-xl leading-tight md:text-2xl"
+                dangerouslySetInnerHTML={{
+                  __html: (form.heroTitle ?? "").trim() || '<span style="opacity:.4">Título do hero…</span>',
+                }}
+              />
+              {(form.heroSubtitle ?? "").trim() ? (
+                <p className="mt-2 max-w-md text-sm opacity-80">{form.heroSubtitle}</p>
+              ) : (
+                <p className="mt-2 text-sm opacity-30">Subtítulo aparece aqui…</p>
+              )}
+              <div className="mt-4 flex gap-2">
+                <span className="rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground">Ver catálogo</span>
+                <span className="rounded-full border border-white/25 bg-white/5 px-4 py-2 text-xs font-semibold">Sobre a raça</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
