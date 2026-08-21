@@ -17,7 +17,7 @@ export const EMPTY_SETTINGS: SiteSettings = {
   adsenseSlotHomeBanner: "",
   adsenseSlotHomeRectangle: "",
   adsenseSlotBlog: "",
-  badgeImage: "/substituto.png",
+  badgeImage: "/badge.png",
 };
 
 /** Lê as configurações reais do banco (TiDB). Substitui useStore(s => s.settings). */
