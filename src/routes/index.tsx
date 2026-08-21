@@ -187,13 +187,16 @@ function Home() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-16 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-20 md:pt-10">
           <div>
             <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40 md:text-xs">
-              Raça tradicional brasileira
+              {settings?.heroEyebrow ?? "Raça tradicional brasileira"}
             </span>
-            <h1 className="mt-3 font-display text-2xl leading-tight md:mt-4 md:text-4xl">
-              Conheça a importância da raça <span className="text-accent-warm">GSB</span>
-            </h1>
+            <h1
+              className="mt-3 font-display text-2xl leading-tight md:mt-4 md:text-4xl"
+              dangerouslySetInnerHTML={{
+                __html: settings?.heroTitle ?? 'Conheça a importância da raça <span style="color:var(--color-accent-warm)">GSB</span>',
+              }}
+            />
             <p className="mt-2.5 max-w-xl text-sm opacity-85 md:mt-3 md:text-base">
-              Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.
+              {settings?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador."}
             </p>
             <div className="mt-4 flex flex-wrap gap-2 md:mt-6 md:gap-3">
               <Link

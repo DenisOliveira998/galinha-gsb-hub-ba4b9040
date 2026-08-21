@@ -82,10 +82,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: async () => {
     const settings = await getSettings().catch(() => null);
-    return { siteDescription: settings?.siteDescription || DEFAULT_DESCRIPTION };
+    return {
+      siteDescription: settings?.siteDescription || DEFAULT_DESCRIPTION,
+      ogImage: settings?.ogImage || "/logo.png",
+    };
   },
   head: ({ loaderData }) => {
     const desc = loaderData?.siteDescription || DEFAULT_DESCRIPTION;
+    const ogImg = loaderData?.ogImage || "/logo.png";
     return {
     meta: [
       { charSet: "utf-8" },
@@ -96,19 +100,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
       { property: "og:description", content: desc },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: ogImg },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
       { name: "twitter:description", content: desc },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4d8872f6-79cc-4566-9fb3-7c01832bf371/id-preview-59f11369--22283bae-4360-4524-8b15-cf24a08446a5.lovable.app-1784746833771.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4d8872f6-79cc-4566-9fb3-7c01832bf371/id-preview-59f11369--22283bae-4360-4524-8b15-cf24a08446a5.lovable.app-1784746833771.png" },
+      { name: "twitter:image", content: ogImg },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/logo.png", type: "image/png" },
-      { rel: "shortcut icon", href: "/favicon.ico" },
+      { rel: "icon", href: "/favicon.ico" },
+      { rel: "icon", href: "/logo.png", type: "image/png", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/logo.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

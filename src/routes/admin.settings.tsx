@@ -30,6 +30,11 @@ const LABELS: Record<keyof SiteSettings, string> = {
   adsenseSlotHomeBanner: "Slot - Banner da Home",
   adsenseSlotHomeRectangle: "Slot - Retangulo da Home",
   adsenseSlotBlog: "Slot - Blog (vertical)",
+  badgeImage: "Imagem do distintivo",
+  ogImage: "Imagem de compartilhamento (OG Image)",
+  heroEyebrow: "Hero - Eyebrow (texto pequeno acima do titulo)",
+  heroTitle: "Hero - Titulo principal",
+  heroSubtitle: "Hero - Subtitulo",
 };
 
 const PRESETS = ["#3F6B52", "#1F4F7A", "#7A2E2E", "#6B4E1F", "#4B2E7A", "#1F1F1F"];
@@ -49,6 +54,11 @@ function Settings() {
     adsenseSlotHomeRectangle: settings?.adsenseSlotHomeRectangle ?? "",
     adsenseSlotBlog: settings?.adsenseSlotBlog ?? "",
     siteDescription: settings?.siteDescription ?? "",
+    badgeImage: settings?.badgeImage ?? "/badge.png",
+    ogImage: settings?.ogImage ?? "/logo.png",
+    heroEyebrow: settings?.heroEyebrow ?? "Raça tradicional brasileira",
+    heroTitle: settings?.heroTitle ?? "Conheça a importância da raça GSB",
+    heroSubtitle: settings?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.",
   };
   const [form, setForm] = useState<SiteSettings>(EMPTY_SETTINGS);
   const [confirming, setConfirming] = useState(false);
@@ -188,6 +198,46 @@ function Settings() {
             <p className="mt-1 text-xs text-muted-foreground">Aparece como subtítulo nos resultados de busca. Ideal entre 120 e 160 caracteres. <span className={`font-semibold ${(form.siteDescription ?? "").length > 160 ? "text-destructive" : ""}`}>{(form.siteDescription ?? "").length}/160</span></p>
           </F>
           <F label="texto_sobre"><textarea value={form.aboutText} onChange={(e) => set("aboutText", e.target.value)} rows={6} className="i" placeholder="Texto da página Sobre" /></F>
+        </div>
+
+        <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
+          <div>
+            <h3 className="font-display text-lg">Texto do Hero (lado esquerdo)</h3>
+            <p className="text-xs text-muted-foreground">
+              Edita o texto exibido à esquerda do carrossel na página inicial. O título suporta HTML simples — use <code>&lt;span style="color:var(--color-accent-warm)"&gt;GSB&lt;/span&gt;</code> para destacar palavras.
+            </p>
+          </div>
+          <F label="eyebrow">
+            <input value={form.heroEyebrow ?? ""} onChange={(e) => set("heroEyebrow", e.target.value)} className="i" placeholder="Raça tradicional brasileira" />
+            <p className="mt-1 text-xs text-muted-foreground">Linha pequena acima do título (cápsula verde).</p>
+          </F>
+          <F label="titulo">
+            <input value={form.heroTitle ?? ""} onChange={(e) => set("heroTitle", e.target.value)} className="i" placeholder="Conheça a importância da raça GSB" />
+            <p className="mt-1 text-xs text-muted-foreground">Título principal em destaque. HTML simples permitido.</p>
+          </F>
+          <F label="subtitulo">
+            <textarea value={form.heroSubtitle ?? ""} onChange={(e) => set("heroSubtitle", e.target.value)} rows={3} className="i" placeholder="Ovos férteis, galinhas e reprodutores..." />
+            <p className="mt-1 text-xs text-muted-foreground">Parágrafo de apoio abaixo do título.</p>
+          </F>
+        </div>
+
+        <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
+          <div>
+            <h3 className="font-display text-lg">Compartilhamento de links (Open Graph)</h3>
+            <p className="text-xs text-muted-foreground">
+              Imagem exibida quando alguém compartilha o link do site no WhatsApp, Instagram, Facebook, etc.
+              Recomendado: 1200×630 px.
+            </p>
+          </div>
+          <F label="og_image">
+            <input value={form.ogImage ?? ""} onChange={(e) => set("ogImage", e.target.value)} className="i" placeholder="https://... ou /logo.png" />
+            <p className="mt-1 text-xs text-muted-foreground">URL completa ou caminho relativo (ex: /og-image.jpg). Cole a URL de uma imagem já enviada na biblioteca de mídia.</p>
+          </F>
+          {(form.ogImage ?? "").startsWith("http") || (form.ogImage ?? "").startsWith("/") ? (
+            <div className="overflow-hidden rounded-xl border">
+              <img src={form.ogImage} alt="Pré-visualização OG" className="max-h-40 w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+            </div>
+          ) : null}
         </div>
 
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">

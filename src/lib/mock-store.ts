@@ -86,6 +86,14 @@ export interface SiteSettings {
   siteDescription?: string;
   /** Imagem exibida na moldura colada ao carrossel da home. */
   badgeImage?: string;
+  /** Imagem usada no Open Graph (preview ao compartilhar links). */
+  ogImage?: string;
+  /** Texto pequeno acima do título no hero (eyebrow). */
+  heroEyebrow?: string;
+  /** Título principal do hero (suporta HTML simples via dangerouslySetInnerHTML). */
+  heroTitle?: string;
+  /** Subtítulo/descrição abaixo do título no hero. */
+  heroSubtitle?: string;
 }
 
 export interface HeroSlide {

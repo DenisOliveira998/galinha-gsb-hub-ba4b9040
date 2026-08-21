@@ -18,6 +18,10 @@ export const EMPTY_SETTINGS: SiteSettings = {
   adsenseSlotHomeRectangle: "",
   adsenseSlotBlog: "",
   badgeImage: "/badge.png",
+  ogImage: "/logo.png",
+  heroEyebrow: "Raça tradicional brasileira",
+  heroTitle: "Conheça a importância da raça GSB",
+  heroSubtitle: "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.",
 };
 
 /** Lê as configurações reais do banco (TiDB). Substitui useStore(s => s.settings). */
