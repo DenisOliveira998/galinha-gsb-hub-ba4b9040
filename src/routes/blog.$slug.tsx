@@ -37,9 +37,13 @@ function BlogDetail() {
       <div className="mx-auto grid max-w-6xl gap-6 px-3 py-6 text-left md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_240px]">
         <article className="min-w-0 text-left">
           <Link to="/blog" className="text-xs text-muted-foreground hover:text-foreground md:text-sm">← Voltar ao blog</Link>
-          <div className="mt-3 overflow-hidden rounded-2xl shadow-[var(--shadow-card)] md:mt-4 md:rounded-3xl">
-            <img src={post.coverImage} alt={post.title} className="aspect-[16/9] w-full object-cover" />
-          </div>
+          {post.coverImage ? (
+            <div className="mt-3 aspect-video overflow-hidden rounded-2xl shadow-[var(--shadow-card)] md:mt-4 md:rounded-3xl">
+              <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <div className="mt-3 aspect-video overflow-hidden rounded-2xl bg-muted md:mt-4 md:rounded-3xl" />
+          )}
           <div className="mt-4 flex items-center justify-between gap-4">
             <div className="text-[11px] text-muted-foreground md:text-xs">{formatDate(post.createdAt)}</div>
             <BlogLikeButton postId={post.id} initialCount={post.likeCount ?? 0} />

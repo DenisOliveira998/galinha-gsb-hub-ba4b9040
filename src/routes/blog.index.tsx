@@ -43,8 +43,10 @@ function Blog() {
                 className="group flex h-full flex-col overflow-hidden rounded-xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
               >
                 {/* capa proporção 16/9 */}
-                <div className="aspect-video w-full overflow-hidden">
-                  <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                <div className="aspect-video w-full overflow-hidden bg-muted">
+                  {p.coverImage && (
+                    <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                  )}
                 </div>
 
                 <div className="flex flex-1 flex-col p-3 text-left">

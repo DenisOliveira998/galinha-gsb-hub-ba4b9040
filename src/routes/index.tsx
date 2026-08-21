@@ -69,8 +69,10 @@ function BlogCard({ p, hydrated, slider }: { p: BlogPost; hydrated: boolean; sli
   const cls = slider ? "group flex w-36 shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:w-44" : "group flex flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]";
   return (
     <Link to="/blog/$slug" params={{ slug: p.slug }} className={cls}>
-      <div className="aspect-square overflow-hidden">
-        <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+      <div className="aspect-square overflow-hidden bg-muted">
+        {p.coverImage && (
+          <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+        )}
       </div>
       <div className="flex flex-1 flex-col p-2 text-left">
         <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
