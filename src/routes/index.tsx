@@ -208,9 +208,8 @@ function Home() {
           </div>
           <div className="relative pb-6 md:pb-0">
             <HeroCarousel slides={heroSlides} />
-            <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm px-3 py-2 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 md:px-4 md:py-3">
-              <div className="font-display text-lg font-semibold md:text-xl">+10 anos</div>
-              <div className="text-[10px] md:text-xs">de tradição no plantel</div>
+            <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 overflow-hidden">
+              <img src="/substituto.png" alt="+10 anos de tradição no plantel" className="h-16 w-auto md:h-20 object-contain" />
             </div>
           </div>
         </div>
