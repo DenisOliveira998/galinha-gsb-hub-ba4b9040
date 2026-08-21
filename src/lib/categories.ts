@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { requireAdmin } from "./admin-auth";
 
 const slugify = (s: string) =>
   s
@@ -33,28 +34,39 @@ export const listCategories = createServerFn({ method: "GET" }).handler(async ()
 export const createCategory = createServerFn({ method: "POST" })
   .validator(z.object({ label: z.string().min(1), image: z.string().optional() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const base = slugify(data.label) || "CATEGORIA";
-    const existing = await prisma.categoryItem.findMany({ select: { id: true } });
+
+    // Busca IDs existentes e o maior order em paralelo para reduzir latência
+    const [existing, maxOrderRes] = await Promise.all([
+      prisma.categoryItem.findMany({ select: { id: true, order: true } }),
+      prisma.categoryItem.aggregate({ _max: { order: true } }),
+    ]);
+
+    // Gera ID único baseado no label
     const taken = new Set(existing.map((e) => e.id));
     let id = base;
     let n = 2;
     while (taken.has(id)) id = `${base}_${n++}`;
 
-    const maxOrder = await prisma.categoryItem.aggregate({ _max: { order: true } });
+    const nextOrder = (maxOrderRes._max.order ?? -1) + 1;
+
     const category = await prisma.categoryItem.create({
       data: {
         id,
         label: data.label.trim(),
-        image: data.image,
-        order: (maxOrder._max.order ?? -1) + 1,
+        // Passa null explicitamente quando sem imagem (evita ambiguidade com undefined)
+        image: data.image ?? null,
+        order: nextOrder,
       },
     });
-    return category;
+    return { id: category.id, label: category.label, image: category.image, order: category.order };
   });
 
 export const updateCategory = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string(), label: z.string().optional(), image: z.string().optional() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const { id, ...rest } = data;
     return prisma.categoryItem.update({ where: { id }, data: rest });
   });
@@ -65,6 +77,7 @@ export const updateCategory = createServerFn({ method: "POST" })
 export const deleteCategory = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const count = await prisma.post.count({ where: { categoryId: data.id } });
     if (count > 0) {
       return { ok: false, error: `Existem ${count} anúncio(s) nesta categoria. Recategorize antes de excluir.` };
@@ -77,6 +90,7 @@ export const deleteCategory = createServerFn({ method: "POST" })
 export const moveCategory = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string(), dir: z.union([z.literal(-1), z.literal(1)]) }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const cats = await prisma.categoryItem.findMany({ orderBy: { order: "asc" } });
     const i = cats.findIndex((c) => c.id === data.id);
     const j = i + data.dir;

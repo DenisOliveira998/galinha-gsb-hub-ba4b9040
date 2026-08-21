@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { requireAdmin } from "./admin-auth";
 
 // Registro único (id fixo "main") — cria com valores padrão se ainda
 // não existir (primeiro acesso após a migração).
@@ -35,5 +36,6 @@ const updateSettingsSchema = z.object({
 export const updateSettings = createServerFn({ method: "POST" })
   .validator(updateSettingsSchema)
   .handler(async ({ data }) => {
+    await requireAdmin();
     return prisma.siteSettings.update({ where: { id: "main" }, data });
   });

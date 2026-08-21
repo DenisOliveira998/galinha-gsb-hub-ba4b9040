@@ -4,6 +4,17 @@ import bcrypt from "bcryptjs";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { prisma } from "./prisma";
 
+// ─── Guard de autenticação ────────────────────────────────────────────────────
+// Lança erro se a requisição não vier de uma sessão admin válida.
+// Use dentro de handlers de createServerFn para proteger mutações admin-only.
+
+export async function requireAdmin(): Promise<void> {
+  const adminId = getCookie("admin_session");
+  if (!adminId) throw new Error("Não autorizado");
+  const admin = await prisma.admin.findUnique({ where: { id: adminId }, select: { id: true } });
+  if (!admin) throw new Error("Não autorizado");
+}
+
 // ─── Login ────────────────────────────────────────────────────────────────────
 // Valida credenciais e, em caso de sucesso, grava cookie HTTP-only de sessão.
 

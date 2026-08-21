@@ -70,9 +70,8 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-primary-foreground/10">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-6 text-xs opacity-70 md:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-6 text-xs opacity-70 md:px-8">
           <span>© {new Date().getFullYear()} Galinha GSB — Todos os direitos reservados.</span>
-          <Link to="/admin/login" className="hover:opacity-100">Admin</Link>
         </div>
       </div>
     </footer>

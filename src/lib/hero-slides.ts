@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { requireAdmin } from "./admin-auth";
 
 export const listHeroSlides = createServerFn({ method: "GET" }).handler(async () => {
   return prisma.heroSlide.findMany({ orderBy: { order: "asc" } });
@@ -17,6 +18,7 @@ const slideSchema = z.object({
 export const addHeroSlide = createServerFn({ method: "POST" })
   .validator(slideSchema)
   .handler(async ({ data }) => {
+    await requireAdmin();
     const max = await prisma.heroSlide.aggregate({ _max: { order: true } });
     return prisma.heroSlide.create({ data: { ...data, order: (max._max.order ?? -1) + 1 } });
   });
@@ -26,6 +28,7 @@ export const addHeroSlide = createServerFn({ method: "POST" })
 export const addHeroSlidesBulk = createServerFn({ method: "POST" })
   .validator(z.object({ images: z.array(z.string()) }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     if (!data.images.length) return { ok: true, count: 0 };
     const max = await prisma.heroSlide.aggregate({ _max: { order: true } });
     let order = (max._max.order ?? -1) + 1;
@@ -45,6 +48,7 @@ export const addHeroSlidesBulk = createServerFn({ method: "POST" })
 export const updateHeroSlide = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }).merge(slideSchema.partial()))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const { id, ...rest } = data;
     return prisma.heroSlide.update({ where: { id }, data: rest });
   });
@@ -52,6 +56,7 @@ export const updateHeroSlide = createServerFn({ method: "POST" })
 export const deleteHeroSlide = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     await prisma.heroSlide.delete({ where: { id: data.id } });
     return { ok: true };
   });
@@ -60,6 +65,7 @@ export const deleteHeroSlide = createServerFn({ method: "POST" })
 export const moveHeroSlide = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string(), dir: z.union([z.literal(-1), z.literal(1)]) }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const slides = await prisma.heroSlide.findMany({ orderBy: { order: "asc" } });
     const i = slides.findIndex((s) => s.id === data.id);
     const j = i + data.dir;

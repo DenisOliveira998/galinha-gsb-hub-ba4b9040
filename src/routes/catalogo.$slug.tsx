@@ -99,7 +99,11 @@ function PostDetail() {
                 </p>
               )}
             </div>
-            {post.price && <div className="mt-4 font-display text-3xl text-primary">R$ {post.price.toFixed(2)}</div>}
+            {post.price && (
+              <div className={`mt-4 font-display text-3xl ${post.inStock ? "text-primary" : "text-muted-foreground line-through"}`}>
+                R$ {post.price.toFixed(2)}
+              </div>
+            )}
             <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
             {waHref && (
               <div className="mt-6">

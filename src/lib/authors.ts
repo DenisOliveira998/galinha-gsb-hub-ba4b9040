@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { requireAdmin } from "./admin-auth";
 
 export const listAuthors = createServerFn({ method: "GET" }).handler(async () => {
   return prisma.author.findMany({ orderBy: { createdAt: "asc" } });
@@ -15,12 +16,14 @@ const authorSchema = z.object({
 export const createAuthor = createServerFn({ method: "POST" })
   .validator(authorSchema)
   .handler(async ({ data }) => {
+    await requireAdmin();
     return prisma.author.create({ data });
   });
 
 export const updateAuthor = createServerFn({ method: "POST" })
   .validator(authorSchema.extend({ id: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const { id, ...rest } = data;
     return prisma.author.update({ where: { id }, data: rest });
   });
@@ -28,6 +31,7 @@ export const updateAuthor = createServerFn({ method: "POST" })
 export const deleteAuthor = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     await prisma.author.delete({ where: { id: data.id } });
     return { ok: true };
   });

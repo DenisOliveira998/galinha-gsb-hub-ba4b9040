@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { requireAdmin } from "./admin-auth";
 
 const slugify = (s: string) =>
   s
@@ -90,6 +91,7 @@ const createBlogSchema = z.object({
 export const createBlogPost = createServerFn({ method: "POST" })
   .validator(createBlogSchema)
   .handler(async ({ data }) => {
+    await requireAdmin();
     const slug = await uniqueBlogSlug(slugify(data.title));
     const post = await prisma.blogPost.create({
       data: {
@@ -132,6 +134,7 @@ const updateBlogSchema = z.object({
 export const updateBlogPost = createServerFn({ method: "POST" })
   .validator(updateBlogSchema)
   .handler(async ({ data }) => {
+    await requireAdmin();
     const { id, images, blocks, ...rest } = data;
 
     const newSlug = rest.title ? await uniqueBlogSlug(slugify(rest.title), id) : undefined;
@@ -173,6 +176,7 @@ export const updateBlogPost = createServerFn({ method: "POST" })
 export const deleteBlogPost = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     await prisma.blogPost.delete({ where: { id: data.id } });
     return { ok: true };
   });

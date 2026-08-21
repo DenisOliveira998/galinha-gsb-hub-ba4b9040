@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { requireAdmin } from "./admin-auth";
 
 // ---------------------------------------------------------------------------
 // Server functions de Posts/Anúncios.
@@ -80,6 +81,7 @@ const createPostSchema = z.object({
 export const createPost = createServerFn({ method: "POST" })
   .validator(createPostSchema)
   .handler(async ({ data }) => {
+    await requireAdmin();
     const slug = await uniquePostSlug(slugify(data.title));
     const post = await prisma.post.create({
       data: {
@@ -119,6 +121,7 @@ const updatePostSchema = z.object({
 export const updatePost = createServerFn({ method: "POST" })
   .validator(updatePostSchema)
   .handler(async ({ data }) => {
+    await requireAdmin();
     const { id, images, faq, category, ...rest } = data;
 
     const newSlug = rest.title ? await uniquePostSlug(slugify(rest.title), id) : undefined;
@@ -158,6 +161,7 @@ export const updatePost = createServerFn({ method: "POST" })
 export const deletePost = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     // onDelete: Cascade no schema já remove images, faqs, comments,
     // ratings e favorites vinculados a este post.
     await prisma.post.delete({ where: { id: data.id } });

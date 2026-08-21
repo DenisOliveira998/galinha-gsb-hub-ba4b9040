@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { requireAdmin } from "./admin-auth";
 
 // ------------------------------------------------- Estoque de imagens (global)
 
@@ -13,6 +14,7 @@ export const listMediaLibrary = createServerFn({ method: "GET" }).handler(async 
 export const addMedia = createServerFn({ method: "POST" })
   .validator(z.object({ images: z.array(z.string()) }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const existing = await prisma.mediaLibraryItem.findMany({
       where: { url: { in: data.images } },
       select: { url: true },
@@ -28,6 +30,7 @@ export const addMedia = createServerFn({ method: "POST" })
 export const deleteMedia = createServerFn({ method: "POST" })
   .validator(z.object({ url: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     await prisma.mediaLibraryItem.deleteMany({ where: { url: data.url } });
     return { ok: true };
   });
@@ -37,6 +40,7 @@ export const deleteMedia = createServerFn({ method: "POST" })
 export const addCategoryImages = createServerFn({ method: "POST" })
   .validator(z.object({ categoryId: z.string(), images: z.array(z.string()) }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     if (!data.images.length) return { ok: true };
     const max = await prisma.categoryImage.aggregate({
       where: { categoryId: data.categoryId },
@@ -53,6 +57,7 @@ export const addCategoryImages = createServerFn({ method: "POST" })
 export const deleteCategoryImage = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     await prisma.categoryImage.delete({ where: { id: data.id } });
     return { ok: true };
   });
@@ -61,6 +66,7 @@ export const deleteCategoryImage = createServerFn({ method: "POST" })
 export const updateCategoryImage = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string(), url: z.string() }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     return prisma.categoryImage.update({ where: { id: data.id }, data: { url: data.url } });
   });
 
@@ -68,6 +74,7 @@ export const updateCategoryImage = createServerFn({ method: "POST" })
 export const moveCategoryImage = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string(), dir: z.union([z.literal(-1), z.literal(1)]) }))
   .handler(async ({ data }) => {
+    await requireAdmin();
     const image = await prisma.categoryImage.findUniqueOrThrow({ where: { id: data.id } });
     const siblings = await prisma.categoryImage.findMany({
       where: { categoryId: image.categoryId },
