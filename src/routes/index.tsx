@@ -211,8 +211,8 @@ function Home() {
           <div className="relative pb-6 md:pb-0">
             <HeroCarousel slides={heroSlides} />
             {(settings?.badgeImage ?? "/badge.png") && (
-              <div className="absolute -bottom-2 -left-2 rounded-2xl bg-accent-warm shadow-[var(--shadow-card)] md:-bottom-4 md:-left-4 overflow-hidden">
-                <img src={settings?.badgeImage ?? "/badge.png"} alt="Distintivo do plantel" className="h-16 w-auto md:h-20 object-contain" />
+              <div className="absolute -bottom-2 -left-2 md:-bottom-4 md:-left-4 w-32 md:w-40 aspect-video overflow-hidden rounded-2xl bg-accent-warm shadow-[var(--shadow-card)]">
+                <img src={settings?.badgeImage ?? "/badge.png"} alt="Distintivo do plantel" className="h-full w-full object-cover" />
               </div>
             )}
           </div>
