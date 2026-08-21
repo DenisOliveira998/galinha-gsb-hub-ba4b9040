@@ -223,25 +223,6 @@ function Settings() {
 
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
           <div>
-            <h3 className="font-display text-lg">Compartilhamento de links (Open Graph)</h3>
-            <p className="text-xs text-muted-foreground">
-              Imagem exibida quando alguém compartilha o link do site no WhatsApp, Instagram, Facebook, etc.
-              Recomendado: 1200×630 px.
-            </p>
-          </div>
-          <F label="og_image">
-            <input value={form.ogImage ?? ""} onChange={(e) => set("ogImage", e.target.value)} className="i" placeholder="https://... ou /logo.png" />
-            <p className="mt-1 text-xs text-muted-foreground">URL completa ou caminho relativo (ex: /og-image.jpg). Cole a URL de uma imagem já enviada na biblioteca de mídia.</p>
-          </F>
-          {(form.ogImage ?? "").startsWith("http") || (form.ogImage ?? "").startsWith("/") ? (
-            <div className="overflow-hidden rounded-xl border">
-              <img src={form.ogImage} alt="Pré-visualização OG" className="max-h-40 w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-            </div>
-          ) : null}
-        </div>
-
-        <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
-          <div>
             <h3 className="font-display text-lg">Google AdSense</h3>
             <p className="text-xs text-muted-foreground">
               Enquanto o ID do publisher e o slot correspondente estiverem vazios, o site

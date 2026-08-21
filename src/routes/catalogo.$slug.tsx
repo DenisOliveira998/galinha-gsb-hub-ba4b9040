@@ -29,6 +29,25 @@ export const Route = createFileRoute("/catalogo/$slug")({
       isAdmin: !!(adminSessionRes.status === "fulfilled" && adminSessionRes.value),
     };
   },
+  head: ({ loaderData }) => {
+    const post = loaderData?.post;
+    if (!post) return {};
+    const img = post.images?.[0] ?? "";
+    const desc = post.description?.slice(0, 160) ?? "";
+    return {
+      meta: [
+        { title: `${post.title} — Galinha GSB` },
+        { name: "description", content: desc },
+        { property: "og:title", content: `${post.title} — Galinha GSB` },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+        { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
+        { name: "twitter:title", content: `${post.title} — Galinha GSB` },
+        { name: "twitter:description", content: desc },
+      ],
+    };
+  },
   component: PostDetail,
   notFoundComponent: () => (
     <SiteLayout>

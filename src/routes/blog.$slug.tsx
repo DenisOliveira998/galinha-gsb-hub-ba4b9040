@@ -15,6 +15,25 @@ export const Route = createFileRoute("/blog/$slug")({
       throw notFound();
     }
   },
+  head: ({ loaderData }) => {
+    const post = loaderData?.post;
+    if (!post) return {};
+    const img = post.coverImage ?? "";
+    const desc = post.excerpt?.slice(0, 160) ?? "";
+    return {
+      meta: [
+        { title: `${post.title} — Blog Galinha GSB` },
+        { name: "description", content: desc },
+        { property: "og:title", content: `${post.title} — Blog Galinha GSB` },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "article" },
+        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+        { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
+        { name: "twitter:title", content: `${post.title} — Blog Galinha GSB` },
+        { name: "twitter:description", content: desc },
+      ],
+    };
+  },
   component: BlogDetail,
   notFoundComponent: () => (
     <SiteLayout>
