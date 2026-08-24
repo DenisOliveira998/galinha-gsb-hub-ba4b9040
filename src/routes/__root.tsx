@@ -18,6 +18,16 @@ import { THEME_INIT_SCRIPT } from "@/hooks/use-theme";
 import { getSettings } from "@/lib/settings";
 import { brandTokens, DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
 
+/** Gera o script inline que aplica tokens da cor da marca antes de qualquer pintura. */
+function makeBrandScript(brandColor: string): string {
+  const tokens = brandTokens(brandColor);
+  return `(function(){var s=document.documentElement.style;${
+    Object.entries(tokens)
+      .map(([k, v]) => `s.setProperty(${JSON.stringify(k)},${JSON.stringify(v)})`)
+      .join(";")
+  }})()`;
+}
+
 const DEFAULT_DESCRIPTION = "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida.";
 
 function NotFoundComponent() {
@@ -92,38 +102,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ loaderData }) => {
     const desc = loaderData?.siteDescription || DEFAULT_DESCRIPTION;
     const ogImg = loaderData?.ogImage || "/logo.png";
+    const brandScript = makeBrandScript(loaderData?.brandColor || DEFAULT_BRAND_COLOR);
     return {
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
-      { name: "description", content: desc },
-      { name: "author", content: "Galinha GSB" },
-      { property: "og:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
-      { property: "og:description", content: desc },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: ogImg },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
-      { name: "twitter:description", content: desc },
-      { name: "twitter:image", content: ogImg },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "icon", href: "/favicon.ico" },
-      { rel: "icon", href: "/logo.png", type: "image/png", sizes: "any" },
-      { rel: "apple-touch-icon", href: "/logo.png" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap",
-      },
-    ],
-  };
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
+        { name: "description", content: desc },
+        { name: "author", content: "Galinha GSB" },
+        { property: "og:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImg },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: "Galinha GSB — Sertanejo Balão | Ovos férteis, galinhas e reprodutores" },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: ogImg },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "icon", href: "/favicon.ico" },
+        { rel: "icon", href: "/logo.png", type: "image/png", sizes: "any" },
+        { rel: "apple-touch-icon", href: "/logo.png" },
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap",
+        },
+      ],
+      scripts: [{ children: brandScript }],
+    };
   },
   shellComponent: RootShell,
   component: RootComponent,
@@ -132,21 +141,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  const loaderData = Route.useLoaderData();
-  const tokens = brandTokens(loaderData?.brandColor || DEFAULT_BRAND_COLOR);
-  // Script inline que aplica os tokens da cor da marca ANTES de qualquer pintura,
-  // eliminando o flash da cor padrão que acontecia ao usar useEffect no cliente.
-  const brandScript = `(function(){var s=document.documentElement.style;${
-    Object.entries(tokens)
-      .map(([k, v]) => `s.setProperty(${JSON.stringify(k)},${JSON.stringify(v)})`)
-      .join(";")
-  }})()`;
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: brandScript }} />
         <HeadContent />
       </head>
       <body>
