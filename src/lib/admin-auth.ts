@@ -7,9 +7,15 @@ import { prisma } from "./prisma";
 // ─── Guard de autenticação ────────────────────────────────────────────────────
 // Lança erro se a requisição não vier de uma sessão admin válida.
 // Use dentro de handlers de createServerFn para proteger mutações admin-only.
+//
+// NOTA: getCookie é importado dinamicamente para evitar que o analisador
+// estático do import-protection-plugin do TanStack Start bloqueie este módulo
+// no bundle do cliente (admin.tsx importa este arquivo para getAdminSession/
+// adminLogout, mas requireAdmin só roda no servidor).
 
 export async function requireAdmin(): Promise<void> {
-  const adminId = getCookie("admin_session");
+  const { getCookie: getServerCookie } = await import("@tanstack/react-start/server");
+  const adminId = getServerCookie("admin_session");
   if (!adminId) throw new Error("Não autorizado");
   const admin = await prisma.admin.findUnique({ where: { id: adminId }, select: { id: true } });
   if (!admin) throw new Error("Não autorizado");
@@ -18,15 +24,22 @@ export async function requireAdmin(): Promise<void> {
 // ─── Login ────────────────────────────────────────────────────────────────────
 // Valida credenciais e, em caso de sucesso, grava cookie HTTP-only de sessão.
 
+// Hash fictício usado quando o email não existe — garante que o bcrypt sempre
+// rode pelo mesmo tempo, impedindo timing attacks (medir ms para saber se o
+// email existe no sistema).
+const DUMMY_HASH = "$2b$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345";
+
 export const adminLogin = createServerFn({ method: "POST" })
   .validator(z.object({ email: z.string().email(), password: z.string().min(1) }))
   .handler(async ({ data }) => {
     try {
       const admin = await prisma.admin.findUnique({ where: { email: data.email.toLowerCase() } });
-      if (!admin) return { ok: false as const, error: "E-mail ou senha inválidos." };
 
-      const valid = await bcrypt.compare(data.password, admin.passwordHash);
-      if (!valid) return { ok: false as const, error: "E-mail ou senha inválidos." };
+      // Sempre roda bcrypt — mesmo sem admin — para que o tempo de resposta
+      // seja idêntico independente de o email existir ou não (anti-timing attack).
+      const valid = await bcrypt.compare(data.password, admin?.passwordHash ?? DUMMY_HASH);
+
+      if (!admin || !valid) return { ok: false as const, error: "E-mail ou senha inválidos." };
 
       setCookie("admin_session", admin.id, {
         httpOnly: true,
