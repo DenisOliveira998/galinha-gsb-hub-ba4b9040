@@ -13,6 +13,9 @@ export const getSettings = createServerFn({ method: "GET" }).handler(async () =>
       id: "main",
       aboutText:
         "A Galinha GSB (Sertanejo Balão) é uma raça tradicional brasileira, criada com dedicação em nosso plantel há muitos anos.",
+      heroTitle: "Conheça a importância da raça GSB",
+      heroSubtitle:
+        "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.",
     },
   });
   return settings;

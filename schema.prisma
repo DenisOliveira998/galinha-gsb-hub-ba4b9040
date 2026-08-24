@@ -261,8 +261,8 @@ model SiteSettings {
   badgeImage             String @default("/badge.png")
   ogImage                String @default("/logo.png")
   heroEyebrow            String @default("Raça tradicional brasileira")
-  heroTitle              String @default("Conheça a importância da raça GSB") @db.Text
-  heroSubtitle           String @default("Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.") @db.Text
+  heroTitle              String @db.Text
+  heroSubtitle           String @db.Text
   updatedAt              DateTime @updatedAt
 
   @@map("site_settings")
