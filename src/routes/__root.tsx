@@ -16,6 +16,7 @@ import { BrandTheme } from "@/components/site/brand-theme";
 import { AdsenseScript } from "@/components/site/ad-slot";
 import { THEME_INIT_SCRIPT } from "@/hooks/use-theme";
 import { getSettings } from "@/lib/settings";
+import { brandTokens, DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
 
 const DEFAULT_DESCRIPTION = "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida.";
 
@@ -85,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     return {
       siteDescription: settings?.siteDescription || DEFAULT_DESCRIPTION,
       ogImage: settings?.ogImage || "/logo.png",
+      brandColor: settings?.brandColor || DEFAULT_BRAND_COLOR,
     };
   },
   head: ({ loaderData }) => {
@@ -130,10 +132,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const loaderData = Route.useLoaderData();
+  const tokens = brandTokens(loaderData?.brandColor || DEFAULT_BRAND_COLOR);
+  // Script inline que aplica os tokens da cor da marca ANTES de qualquer pintura,
+  // eliminando o flash da cor padrão que acontecia ao usar useEffect no cliente.
+  const brandScript = `(function(){var s=document.documentElement.style;${
+    Object.entries(tokens)
+      .map(([k, v]) => `s.setProperty(${JSON.stringify(k)},${JSON.stringify(v)})`)
+      .join(";")
+  }})()`;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: brandScript }} />
         <HeadContent />
       </head>
       <body>
