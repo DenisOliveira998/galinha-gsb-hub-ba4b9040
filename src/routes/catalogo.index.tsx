@@ -114,8 +114,8 @@ function Catalog() {
               <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
                 <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  {p.status === "SOLD" && (
-                    <span className="absolute left-3 top-3 rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-destructive-foreground">Vendido</span>
+                  {(p.status === "SOLD" || !p.inStock) && (
+                    <img src="/sem-estoque.png" alt="Sem estoque" className="absolute inset-0 h-full w-full object-contain pointer-events-none" />
                   )}
                 </Link>
                 <div className="flex flex-1 flex-col p-4 text-left md:p-5">

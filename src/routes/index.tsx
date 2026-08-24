@@ -52,8 +52,11 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
         params={{ slug: p.slug }}
         className="group flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
       >
-        <div className="aspect-square overflow-hidden">
+        <div className="relative aspect-square overflow-hidden">
           <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+          {(p.status === "SOLD" || !p.inStock) && (
+            <img src="/sem-estoque.png" alt="Sem estoque" className="absolute inset-0 h-full w-full object-contain pointer-events-none" />
+          )}
         </div>
         <div className="flex flex-col p-2 text-left">
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
