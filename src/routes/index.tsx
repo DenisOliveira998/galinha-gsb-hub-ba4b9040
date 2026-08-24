@@ -181,10 +181,10 @@ function Home() {
   return (
     <SiteLayout>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-brand-green text-brand-green-foreground">
+      <section className="relative bg-brand-green text-brand-green-foreground">
         <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background/80" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-16 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-20 md:pt-10">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-24 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-28 md:pt-10">
           <div>
             <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40 md:text-xs">
               {settings?.heroEyebrow ?? "Raça tradicional brasileira"}
@@ -213,11 +213,11 @@ function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative pb-6 md:pb-0">
+          <div className="relative">
             <HeroCarousel slides={heroSlides} />
             {(settings?.badgeImage ?? "/badge.png") && (
-              <div className="absolute -bottom-2 -left-2 md:-bottom-4 md:-left-4 w-32 md:w-40">
-                <img src={settings?.badgeImage ?? "/badge.png"} alt="Distintivo do plantel" className="h-full w-full object-contain drop-shadow-lg" />
+              <div className="absolute bottom-0 -left-4 md:-left-6 w-44 md:w-56 translate-y-1/2 z-10">
+                <img src={settings?.badgeImage ?? "/badge.png"} alt="Distintivo do plantel" className="h-full w-full object-contain drop-shadow-xl" />
               </div>
             )}
           </div>
