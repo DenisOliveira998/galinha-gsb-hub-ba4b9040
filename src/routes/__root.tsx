@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -131,7 +132,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap",
         },
       ],
-      scripts: [{ children: brandScript }],
     };
   },
   shellComponent: RootShell,
@@ -141,10 +141,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  // useRouterState é isomórfico e disponível no shellComponent.
+  // No SSR o loader já rodou, então matches[0].loaderData já tem brandColor.
+  const state = useRouterState();
+  const loaderData = state.matches[0]?.loaderData as { brandColor?: string } | undefined;
+  // Script da cor da marca ANTES de <HeadContent> (que contém o <link stylesheet>)
+  // → garante que os tokens CSS são aplicados antes do CSS padrão pintar a tela.
+  const brandScript = makeBrandScript(loaderData?.brandColor ?? DEFAULT_BRAND_COLOR);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: brandScript }} />
         <HeadContent />
       </head>
       <body>
