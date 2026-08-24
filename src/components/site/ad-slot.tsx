@@ -62,13 +62,8 @@ export function AdSlot({
     }
   }, [active]);
 
-  if (!active) {
-    return (
-      <div role="complementary" aria-label={label} className={className}>
-        {placeholder}
-      </div>
-    );
-  }
+  // Sem publisher/slot configurado: não exibe nada (sem placeholder visível ao público).
+  if (!active) return null;
 
   return (
     <div role="complementary" aria-label={label} className={className}>
