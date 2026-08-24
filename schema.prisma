@@ -261,8 +261,8 @@ model SiteSettings {
   badgeImage             String @default("/badge.png")
   ogImage                String  @default("/logo.png")
   heroEyebrow            String  @default("Raça tradicional brasileira")
-  heroTitle              String? @db.Text
-  heroSubtitle           String? @db.Text
+  heroTitle              String? @db.VarChar(500)
+  heroSubtitle           String? @db.VarChar(1000)
   updatedAt              DateTime @updatedAt
 
   @@map("site_settings")
