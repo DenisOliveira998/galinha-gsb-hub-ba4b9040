@@ -25,6 +25,7 @@ const updateSettingsSchema = z.object({
   whatsapp: z.string().optional(),
   whatsappLink: z.string().optional(),
   instagram: z.string().optional(),
+  youtube: z.string().optional(),
   email: z.string().optional(),
   aboutText: z.string().optional(),
   brandColor: z.string().optional(),

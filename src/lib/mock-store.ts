@@ -70,6 +70,7 @@ export interface SiteSettings {
   /** Link completo do WhatsApp, ex: https://wa.me/5511999999999 */
   whatsappLink: string;
   instagram: string;
+  youtube: string;
   email: string;
   aboutText: string;
   /** Cor principal da marca (hex), configurável em Configurações -> Aparência. */

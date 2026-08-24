@@ -9,6 +9,7 @@ export const EMPTY_SETTINGS: SiteSettings = {
   whatsapp: "",
   whatsappLink: "",
   instagram: "",
+  youtube: "",
   email: "",
   aboutText: "",
   brandColor: "",
