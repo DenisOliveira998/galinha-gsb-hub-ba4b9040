@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MessageCircle, Moon, Sun, User } from "lucide-react";
+import { Moon, Sun, User } from "lucide-react";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useTheme } from "@/hooks/use-theme";
 import { whatsappHref } from "@/lib/mock-store";
@@ -51,7 +51,7 @@ export function SiteHeader() {
               title="Falar no WhatsApp"
               className="grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10"
             >
-              <MessageCircle className="h-5 w-5" />
+              <img src="/whatsapp.png" alt="WhatsApp" className="h-5 w-5 object-contain" />
             </a>
             <Link
               to="/conta/login"
