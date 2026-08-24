@@ -23,10 +23,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
             </section>
           ))}
         </div>
-        <p className="mt-10 rounded-2xl bg-muted p-4 text-xs text-muted-foreground">
-          Este é um texto padrão, de caráter informativo e não jurídico, que pode ser editado
-          futuramente para refletir as práticas específicas do site.
-        </p>
+
       </article>
     </SiteLayout>
   );
