@@ -19,7 +19,7 @@ export function SiteHeader() {
             <img src="/logo.png" alt="Galinha GSB" className="h-12 w-12 object-contain drop-shadow" />
             <div className="hidden leading-tight sm:block">
               <div className="font-display text-lg font-semibold">Galinha GSB</div>
-              <div className="text-xs opacity-70">Sertanejo Balão</div>
+              <div className="text-xs opacity-70">Balão Sertaneja</div>
             </div>
           </Link>
 
@@ -51,7 +51,7 @@ export function SiteHeader() {
               title="Falar no WhatsApp"
               className="grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10"
             >
-              <img src="/whatsapp.png" alt="WhatsApp" className="h-6 w-6 shrink-0 rounded-full object-cover" />
+              <img src="/whatsapp.png" alt="WhatsApp" className="h-6 w-6 shrink-0 object-contain" />
             </a>
             <Link
               to="/conta/login"
