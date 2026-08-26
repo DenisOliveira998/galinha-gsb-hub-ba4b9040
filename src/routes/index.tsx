@@ -12,21 +12,28 @@ import { listPosts } from "@/lib/posts";
 import { listBlogPosts } from "@/lib/blog";
 import { listHeroSlides } from "@/lib/hero-slides";
 import { listCategories } from "@/lib/categories";
+import { getSettings } from "@/lib/settings";
 import { useSettingsQuery } from "@/lib/hooks/use-settings";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [postsRes, blogRes, heroSlidesRes, categoriesRes] = await Promise.allSettled([
+    const [postsRes, blogRes, heroSlidesRes, categoriesRes, settingsRes] = await Promise.allSettled([
       listPosts(),
       listBlogPosts(),
       listHeroSlides(),
       listCategories(),
+      getSettings(),
     ]);
+    const s = settingsRes.status === "fulfilled" ? settingsRes.value : null;
     return {
       posts: postsRes.status === "fulfilled" ? postsRes.value : [],
       blog: blogRes.status === "fulfilled" ? blogRes.value : [],
       heroSlides: heroSlidesRes.status === "fulfilled" ? heroSlidesRes.value : [],
       categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
+      heroEyebrow: s?.heroEyebrow ?? "Raça tradicional brasileira",
+      heroTitle: s?.heroTitle ?? 'Conheça a importância da raça <span style="color:var(--color-accent-warm)">GSB</span>',
+      heroSubtitle: s?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.",
+      badgeImage: s?.badgeImage ?? "/badge.png",
     };
   },
   component: Home,
@@ -175,7 +182,7 @@ function DragScroller({ children, scrollAmount = 320 }: { children: React.ReactN
 }
 
 function Home() {
-  const { posts, blog, heroSlides, categories } = Route.useLoaderData();
+  const { posts, blog, heroSlides, categories, heroEyebrow, heroTitle, heroSubtitle, badgeImage } = Route.useLoaderData();
   const hydrated = useHydrated();
   const { data: settings } = useSettingsQuery();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 8);
@@ -190,16 +197,16 @@ function Home() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-24 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-28 md:pt-10">
           <div>
             <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40 md:text-xs">
-              {settings?.heroEyebrow ?? "Raça tradicional brasileira"}
+              {settings?.heroEyebrow ?? heroEyebrow}
             </span>
             <h1
               className="mt-3 font-display text-2xl leading-tight md:mt-4 md:text-4xl"
               dangerouslySetInnerHTML={{
-                __html: settings?.heroTitle ?? 'Conheça a importância da raça <span style="color:var(--color-accent-warm)">GSB</span>',
+                __html: settings?.heroTitle ?? heroTitle,
               }}
             />
             <p className="mt-2.5 max-w-xl text-sm opacity-85 md:mt-3 md:text-base">
-              {settings?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador."}
+              {settings?.heroSubtitle ?? heroSubtitle}
             </p>
             <div className="mt-4 flex flex-wrap gap-2 md:mt-6 md:gap-3">
               <Link
@@ -218,11 +225,9 @@ function Home() {
           </div>
           <div className="relative">
             <HeroCarousel slides={heroSlides} />
-            {(settings?.badgeImage ?? "/badge.png") && (
-              <div className="absolute bottom-0 -left-4 md:-left-6 w-44 md:w-56 translate-y-1/2 z-10">
-                <img src={settings?.badgeImage ?? "/badge.png"} alt="Distintivo do plantel" className="h-full w-full object-contain drop-shadow-xl" />
-              </div>
-            )}
+            <div className="absolute bottom-0 -left-4 md:-left-6 w-44 md:w-56 translate-y-1/2 z-10">
+              <img src={settings?.badgeImage ?? badgeImage} alt="Distintivo do plantel" className="h-full w-full object-contain drop-shadow-xl" />
+            </div>
           </div>
         </div>
         <svg

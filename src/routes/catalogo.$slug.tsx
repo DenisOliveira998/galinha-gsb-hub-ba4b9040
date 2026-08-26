@@ -124,18 +124,24 @@ function PostDetail() {
               </div>
             )}
             <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
-            {waHref && (
-              <div className="mt-6">
-                <a
-                  href={waHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
-                >
-                  Falar no WhatsApp
-                </a>
-              </div>
-            )}
+            <div className="mt-6">
+              {post.inStock && post.status !== "SOLD" ? (
+                waHref ? (
+                  <a
+                    href={waHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
+                  >
+                    Falar no WhatsApp
+                  </a>
+                ) : null
+              ) : (
+                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-muted px-6 py-3 text-sm font-semibold text-muted-foreground">
+                  Indisponível
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

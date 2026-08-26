@@ -51,7 +51,7 @@ export function SiteHeader() {
               title="Falar no WhatsApp"
               className="grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10"
             >
-              <img src="/whatsapp.png" alt="WhatsApp" className="h-5 w-5 object-contain" />
+              <img src="/whatsapp.png" alt="WhatsApp" className="h-6 w-6 shrink-0 rounded-full object-cover" />
             </a>
             <Link
               to="/conta/login"

@@ -24,6 +24,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAutoresRouteImport } from './routes/admin.autores'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminCarrosselRouteImport } from './routes/admin.carrossel'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
@@ -119,6 +120,11 @@ const TermosRoute = TermosRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAutoresRoute = AdminAutoresRouteImport.update({
+  id: '/autores',
+  path: '/autores',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBlogRoute = AdminBlogRouteImport.update({
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
+  '/admin/autores': typeof AdminAutoresRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
+  '/admin/autores': typeof AdminAutoresRoute
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/clientes': typeof AdminClientesRoute
@@ -313,6 +321,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
+  '/admin/autores': typeof AdminAutoresRoute
   '/admin/blog': typeof AdminBlogRouteWithChildren
   '/admin/carrossel': typeof AdminCarrosselRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -353,6 +362,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sobre'
     | '/termos'
+    | '/admin/autores'
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
@@ -380,7 +390,6 @@ export interface FileRouteTypes {
     | '/'
     | '/afiliados'
     | '/carrinho'
-    | '/checkout'
     | '/contato'
     | '/cookies'
     | '/privacidade'
@@ -388,6 +397,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sobre'
     | '/termos'
+    | '/admin/autores'
     | '/admin/carrossel'
     | '/admin/categorias'
     | '/admin/clientes'
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sobre'
     | '/termos'
+    | '/admin/autores'
     | '/admin/blog'
     | '/admin/carrossel'
     | '/admin/categorias'
@@ -570,6 +581,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/autores': {
+      id: '/admin/autores'
+      path: '/autores'
+      fullPath: '/admin/autores'
+      preLoaderRoute: typeof AdminAutoresRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/blog': {
@@ -755,6 +773,7 @@ const AdminPostsRouteWithChildren = AdminPostsRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminAutoresRoute: typeof AdminAutoresRoute
   AdminBlogRoute: typeof AdminBlogRouteWithChildren
   AdminCarrosselRoute: typeof AdminCarrosselRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
@@ -768,6 +787,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAutoresRoute: AdminAutoresRoute,
   AdminBlogRoute: AdminBlogRouteWithChildren,
   AdminCarrosselRoute: AdminCarrosselRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
