@@ -30,6 +30,7 @@ export function SiteHeader() {
             <Link to="/catalogo" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Catálogo</Link>
             <Link to="/sobre" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Sobre</Link>
             <Link to="/blog" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Blog</Link>
+            <Link to="/guia-galinha-gsb" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Guia da GSB</Link>
             <Link to="/contato" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Contato</Link>
           </nav>
 
