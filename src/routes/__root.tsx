@@ -29,7 +29,7 @@ function makeBrandScript(brandColor: string): string {
   }})()`;
 }
 
-const DEFAULT_DESCRIPTION = "Criadouro de galinha Sertanejo Balão (GSB). Ovos férteis, galinhas e reprodutores de procedência garantida.";
+const DEFAULT_DESCRIPTION = "Portal Galinha GSB, especializado na Galinha Sertaneja Balão. Encontre notícias, conteúdos sobre criação e manejo, além de ovos férteis, pintinhos, galinhas e reprodutores GSB.";
 
 function NotFoundComponent() {
   return (
