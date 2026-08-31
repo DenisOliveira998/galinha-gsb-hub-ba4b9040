@@ -111,12 +111,12 @@ function Catalog() {
         ) : (
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p) => (
-              <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
-                {(p.status === "SOLD" || !p.inStock) && (
-                  <img src="/sem-estoque.png" alt="Sem estoque" className="absolute inset-0 z-10 h-full w-full object-contain pointer-events-none" />
-                )}
+              <article key={p.id} className={`group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]${(p.status === "SOLD" || !p.inStock) ? " opacity-70" : ""}`}>
                 <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
                   <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                  {(p.status === "SOLD" || !p.inStock) && (
+                    <img src="/sem-estoque.png" alt="Sem estoque" className="absolute inset-0 z-10 h-full w-full object-contain pointer-events-none" />
+                  )}
                 </Link>
                 <div className="flex flex-1 flex-col p-4 text-left md:p-5">
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{catLabel(p.category)}</div>
