@@ -57,13 +57,17 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
       <Link
         to="/catalogo/$slug"
         params={{ slug: p.slug }}
-        className={`group relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]${(p.status === "SOLD" || !p.inStock) ? " opacity-70" : ""}`}
+        className="group relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
       >
+        {(p.status === "SOLD" || !p.inStock) && (
+          <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-xl">
+            <div className="absolute right-[-30px] top-[20px] w-[130px] rotate-45 bg-[#1a5c2a] py-1 text-center text-[9px] font-bold uppercase tracking-widest text-white shadow-md">
+              Sem Estoque
+            </div>
+          </div>
+        )}
         <div className="relative aspect-square overflow-hidden">
-          <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-          {(p.status === "SOLD" || !p.inStock) && (
-            <img src="/sem-estoque.png" alt="Sem estoque" className="absolute inset-0 z-10 h-full w-full object-contain pointer-events-none" />
-          )}
+          <img src={p.images[0]} alt={p.title} className={`h-full w-full object-cover transition group-hover:scale-105${(p.status === "SOLD" || !p.inStock) ? " opacity-60 grayscale-[30%]" : ""}`} />
         </div>
         <div className="flex flex-col p-2 text-left">
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
