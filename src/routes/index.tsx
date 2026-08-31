@@ -67,12 +67,15 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
           </div>
         )}
         <div className="relative aspect-square overflow-hidden">
-          <img src={p.images[0]} alt={p.title} className={`h-full w-full object-cover transition group-hover:scale-105${(p.status === "SOLD" || !p.inStock) ? " opacity-60 grayscale-[30%]" : ""}`} />
+          <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
         </div>
         <div className="flex flex-col p-2 text-left">
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
           <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
-          {p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>}
+          {(p.status === "SOLD" || !p.inStock)
+            ? <div className="mt-1 text-xs font-semibold text-muted-foreground">Indisponível</div>
+            : p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>
+          }
         </div>
       </Link>
     </div>

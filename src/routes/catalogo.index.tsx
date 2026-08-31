@@ -114,7 +114,7 @@ function Catalog() {
               <article key={p.id} className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
                 {(p.status === "SOLD" || !p.inStock) && <SemEstoqueRibbon />}
                 <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="relative aspect-[4/3] overflow-hidden">
-                  <img src={p.images[0]} alt={p.title} className={`h-full w-full object-cover transition group-hover:scale-105${(p.status === "SOLD" || !p.inStock) ? " opacity-60 grayscale-[30%]" : ""}`} />
+                  <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
                 </Link>
                 <div className="flex flex-1 flex-col p-4 text-left md:p-5">
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{catLabel(p.category)}</div>
@@ -123,7 +123,10 @@ function Catalog() {
                   </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
                   <div className="mt-1.5"><StarsDisplay average={ratingsMap[p.id]?.average ?? 0} count={ratingsMap[p.id]?.count ?? 0} /></div>
-                  {p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>}
+                  {(p.status === "SOLD" || !p.inStock)
+                    ? <div className="mt-3 text-sm font-semibold text-muted-foreground">Indisponível</div>
+                    : p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>
+                  }
                 </div>
               </article>
             ))}
