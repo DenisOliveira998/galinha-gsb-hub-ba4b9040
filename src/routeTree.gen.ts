@@ -40,6 +40,15 @@ import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
 import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as ContaIndexRouteImport } from './routes/conta.index'
 import { Route as ContaLoginRouteImport } from './routes/conta.login'
+import { Route as GuiaIndexRouteImport } from './routes/guia/index'
+import { Route as GuiaAlimentacaoRouteImport } from './routes/guia/alimentacao'
+import { Route as GuiaCaracteristicasRouteImport } from './routes/guia/caracteristicas'
+import { Route as GuiaOrigemRouteImport } from './routes/guia/origem'
+import { Route as GuiaPintinhosRouteImport } from './routes/guia/pintinhos'
+import { Route as GuiaPlumagemRouteImport } from './routes/guia/plumagem'
+import { Route as GuiaReproducaoRouteImport } from './routes/guia/reproducao'
+import { Route as GuiaSanidadeRouteImport } from './routes/guia/sanidade'
+import { Route as GuiaSelecaoRouteImport } from './routes/guia/selecao'
 import { Route as AdminBlogIndexRouteImport } from './routes/admin.blog.index'
 import { Route as AdminBlogIdRouteImport } from './routes/admin.blog.$id'
 import { Route as AdminBlogNovoRouteImport } from './routes/admin.blog.novo'
@@ -202,6 +211,51 @@ const ContaLoginRoute = ContaLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => ContaRoute,
 } as any)
+const GuiaIndexRoute = GuiaIndexRouteImport.update({
+  id: '/guia/',
+  path: '/guia/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaAlimentacaoRoute = GuiaAlimentacaoRouteImport.update({
+  id: '/guia/alimentacao',
+  path: '/guia/alimentacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaCaracteristicasRoute = GuiaCaracteristicasRouteImport.update({
+  id: '/guia/caracteristicas',
+  path: '/guia/caracteristicas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaOrigemRoute = GuiaOrigemRouteImport.update({
+  id: '/guia/origem',
+  path: '/guia/origem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaPintinhosRoute = GuiaPintinhosRouteImport.update({
+  id: '/guia/pintinhos',
+  path: '/guia/pintinhos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaPlumagemRoute = GuiaPlumagemRouteImport.update({
+  id: '/guia/plumagem',
+  path: '/guia/plumagem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaReproducaoRoute = GuiaReproducaoRouteImport.update({
+  id: '/guia/reproducao',
+  path: '/guia/reproducao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaSanidadeRoute = GuiaSanidadeRouteImport.update({
+  id: '/guia/sanidade',
+  path: '/guia/sanidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaSelecaoRoute = GuiaSelecaoRouteImport.update({
+  id: '/guia/selecao',
+  path: '/guia/selecao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminBlogIndexRoute = AdminBlogIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -261,10 +315,19 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/conta/login': typeof ContaLoginRoute
+  '/guia/alimentacao': typeof GuiaAlimentacaoRoute
+  '/guia/caracteristicas': typeof GuiaCaracteristicasRoute
+  '/guia/origem': typeof GuiaOrigemRoute
+  '/guia/pintinhos': typeof GuiaPintinhosRoute
+  '/guia/plumagem': typeof GuiaPlumagemRoute
+  '/guia/reproducao': typeof GuiaReproducaoRoute
+  '/guia/sanidade': typeof GuiaSanidadeRoute
+  '/guia/selecao': typeof GuiaSelecaoRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/catalogo/': typeof CatalogoIndexRoute
   '/conta/': typeof ContaIndexRoute
+  '/guia/': typeof GuiaIndexRoute
   '/admin/blog/$id': typeof AdminBlogIdRoute
   '/admin/blog/novo': typeof AdminBlogNovoRoute
   '/admin/posts/$id': typeof AdminPostsIdRoute
@@ -294,10 +357,19 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/conta/login': typeof ContaLoginRoute
+  '/guia/alimentacao': typeof GuiaAlimentacaoRoute
+  '/guia/caracteristicas': typeof GuiaCaracteristicasRoute
+  '/guia/origem': typeof GuiaOrigemRoute
+  '/guia/pintinhos': typeof GuiaPintinhosRoute
+  '/guia/plumagem': typeof GuiaPlumagemRoute
+  '/guia/reproducao': typeof GuiaReproducaoRoute
+  '/guia/sanidade': typeof GuiaSanidadeRoute
+  '/guia/selecao': typeof GuiaSelecaoRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/catalogo': typeof CatalogoIndexRoute
   '/conta': typeof ContaIndexRoute
+  '/guia': typeof GuiaIndexRoute
   '/admin/blog/$id': typeof AdminBlogIdRoute
   '/admin/blog/novo': typeof AdminBlogNovoRoute
   '/admin/posts/$id': typeof AdminPostsIdRoute
@@ -334,10 +406,19 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/conta/login': typeof ContaLoginRoute
+  '/guia/alimentacao': typeof GuiaAlimentacaoRoute
+  '/guia/caracteristicas': typeof GuiaCaracteristicasRoute
+  '/guia/origem': typeof GuiaOrigemRoute
+  '/guia/pintinhos': typeof GuiaPintinhosRoute
+  '/guia/plumagem': typeof GuiaPlumagemRoute
+  '/guia/reproducao': typeof GuiaReproducaoRoute
+  '/guia/sanidade': typeof GuiaSanidadeRoute
+  '/guia/selecao': typeof GuiaSelecaoRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/catalogo/': typeof CatalogoIndexRoute
   '/conta/': typeof ContaIndexRoute
+  '/guia/': typeof GuiaIndexRoute
   '/admin/blog/$id': typeof AdminBlogIdRoute
   '/admin/blog/novo': typeof AdminBlogNovoRoute
   '/admin/posts/$id': typeof AdminPostsIdRoute
@@ -375,10 +456,19 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/catalogo/$slug'
     | '/conta/login'
+    | '/guia/alimentacao'
+    | '/guia/caracteristicas'
+    | '/guia/origem'
+    | '/guia/pintinhos'
+    | '/guia/plumagem'
+    | '/guia/reproducao'
+    | '/guia/sanidade'
+    | '/guia/selecao'
     | '/admin/'
     | '/blog/'
     | '/catalogo/'
     | '/conta/'
+    | '/guia/'
     | '/admin/blog/$id'
     | '/admin/blog/novo'
     | '/admin/posts/$id'
@@ -408,10 +498,19 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/catalogo/$slug'
     | '/conta/login'
+    | '/guia/alimentacao'
+    | '/guia/caracteristicas'
+    | '/guia/origem'
+    | '/guia/pintinhos'
+    | '/guia/plumagem'
+    | '/guia/reproducao'
+    | '/guia/sanidade'
+    | '/guia/selecao'
     | '/admin'
     | '/blog'
     | '/catalogo'
     | '/conta'
+    | '/guia'
     | '/admin/blog/$id'
     | '/admin/blog/novo'
     | '/admin/posts/$id'
@@ -447,10 +546,19 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/catalogo/$slug'
     | '/conta/login'
+    | '/guia/alimentacao'
+    | '/guia/caracteristicas'
+    | '/guia/origem'
+    | '/guia/pintinhos'
+    | '/guia/plumagem'
+    | '/guia/reproducao'
+    | '/guia/sanidade'
+    | '/guia/selecao'
     | '/admin/'
     | '/blog/'
     | '/catalogo/'
     | '/conta/'
+    | '/guia/'
     | '/admin/blog/$id'
     | '/admin/blog/novo'
     | '/admin/posts/$id'
@@ -474,6 +582,15 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
   TermosRoute: typeof TermosRoute
+  GuiaAlimentacaoRoute: typeof GuiaAlimentacaoRoute
+  GuiaCaracteristicasRoute: typeof GuiaCaracteristicasRoute
+  GuiaOrigemRoute: typeof GuiaOrigemRoute
+  GuiaPintinhosRoute: typeof GuiaPintinhosRoute
+  GuiaPlumagemRoute: typeof GuiaPlumagemRoute
+  GuiaReproducaoRoute: typeof GuiaReproducaoRoute
+  GuiaSanidadeRoute: typeof GuiaSanidadeRoute
+  GuiaSelecaoRoute: typeof GuiaSelecaoRoute
+  GuiaIndexRoute: typeof GuiaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -695,6 +812,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContaLoginRouteImport
       parentRoute: typeof ContaRoute
     }
+    '/guia/': {
+      id: '/guia/'
+      path: '/guia'
+      fullPath: '/guia/'
+      preLoaderRoute: typeof GuiaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/alimentacao': {
+      id: '/guia/alimentacao'
+      path: '/guia/alimentacao'
+      fullPath: '/guia/alimentacao'
+      preLoaderRoute: typeof GuiaAlimentacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/caracteristicas': {
+      id: '/guia/caracteristicas'
+      path: '/guia/caracteristicas'
+      fullPath: '/guia/caracteristicas'
+      preLoaderRoute: typeof GuiaCaracteristicasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/origem': {
+      id: '/guia/origem'
+      path: '/guia/origem'
+      fullPath: '/guia/origem'
+      preLoaderRoute: typeof GuiaOrigemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/pintinhos': {
+      id: '/guia/pintinhos'
+      path: '/guia/pintinhos'
+      fullPath: '/guia/pintinhos'
+      preLoaderRoute: typeof GuiaPintinhosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/plumagem': {
+      id: '/guia/plumagem'
+      path: '/guia/plumagem'
+      fullPath: '/guia/plumagem'
+      preLoaderRoute: typeof GuiaPlumagemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/reproducao': {
+      id: '/guia/reproducao'
+      path: '/guia/reproducao'
+      fullPath: '/guia/reproducao'
+      preLoaderRoute: typeof GuiaReproducaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/sanidade': {
+      id: '/guia/sanidade'
+      path: '/guia/sanidade'
+      fullPath: '/guia/sanidade'
+      preLoaderRoute: typeof GuiaSanidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia/selecao': {
+      id: '/guia/selecao'
+      path: '/guia/selecao'
+      fullPath: '/guia/selecao'
+      preLoaderRoute: typeof GuiaSelecaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/blog/': {
       id: '/admin/blog/'
       path: '/'
@@ -855,6 +1035,15 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
   TermosRoute: TermosRoute,
+  GuiaAlimentacaoRoute: GuiaAlimentacaoRoute,
+  GuiaCaracteristicasRoute: GuiaCaracteristicasRoute,
+  GuiaOrigemRoute: GuiaOrigemRoute,
+  GuiaPintinhosRoute: GuiaPintinhosRoute,
+  GuiaPlumagemRoute: GuiaPlumagemRoute,
+  GuiaReproducaoRoute: GuiaReproducaoRoute,
+  GuiaSanidadeRoute: GuiaSanidadeRoute,
+  GuiaSelecaoRoute: GuiaSelecaoRoute,
+  GuiaIndexRoute: GuiaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
