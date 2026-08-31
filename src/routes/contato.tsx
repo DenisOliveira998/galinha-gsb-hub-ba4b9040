@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
 import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
-import { Instagram, Mail, MessageCircle, Youtube } from "lucide-react";
+import { Instagram, Mail, MapPin, MessageCircle, Youtube } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/contato")({
@@ -54,6 +54,7 @@ function Contact() {
             <a href={whatsappHref(s, "Olá! Vim pelo site e gostaria de mais informações.")} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)] transition hover:bg-muted"><MessageCircle className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">WhatsApp</div><div className="font-semibold">{s.whatsapp}</div></div></a>
             {s.instagram && <div className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><Instagram className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">Instagram</div><div className="font-semibold">{s.instagram}</div><div className="text-xs text-muted-foreground mt-0.5">Busque o perfil no aplicativo do Instagram</div></div></div>}
             {s.youtube && <a href={s.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)] transition hover:bg-muted"><Youtube className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">YouTube</div><div className="font-semibold">{s.youtube.replace(/^https?:\/\/(www\.)?youtube\.com\//,"youtube.com/")}</div></div></a>}
+            {s.address && <div className="flex items-start gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><div><div className="text-xs text-muted-foreground">Endereço</div><div className="font-semibold">{s.address}</div></div></div>}
             <div className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><Mail className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">E-mail</div><div className="font-semibold">{s.email}</div></div></div>
           </div>
         </div>

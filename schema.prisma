@@ -260,6 +260,7 @@ model SiteSettings {
   adsenseSlotBlog        String @default("")
   badgeImage             String @default("/badge.png")
   youtube                String  @default("")
+  address                String  @default("")
   ogImage                String  @default("/logo.png")
   heroEyebrow            String  @default("Raça tradicional brasileira")
   heroTitle              String? @db.VarChar(500)

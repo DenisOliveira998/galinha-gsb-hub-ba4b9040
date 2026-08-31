@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
-import { Egg, Instagram, Mail, MessageCircle, Youtube } from "lucide-react";
+import { Egg, Instagram, Mail, MapPin, MessageCircle, Youtube } from "lucide-react";
 import { CookieBanner } from "@/components/site/cookie-banner";
 
 export function SiteFooter() {
@@ -49,6 +49,7 @@ export function SiteFooter() {
             <li><a href={whatsappHref(s)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-100"><MessageCircle className="h-4 w-4" /> {s.whatsapp}</a></li>
             {s.instagram && <li><a href={`https://instagram.com/${s.instagram.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-100"><Instagram className="h-4 w-4" /> {s.instagram}</a></li>}
             {s.youtube && <li><a href={s.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-100"><Youtube className="h-4 w-4" /> YouTube</a></li>}
+            {s.address && <li className="flex items-start gap-2 opacity-70"><MapPin className="mt-0.5 h-4 w-4 shrink-0" /><span>{s.address}</span></li>}
             <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> {s.email}</li>
           </ul>
         </div>

@@ -23,6 +23,7 @@ const LABELS: Record<keyof SiteSettings, string> = {
   whatsappLink: "Link do WhatsApp",
   instagram: "Instagram",
   youtube: "YouTube",
+  address: "Endereço",
   email: "E-mail",
   aboutText: 'Texto "Sobre"',
   brandColor: "Cor principal do site",
@@ -48,6 +49,7 @@ function Settings() {
     whatsappLink: settings?.whatsappLink ?? "",
     instagram: settings?.instagram ?? "",
     youtube: settings?.youtube ?? "",
+    address: settings?.address ?? "",
     email: settings?.email ?? "",
     aboutText: settings?.aboutText ?? "",
     brandColor: settings?.brandColor ?? DEFAULT_BRAND_COLOR,
@@ -124,6 +126,7 @@ function Settings() {
           <F label="whatsapp_link"><input value={form.whatsappLink} onChange={(e) => set("whatsappLink", e.target.value)} className="i" placeholder="https://wa.me/5511999999999" /><p className="mt-1 text-xs text-muted-foreground">Usado em todos os botões de contato do site (carrinho, catálogo, contato, rodapé).</p></F>
           <F label="instagram"><input value={form.instagram} onChange={(e) => set("instagram", e.target.value)} className="i" placeholder="@instagram_do_criador" /></F>
           <F label="youtube"><input value={form.youtube} onChange={(e) => set("youtube", e.target.value)} className="i" placeholder="https://youtube.com/@canal" /></F>
+          <F label="address"><input value={form.address} onChange={(e) => set("address", e.target.value)} className="i" placeholder="Rua Exemplo, 123 — Cidade, Estado" /></F>
           <F label="email"><input value={form.email} onChange={(e) => set("email", e.target.value)} className="i" placeholder="email@exemplo.com" /></F>
         </div>
 

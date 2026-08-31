@@ -71,6 +71,7 @@ export interface SiteSettings {
   whatsappLink: string;
   instagram: string;
   youtube: string;
+  address: string;
   email: string;
   aboutText: string;
   /** Cor principal da marca (hex), configurável em Configurações -> Aparência. */

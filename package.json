@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "prisma generate && vite build && node scripts/build-vercel.mjs",
+    "build": "prisma generate && prisma db push --accept-data-loss && vite build && node scripts/build-vercel.mjs",
     "db:push": "prisma db push --accept-data-loss",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
