@@ -234,7 +234,7 @@ const HIGHLIGHTS = [
   {
     tag: "Origem",
     title: "Sertão da Bahia e Baixa Grande",
-    body: "A história da GSB está ligada ao sertão da Bahia, especialmente ao município de Baixa Grande. Famílias de criadores mantinham aves pesadas conhecidas regionalmente como "galinhas balão" e, por volta da década de 1950, a seleção passou a ter direção mais definida, com preferência por exemplares maiores, robustos e de conformação própria.",
+    body: "A história da GSB está ligada ao sertão da Bahia, especialmente ao município de Baixa Grande. Famílias de criadores mantinham aves pesadas conhecidas regionalmente como 'galinhas balão' e, por volta da década de 1950, a seleção passou a ter direção mais definida, com preferência por exemplares maiores, robustos e de conformação própria.",
   },
   {
     tag: "Características gerais",
@@ -254,7 +254,7 @@ const HIGHLIGHTS = [
   {
     tag: "Reprodução",
     title: "Fertilidade, incubação e cuidados",
-    body: "O acasalamento deve ocorrer em piso firme, sem superlotação, com fêmeas em boa condição corporal. O guia recomenda incubação artificial ou uso de galinha de menor porte como "mãe adotiva", dado o risco de quebra de ovos sob uma ave muito pesada. Coletar ovos com frequência e armazenar em ambiente fresco são práticas essenciais.",
+    body: "O acasalamento deve ocorrer em piso firme, sem superlotação, com fêmeas em boa condição corporal. O guia recomenda incubação artificial ou uso de galinha de menor porte como mae adotiva, dado o risco de quebra de ovos sob uma ave muito pesada. Coletar ovos com frequência e armazenar em ambiente fresco são práticas essenciais.",
   },
   {
     tag: "Alimentação e manejo",
