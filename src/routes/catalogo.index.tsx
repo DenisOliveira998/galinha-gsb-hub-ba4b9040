@@ -140,7 +140,7 @@ function Catalog() {
 function SemEstoqueRibbon() {
   return (
     <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-3xl">
-      <div className="absolute right-[-38px] top-[28px] w-[160px] rotate-45 bg-[#1a5c2a] py-1.5 text-center text-[10px] font-bold uppercase tracking-widest text-white shadow-md">
+      <div className="absolute right-[-66px] top-[49px] w-[280px] rotate-45 bg-[#1a5c2a] py-2.5 text-center text-[17px] font-bold uppercase tracking-widest text-white shadow-md">
         Sem Estoque
       </div>
     </div>
