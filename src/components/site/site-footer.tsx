@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
-import { Egg, Instagram, Mail, MapPin, MessageCircle, Youtube } from "lucide-react";
+import { Instagram, Mail, MapPin, MessageCircle, Youtube } from "lucide-react";
 import { CookieBanner } from "@/components/site/cookie-banner";
 
 export function SiteFooter() {
@@ -13,16 +13,14 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 md:px-8">
         <div>
           <div className="flex items-center gap-2">
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary-glow/20 ring-1 ring-primary-glow/40">
-              <Egg className="h-5 w-5" />
-            </span>
+            <img src="/logo.png" alt="Galinha GSB" className="h-12 w-12 object-contain drop-shadow" />
             <div className="leading-tight">
               <div className="font-display text-lg font-semibold">Galinha GSB</div>
               <div className="text-xs opacity-70">Sertanejo Balão</div>
             </div>
           </div>
           <p className="mt-4 text-sm opacity-80">
-            Criadouro tradicional da raça Sertanejo Balão. Procedência garantida e suporte ao criador.
+            Portal Galinha GSB, especializado na Galinha Sertaneja Balão. Encontre notícias, conteúdos sobre criação e manejo, além de ovos férteis, pintinhos, galinhas e reprodutores GSB.
           </p>
         </div>
         <div>
@@ -32,6 +30,7 @@ export function SiteFooter() {
             <li><Link to="/catalogo" className="hover:opacity-100">Catálogo</Link></li>
             <li><Link to="/sobre" className="hover:opacity-100">Sobre</Link></li>
             <li><Link to="/blog" className="hover:opacity-100">Blog</Link></li>
+            <li><Link to="/guia" className="hover:opacity-100">Guia da GSB</Link></li>
             <li><Link to="/contato" className="hover:opacity-100">Contato</Link></li>
           </ul>
         </div>
