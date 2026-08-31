@@ -32,18 +32,6 @@ function About() {
       <section className="mx-auto max-w-4xl px-4 py-16 md:px-8">
         <p className="whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{s.aboutText}</p>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {[
-            { n: "+10", l: "anos de plantel" },
-            { n: "100%", l: "linhagem pura GSB" },
-            { n: "Br", l: "raça brasileira tradicional" },
-          ].map((it) => (
-            <div key={it.l} className="rounded-3xl bg-card p-6 text-center shadow-[var(--shadow-soft)]">
-              <div className="font-display text-4xl text-primary">{it.n}</div>
-              <div className="mt-2 text-sm text-muted-foreground">{it.l}</div>
-            </div>
-          ))}
-        </div>
       </section>
     </SiteLayout>
   );
