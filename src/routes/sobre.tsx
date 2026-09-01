@@ -46,21 +46,6 @@ function About() {
             Se você está começando com a GSB, procura reforçar o plantel com sangue selecionado ou quer entender melhor a raça antes de investir, este é o lugar certo. Entre em contato pelo WhatsApp ou por e-mail — respondo pessoalmente, sem script de atendimento, e sem pressa de fechar venda. Criador bom é aquele que vende para quem vai cuidar bem do animal.
           </p>
         </div>
-
-        <div className="mt-14 grid gap-6 sm:grid-cols-3">
-          <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)]">
-            <div className="font-display text-3xl font-bold text-primary">+10</div>
-            <div className="mt-1 text-sm text-muted-foreground">anos criando a raça Sertanejo Balão</div>
-          </div>
-          <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)]">
-            <div className="font-display text-3xl font-bold text-primary">100%</div>
-            <div className="mt-1 text-sm text-muted-foreground">plantel próprio — sem revenda de terceiros</div>
-          </div>
-          <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)]">
-            <div className="font-display text-3xl font-bold text-primary">GSB</div>
-            <div className="mt-1 text-sm text-muted-foreground">raça brasileira tradicional com procedência</div>
-          </div>
-        </div>
       </section>
     </SiteLayout>
   );
