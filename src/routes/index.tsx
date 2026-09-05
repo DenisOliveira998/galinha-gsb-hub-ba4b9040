@@ -83,34 +83,40 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
 }
 
 function BlogCard({ p, hydrated, slider }: { p: BlogPost; hydrated: boolean; slider?: boolean }) {
-  const cls = slider ? "group flex w-36 shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] md:w-44" : "group flex flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]";
+  const cls = slider ? "relative w-36 shrink-0 snap-start md:w-44" : "relative";
   return (
-    <Link to="/blog/$slug" params={{ slug: p.slug }} className={cls}>
-      <div className="aspect-square overflow-hidden bg-muted">
-        {p.coverImage && (
-          <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-        )}
-      </div>
-      <div className="flex flex-1 flex-col p-2 text-left">
-        <div className="text-[10px] text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
-        <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
-        <div className="mt-auto flex items-center justify-between pt-1.5">
-          {p.author ? (
-            <div className="flex min-w-0 items-center gap-1">
-              {p.author.avatar ? (
-                <img src={p.author.avatar} alt={p.author.name} className="h-3.5 w-3.5 shrink-0 rounded-full object-cover" />
-              ) : (
-                <UserCircle2 className="h-3 w-3 shrink-0 text-muted-foreground" />
-              )}
-              <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
-            </div>
-          ) : (
-            <span className="text-[10px] font-semibold text-primary">Ler →</span>
+    <div className={cls}>
+      <Link
+        to="/blog/$slug"
+        params={{ slug: p.slug }}
+        className="group relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
+      >
+        <div className="relative aspect-square overflow-hidden bg-muted">
+          {p.coverImage && (
+            <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
           )}
-          <BlogLikeButton postId={p.id} initialCount={p.likeCount} />
         </div>
-      </div>
-    </Link>
+        <div className="flex flex-col p-2 text-left">
+          <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
+          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+          <div className="mt-1 flex items-center justify-between">
+            {p.author ? (
+              <div className="flex min-w-0 items-center gap-1">
+                {p.author.avatar ? (
+                  <img src={p.author.avatar} alt={p.author.name} className="h-3.5 w-3.5 shrink-0 rounded-full object-cover" />
+                ) : (
+                  <UserCircle2 className="h-3 w-3 shrink-0 text-muted-foreground" />
+                )}
+                <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
+              </div>
+            ) : (
+              <span className="text-[10px] font-semibold text-primary">Ler →</span>
+            )}
+            <BlogLikeButton postId={p.id} initialCount={p.likeCount} />
+          </div>
+        </div>
+      </Link>
+    </div>
   );
 }
 
@@ -193,7 +199,7 @@ function Home() {
   const hydrated = useHydrated();
   const { data: settings } = useSettingsQuery();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 8);
-  const ultimosPosts = blog.filter((p) => p.published);
+  const ultimosPosts = blog.filter((p) => p.published).slice(0, 12); // 3 linhas × 4 colunas
 
   return (
     <SiteLayout>
