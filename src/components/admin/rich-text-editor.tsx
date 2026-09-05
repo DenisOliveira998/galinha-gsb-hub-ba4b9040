@@ -19,7 +19,7 @@ import Youtube from "@tiptap/extension-youtube";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Extension } from "@tiptap/core";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -331,6 +331,10 @@ export function RichTextEditor({
   placeholder?: string;
   minHeight?: number;
 }) {
+  // Só monta o editor no cliente — evita mismatch de hidratação com SSR
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -354,6 +358,7 @@ export function RichTextEditor({
       Placeholder.configure({ placeholder }),
     ],
     content: value,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
@@ -364,6 +369,30 @@ export function RichTextEditor({
       },
     },
   });
+
+  // Sincroniza o conteúdo quando o valor muda externamente
+  // (as settings chegam do banco após o mount inicial)
+  const lastValueRef = useRef(value);
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    if (value === lastValueRef.current) return;
+    lastValueRef.current = value;
+    const current = editor.getHTML();
+    if (current !== value) {
+      editor.commands.setContent(value || "", false);
+    }
+  }, [value, editor]);
+
+  if (!mounted) {
+    return (
+      <div
+        className="min-h-[160px] rounded-2xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground"
+        style={{ minHeight }}
+      >
+        Carregando editor…
+      </div>
+    );
+  }
 
   const handleUpload = useCallback(() => {
     const input = document.createElement("input");
