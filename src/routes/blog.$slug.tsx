@@ -103,15 +103,13 @@ function BlogDetail() {
             }
           />
 
-          <div className="mt-5 whitespace-pre-line text-left text-sm leading-relaxed text-foreground/90 md:text-base">{post.content}</div>
+          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: post.content }} />
 
           {(post.blocks ?? []).length > 0 && (
             <div className="mt-6 space-y-5">
               {(post.blocks ?? []).map((b) =>
                 b.type === "text" ? (
-                  <p key={b.id} className="whitespace-pre-line text-left text-sm leading-relaxed text-foreground/90 md:text-base">
-                    {b.text}
-                  </p>
+                  <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: b.text ?? "" }} />
                 ) : b.image ? (
                   <img key={b.id} src={b.image} alt="" loading="lazy" className="aspect-[16/9] w-full rounded-2xl object-cover" />
                 ) : null,

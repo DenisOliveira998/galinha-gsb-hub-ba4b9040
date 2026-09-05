@@ -123,7 +123,7 @@ function PostDetail() {
                 R$ {post.price.toFixed(2)}
               </div>
             )}
-            <p className="mt-6 whitespace-pre-line text-muted-foreground">{post.description}</p>
+            <div className="prose prose-sm mt-6 max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: post.description ?? "" }} />
             <div className="mt-6">
               {post.inStock && post.status !== "SOLD" ? (
                 waHref ? (
@@ -154,7 +154,7 @@ function PostDetail() {
               {faq.map((f) => (
                 <li key={f.id} className="rounded-2xl bg-muted/60 p-4">
                   <p className="text-sm font-semibold">{f.question}</p>
-                  <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{f.answer}</p>
+                  <div className="prose prose-sm mt-1 max-w-none text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.answer ?? "" }} />
                 </li>
               ))}
             </ul>

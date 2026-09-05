@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageDropzone } from "./image-dropzone";
 import { listAuthors } from "@/lib/authors";
 
@@ -186,7 +187,7 @@ export function BlogForm({ initial, onSubmit, loading = false }: { initial?: Blo
       <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
         <h3 className="font-display text-lg">Conteúdo</h3>
         <F label="texto_introdutorio">
-          <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={6} className="i" placeholder="Texto de abertura do post" />
+          <RichTextEditor value={content} onChange={setContent} placeholder="Texto de abertura do post" minHeight={200} />
         </F>
 
         <div className="flex flex-wrap gap-2">
@@ -209,7 +210,7 @@ export function BlogForm({ initial, onSubmit, loading = false }: { initial?: Blo
               </div>
 
               {b.type === "text" ? (
-                <textarea value={b.text ?? ""} onChange={(e) => patchBlock(b.id, { text: e.target.value })} rows={5} className="i" placeholder="Parágrafo do post" />
+                <RichTextEditor value={b.text ?? ""} onChange={(html) => patchBlock(b.id, { text: html })} placeholder="Parágrafo do post" minHeight={160} />
               ) : (
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-2">

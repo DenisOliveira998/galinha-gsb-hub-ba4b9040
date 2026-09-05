@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import type { FaqItem, Post, PostStatus } from "@/lib/mock-store";
 import { useCategoriesQuery } from "@/lib/hooks/use-categories";
 import { X, ClipboardPaste, Plus, Trash2, Images } from "lucide-react";
@@ -118,7 +119,7 @@ export function PostForm({ initial, onSubmit, loading = false }: { initial?: Pos
           <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" step="0.01" className="input" placeholder="0.00" />
         </Field>
         <Field label="descricao">
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={5} className="input" placeholder="Descreva o anúncio..." />
+          <RichTextEditor value={description} onChange={setDescription} placeholder="Descreva o anúncio..." minHeight={180} />
         </Field>
       </Card>
 
@@ -239,13 +240,14 @@ export function PostForm({ initial, onSubmit, loading = false }: { initial?: Pos
                 className="input"
                 placeholder="Pergunta"
               />
-              <textarea
-                value={f.answer}
-                onChange={(e) => setFaq((prev) => prev.map((x) => (x.id === f.id ? { ...x, answer: e.target.value } : x)))}
-                rows={3}
-                className="input mt-2"
-                placeholder="Resposta"
-              />
+              <div className="mt-2">
+                <RichTextEditor
+                  value={f.answer}
+                  onChange={(html) => setFaq((prev) => prev.map((x) => (x.id === f.id ? { ...x, answer: html } : x)))}
+                  placeholder="Resposta"
+                  minHeight={80}
+                />
+              </div>
             </div>
           ))}
           {faq.length === 0 && (
