@@ -50,7 +50,7 @@ const FontSize = Extension.create({
       setFontSize: (size: string) => ({ chain }: any) =>
         chain().setMark("textStyle", { fontSize: size }).run(),
       unsetFontSize: () => ({ chain }: any) =>
-        chain().setMark("textStyle", { fontSize: null }).removeEmptyTextStyle().run(),
+        chain().setMark("textStyle", { fontSize: null }).run(),
     } as any;
   },
 });
@@ -319,8 +319,30 @@ function Toolbar({ editor, onImageUpload }: { editor: ReturnType<typeof useEdito
   );
 }
 
-/* ─── RichTextEditor (exported) ───────────────────────────────────── */
-export function RichTextEditor({
+/* ─── Shell: renderiza apenas no cliente ──────────────────────────── */
+export function RichTextEditor(props: {
+  value: string;
+  onChange: (html: string) => void;
+  placeholder?: string;
+  minHeight?: number;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) {
+    return (
+      <div
+        className="rounded-2xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground"
+        style={{ minHeight: props.minHeight ?? 160 }}
+      >
+        Carregando editor…
+      </div>
+    );
+  }
+  return <EditorInner {...props} />;
+}
+
+/* ─── Inner: useEditor só roda no cliente ─────────────────────────── */
+function EditorInner({
   value,
   onChange,
   placeholder = "Digite aqui…",
@@ -331,10 +353,6 @@ export function RichTextEditor({
   placeholder?: string;
   minHeight?: number;
 }) {
-  // Só monta o editor no cliente — evita mismatch de hidratação com SSR
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -370,29 +388,16 @@ export function RichTextEditor({
     },
   });
 
-  // Sincroniza o conteúdo quando o valor muda externamente
-  // (as settings chegam do banco após o mount inicial)
+  // Sincroniza quando o valor muda externamente (ex: settings chegam do banco)
   const lastValueRef = useRef(value);
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
     if (value === lastValueRef.current) return;
     lastValueRef.current = value;
-    const current = editor.getHTML();
-    if (current !== value) {
+    if (editor.getHTML() !== value) {
       editor.commands.setContent(value || "", false);
     }
   }, [value, editor]);
-
-  if (!mounted) {
-    return (
-      <div
-        className="min-h-[160px] rounded-2xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground"
-        style={{ minHeight }}
-      >
-        Carregando editor…
-      </div>
-    );
-  }
 
   const handleUpload = useCallback(() => {
     const input = document.createElement("input");
