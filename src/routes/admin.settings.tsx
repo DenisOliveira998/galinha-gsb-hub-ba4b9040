@@ -7,6 +7,7 @@ import { DEFAULT_BRAND_COLOR, normalizeHex } from "@/lib/brand-color";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PreviewBoundary } from "@/components/admin/preview-boundary";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export const Route = createFileRoute("/admin/settings")({
   component: Settings,
@@ -203,7 +204,9 @@ function Settings() {
             <textarea value={form.siteDescription ?? ""} onChange={(e) => set("siteDescription", e.target.value)} rows={3} className="i" placeholder="Texto exibido abaixo do título nos resultados do Google" />
             <p className="mt-1 text-xs text-muted-foreground">Aparece como subtítulo nos resultados de busca. Ideal entre 120 e 160 caracteres. <span className={`font-semibold ${(form.siteDescription ?? "").length > 160 ? "text-destructive" : ""}`}>{(form.siteDescription ?? "").length}/160</span></p>
           </F>
-          <F label="texto_sobre"><textarea value={form.aboutText} onChange={(e) => set("aboutText", e.target.value)} rows={6} className="i" placeholder="Texto da página Sobre" /></F>
+          <F label="texto_sobre">
+            <RichTextEditor value={form.aboutText} onChange={(html) => set("aboutText", html)} placeholder="Texto da página Sobre" minHeight={200} />
+          </F>
         </div>
 
         <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
@@ -218,11 +221,11 @@ function Settings() {
             <p className="mt-1 text-xs text-muted-foreground">Linha pequena acima do título (cápsula verde).</p>
           </F>
           <F label="titulo">
-            <input value={form.heroTitle ?? ""} onChange={(e) => set("heroTitle", e.target.value)} className="i" placeholder="Conheça a importância da raça GSB" />
-            <p className="mt-1 text-xs text-muted-foreground">Título principal em destaque. HTML simples permitido.</p>
+            <RichTextEditor value={form.heroTitle ?? ""} onChange={(html) => set("heroTitle", html)} placeholder="Conheça a importância da raça GSB" minHeight={80} />
+            <p className="mt-1 text-xs text-muted-foreground">Título principal em destaque. Use negrito ou cor para destacar palavras.</p>
           </F>
           <F label="subtitulo">
-            <textarea value={form.heroSubtitle ?? ""} onChange={(e) => set("heroSubtitle", e.target.value)} rows={3} className="i" placeholder="Ovos férteis, galinhas e reprodutores..." />
+            <RichTextEditor value={form.heroSubtitle ?? ""} onChange={(html) => set("heroSubtitle", html)} placeholder="Ovos férteis, galinhas e reprodutores..." minHeight={80} />
             <p className="mt-1 text-xs text-muted-foreground">Parágrafo de apoio abaixo do título.</p>
           </F>
           {/* Pré-visualização do hero */}
