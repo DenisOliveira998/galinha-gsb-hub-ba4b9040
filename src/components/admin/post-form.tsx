@@ -77,7 +77,7 @@ export function PostForm({ initial, onSubmit, loading = false }: { initial?: Pos
       <div className="space-y-6">
         <Card>
         <Field label="titulo">
-          <input value={title} onChange={(e) => setTitle(e.target.value)} required className="input" placeholder="Ovos férteis GSB — dúzia" />
+          <RichTextEditor value={title} onChange={setTitle} placeholder="Ovos férteis GSB — dúzia" minHeight={52} />
         </Field>
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="categoria">

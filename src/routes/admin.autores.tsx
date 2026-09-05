@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { listAuthors, createAuthor, updateAuthor, deleteAuthor } from "@/lib/authors";
 
 export const Route = createFileRoute("/admin/autores")({
@@ -140,13 +141,14 @@ function Autores() {
 
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bio (opcional)</label>
-              <textarea
-                value={form.bio ?? ""}
-                onChange={(e) => setForm({ ...form, bio: e.target.value || null })}
-                rows={3}
-                className="mt-1 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                placeholder="Breve descrição do autor…"
-              />
+              <div className="mt-1">
+                <RichTextEditor
+                  value={form.bio ?? ""}
+                  onChange={(html) => setForm({ ...form, bio: html || null })}
+                  placeholder="Breve descrição do autor…"
+                  minHeight={100}
+                />
+              </div>
             </div>
 
             <div className="flex gap-3 pt-1">

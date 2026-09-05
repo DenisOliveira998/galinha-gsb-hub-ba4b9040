@@ -104,8 +104,12 @@ export function BlogForm({ initial, onSubmit, loading = false }: { initial?: Blo
     >
       <div className="min-w-0 space-y-6">
       <div className="rounded-2xl bg-card p-6 shadow-[var(--shadow-soft)] space-y-4">
-        <F label="titulo"><input value={title} onChange={(e) => setTitle(e.target.value)} required className="i" placeholder="Título do post" /></F>
-        <F label="resumo"><textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} className="i" placeholder="Resumo curto" /></F>
+        <F label="titulo">
+          <RichTextEditor value={title} onChange={setTitle} placeholder="Título do post" minHeight={52} />
+        </F>
+        <F label="resumo">
+          <RichTextEditor value={excerpt} onChange={setExcerpt} placeholder="Resumo curto exibido na listagem e nas meta tags" minHeight={80} />
+        </F>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} /> Publicado</label>
         <F label="autor">
           <select

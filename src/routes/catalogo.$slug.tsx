@@ -93,7 +93,7 @@ function PostDetail() {
                 <span className="rounded-full bg-destructive px-2.5 py-0.5 text-[11px] font-semibold text-destructive-foreground">Esgotado</span>
               )}
             </div>
-            <h1 className="mt-2 font-display text-3xl md:text-4xl">{post.title}</h1>
+            <h1 className="mt-2 font-display text-3xl md:text-4xl" dangerouslySetInnerHTML={{ __html: post.title }} />
             <div className="mt-2 flex flex-col gap-1.5">
               <StarsDisplay average={summary?.average ?? 0} count={summary?.count ?? 0} size="md" />
               {loggedIn ? (

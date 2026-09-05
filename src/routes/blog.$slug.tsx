@@ -67,8 +67,8 @@ function BlogDetail() {
             <div className="text-[11px] text-muted-foreground md:text-xs">{formatDate(post.createdAt)}</div>
             <BlogLikeButton postId={post.id} initialCount={post.likeCount ?? 0} />
           </div>
-          <h1 className="mt-1 text-left font-display text-xl md:text-2xl">{post.title}</h1>
-          <p className="mt-2 text-left text-sm text-muted-foreground md:text-base">{post.excerpt}</p>
+          <h1 className="mt-1 text-left font-display text-xl md:text-2xl" dangerouslySetInnerHTML={{ __html: post.title }} />
+          <div className="prose prose-sm mt-2 max-w-none text-left text-muted-foreground md:text-base" dangerouslySetInnerHTML={{ __html: post.excerpt ?? "" }} />
 
           {/* Autor */}
           {post.author && (
@@ -82,7 +82,7 @@ function BlogDetail() {
               )}
               <div className="min-w-0">
                 <p className="text-sm font-semibold">{post.author.name}</p>
-                {post.author.bio && <p className="text-xs text-muted-foreground line-clamp-2">{post.author.bio}</p>}
+                {post.author.bio && <div className="prose prose-xs max-w-none text-xs text-muted-foreground line-clamp-2" dangerouslySetInnerHTML={{ __html: post.author.bio }} />}
               </div>
             </div>
           )}
