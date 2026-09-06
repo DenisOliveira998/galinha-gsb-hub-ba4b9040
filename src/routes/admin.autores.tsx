@@ -141,14 +141,12 @@ function Autores() {
 
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bio (opcional)</label>
-              <div className="mt-1">
-                <RichTextEditor
-                  value={form.bio ?? ""}
-                  onChange={(html) => setForm({ ...form, bio: html || null })}
-                  placeholder="Breve descrição do autor…"
-                  minHeight={100}
-                />
-              </div>
+              <RichTextEditor
+                value={form.bio ?? ""}
+                onChange={(html) => setForm({ ...form, bio: html || null })}
+                placeholder="Breve descrição do autor…"
+                minHeight={100}
+              />
             </div>
 
             <div className="flex gap-3 pt-1">
