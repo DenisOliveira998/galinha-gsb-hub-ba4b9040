@@ -19,17 +19,19 @@ export const Route = createFileRoute("/blog/$slug")({
     const post = loaderData?.post;
     if (!post) return {};
     const img = post.coverImage ?? "";
-    const desc = post.excerpt?.slice(0, 160) ?? "";
+    const plainTitle = post.title.replace(/<[^>]*>/g, "").trim();
+    const plainExcerpt = post.excerpt?.replace(/<[^>]*>/g, "").trim() ?? "";
+    const desc = plainExcerpt.slice(0, 160);
     return {
       meta: [
-        { title: `${post.title} — Blog Galinha GSB` },
+        { title: `${plainTitle} — Blog Galinha GSB` },
         { name: "description", content: desc },
-        { property: "og:title", content: `${post.title} — Blog Galinha GSB` },
+        { property: "og:title", content: `${plainTitle} — Blog Galinha GSB` },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
         ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
         { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
-        { name: "twitter:title", content: `${post.title} — Blog Galinha GSB` },
+        { name: "twitter:title", content: `${plainTitle} — Blog Galinha GSB` },
         { name: "twitter:description", content: desc },
       ],
     };

@@ -64,8 +64,8 @@ function Blog() {
 
                 <div className="flex flex-1 flex-col p-3 text-left">
                   <div className="text-[10px] text-muted-foreground">{formatDate(p.createdAt)}</div>
-                  <h2 className="mt-0.5 line-clamp-2 font-display text-sm leading-snug">{p.title}</h2>
-                  <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">{p.excerpt}</p>
+                  <h2 className="mt-0.5 line-clamp-2 font-display text-sm leading-snug" dangerouslySetInnerHTML={{ __html: p.title }} />
+                  <div className="mt-1 line-clamp-2 text-[11px] text-muted-foreground" dangerouslySetInnerHTML={{ __html: p.excerpt }} />
 
                   <div className="mt-auto flex items-center justify-between pt-2">
                     {/* autor */}

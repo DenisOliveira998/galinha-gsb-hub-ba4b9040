@@ -174,7 +174,7 @@ function PostDetail() {
                   </div>
                   <div className="flex flex-1 flex-col p-3 text-left">
                     <div className="text-[9px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
-                    <div className="mt-0.5 line-clamp-2 font-display text-sm">{p.title}</div>
+                    <div className="mt-0.5 line-clamp-2 font-display text-sm" dangerouslySetInnerHTML={{ __html: p.title }} />
                     {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
                   </div>
                 </Link>

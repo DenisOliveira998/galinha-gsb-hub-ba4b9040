@@ -71,7 +71,7 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
         </div>
         <div className="flex flex-col p-2 text-left">
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
-          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug" dangerouslySetInnerHTML={{ __html: p.title }} />
           {(p.status === "SOLD" || !p.inStock)
             ? <div className="mt-1 text-xs font-semibold text-muted-foreground">Indisponível</div>
             : p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>
@@ -98,7 +98,7 @@ function BlogCard({ p, hydrated, slider }: { p: BlogPost; hydrated: boolean; sli
         </div>
         <div className="flex flex-col p-2 text-left">
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
-          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug">{p.title}</h3>
+          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug" dangerouslySetInnerHTML={{ __html: p.title }} />
           <div className="mt-1 flex items-center justify-between">
             {p.author ? (
               <div className="flex min-w-0 items-center gap-1">

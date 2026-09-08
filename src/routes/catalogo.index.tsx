@@ -119,7 +119,7 @@ function Catalog() {
                 <div className="flex flex-1 flex-col p-4 text-left md:p-5">
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-primary md:text-xs">{catLabel(p.category)}</div>
                   <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
-                    {p.title}
+                    <span dangerouslySetInnerHTML={{ __html: p.title }} />
                   </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
                   <div className="mt-1.5"><StarsDisplay average={ratingsMap[p.id]?.average ?? 0} count={ratingsMap[p.id]?.count ?? 0} /></div>
