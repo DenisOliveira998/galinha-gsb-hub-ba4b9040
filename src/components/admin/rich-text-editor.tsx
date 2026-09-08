@@ -385,6 +385,10 @@ function EditorInner({
         class: "prose prose-sm max-w-none focus:outline-none px-4 py-3",
         style: `min-height:${minHeight}px`,
       },
+      transformPastedHTML: (html: string) => {
+        // Remove inline styles ao colar para evitar font-family/color de fontes externas
+        return html.replace(/\s*style="[^"]*"/gi, "");
+      },
     },
   });
 

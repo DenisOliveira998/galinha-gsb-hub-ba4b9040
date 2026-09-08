@@ -92,7 +92,8 @@ export const createBlogPost = createServerFn({ method: "POST" })
   .validator(createBlogSchema)
   .handler(async ({ data }) => {
     await requireAdmin();
-    const slug = await uniqueBlogSlug(slugify(data.title));
+    const plainTitle = data.title.replace(/<[^>]*>/g, "").trim();
+    const slug = await uniqueBlogSlug(slugify(plainTitle));
     const post = await prisma.blogPost.create({
       data: {
         title: data.title,
@@ -137,7 +138,8 @@ export const updateBlogPost = createServerFn({ method: "POST" })
     await requireAdmin();
     const { id, images, blocks, ...rest } = data;
 
-    const newSlug = rest.title ? await uniqueBlogSlug(slugify(rest.title), id) : undefined;
+    const plainTitle = rest.title ? rest.title.replace(/<[^>]*>/g, "").trim() : undefined;
+    const newSlug = plainTitle ? await uniqueBlogSlug(slugify(plainTitle), id) : undefined;
 
     await prisma.blogPost.update({
       where: { id },

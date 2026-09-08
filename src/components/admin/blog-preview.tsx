@@ -35,10 +35,27 @@ export function BlogPreview({
         </div>
       )}
 
-      <h4 className="mt-3 font-display text-base">{title || "Título do post"}</h4>
-      {excerpt && <p className="mt-1 text-sm text-muted-foreground">{excerpt}</p>}
+      {title ? (
+        <h4
+          className="mt-3 font-display text-base text-foreground"
+          dangerouslySetInnerHTML={{ __html: title }}
+        />
+      ) : (
+        <h4 className="mt-3 font-display text-base text-muted-foreground">Título do post</h4>
+      )}
+
+      {excerpt && (
+        <div
+          className="prose prose-sm mt-1 max-w-none text-muted-foreground [&_*]:text-muted-foreground"
+          dangerouslySetInnerHTML={{ __html: excerpt }}
+        />
+      )}
+
       {content && (
-        <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-foreground/90">{content}</p>
+        <div
+          className="prose prose-sm mt-3 max-w-none text-foreground/90 [&_*]:color-inherit"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
       )}
 
       {safeBlocks.length > 0 && (
@@ -46,9 +63,11 @@ export function BlogPreview({
           {safeBlocks.map((b) =>
             b.type === "text" ? (
               b.text ? (
-                <p key={b.id} className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">
-                  {b.text}
-                </p>
+                <div
+                  key={b.id}
+                  className="prose prose-sm max-w-none text-foreground/90"
+                  dangerouslySetInnerHTML={{ __html: b.text }}
+                />
               ) : null
             ) : b.image ? (
               <img key={b.id} src={b.image} alt="" className="aspect-[16/9] w-full rounded-xl object-cover" />
@@ -64,6 +83,15 @@ export function BlogPreview({
           ))}
         </div>
       )}
+
+      {/* Estilos para tabelas do TipTap dentro da preview */}
+      <style>{`
+        .prose table{border-collapse:collapse;width:100%;margin:.5rem 0}
+        .prose th,.prose td{border:1px solid var(--color-border);padding:.4rem .6rem;text-align:left;font-size:.85rem}
+        .prose th{background:var(--color-muted);font-weight:600}
+        .prose a{color:var(--color-primary)}
+        .prose img{border-radius:.75rem}
+      `}</style>
     </div>
   );
 }

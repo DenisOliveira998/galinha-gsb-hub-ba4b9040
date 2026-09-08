@@ -199,7 +199,7 @@ function Home() {
   const hydrated = useHydrated();
   const { data: settings } = useSettingsQuery();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 8);
-  const ultimosPosts = blog.filter((p) => p.published).slice(0, 12); // 3 linhas × 4 colunas
+  const ultimosPosts = blog.filter((p) => p.published).slice(0, 10); // 2 linhas × 5 colunas
 
   return (
     <SiteLayout>
@@ -354,7 +354,7 @@ function Home() {
             <Link to="/blog" className="text-sm font-semibold text-primary hover:underline">Ver todos →</Link>
           </div>
           <div className="mt-4 md:mt-5">
-            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-5">
               {ultimosPosts.map((p) => <BlogCard key={p.id} p={p} hydrated={hydrated} />)}
             </div>
           </div>

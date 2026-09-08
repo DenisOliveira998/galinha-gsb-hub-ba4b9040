@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -176,4 +177,38 @@
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
+}
+
+/* Estilos para conteúdo rico (blog e catálogo) */
+.blog-content table,
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto;
+  display: block;
+}
+.blog-content th,
+.blog-content td,
+.prose th,
+.prose td {
+  border: 1px solid var(--color-border);
+  padding: .4rem .75rem;
+  text-align: left;
+  font-size: .875rem;
+}
+.blog-content th,
+.prose th {
+  background: var(--color-muted);
+  font-weight: 600;
+}
+.blog-content a,
+.prose a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+.blog-content img,
+.prose img {
+  border-radius: .75rem;
+  max-width: 100%;
 }

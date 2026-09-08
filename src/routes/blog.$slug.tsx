@@ -103,7 +103,7 @@ function BlogDetail() {
             }
           />
 
-          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base blog-content" dangerouslySetInnerHTML={{ __html: post.content }} />
 
           {(post.blocks ?? []).length > 0 && (
             <div className="mt-6 space-y-5">
