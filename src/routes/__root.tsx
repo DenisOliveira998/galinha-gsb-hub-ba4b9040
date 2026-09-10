@@ -98,12 +98,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       siteDescription: settings?.siteDescription || DEFAULT_DESCRIPTION,
       ogImage: settings?.ogImage || "/logo.png",
       brandColor: settings?.brandColor || DEFAULT_BRAND_COLOR,
+      adsensePublisherId: settings?.adsensePublisherId?.trim() || "",
     };
   },
   head: ({ loaderData }) => {
     const desc = loaderData?.siteDescription || DEFAULT_DESCRIPTION;
     const ogImg = loaderData?.ogImage || "/logo.png";
     const brandScript = makeBrandScript(loaderData?.brandColor || DEFAULT_BRAND_COLOR);
+    const adsenseId = loaderData?.adsensePublisherId || "";
     return {
       meta: [
         { charSet: "utf-8" },
@@ -132,6 +134,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap",
         },
       ],
+      scripts: adsenseId ? [
+        {
+          src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(adsenseId)}`,
+          async: true,
+          crossOrigin: "anonymous" as const,
+        },
+      ] : [],
     };
   },
   shellComponent: RootShell,
