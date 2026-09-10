@@ -48,6 +48,7 @@ export function AdSlot({
   const slotId = (customSlotId || "").trim() || globalSlotId;
   const ref = useRef<HTMLModElement | null>(null);
   const pushed = useRef(false);
+  const hasPublisher = Boolean(client);
   const active = Boolean(client && slotId);
 
   useEffect(() => {
@@ -62,8 +63,17 @@ export function AdSlot({
     }
   }, [active]);
 
-  // Sem publisher/slot configurado: não exibe nada (sem placeholder visível ao público).
-  if (!active) return null;
+  // Sem publisher configurado: oculta completamente.
+  if (!hasPublisher) return null;
+
+  // Publisher configurado mas sem slot ID: mostra o placeholder.
+  if (!active) {
+    return (
+      <div role="complementary" aria-label={label} className={className} style={style}>
+        {placeholder}
+      </div>
+    );
+  }
 
   return (
     <div role="complementary" aria-label={label} className={className}>
