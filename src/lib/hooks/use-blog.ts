@@ -13,7 +13,7 @@ export function useBlogPostsQuery() {
   return useQuery({
     queryKey: BLOG_QUERY_KEY,
     queryFn: () => listBlogPosts(),
-    staleTime: 15_000,
+    staleTime: 5 * 60_000, // 5 min
   });
 }
 

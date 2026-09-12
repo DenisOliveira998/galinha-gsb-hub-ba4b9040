@@ -15,7 +15,7 @@ export function useHeroSlidesQuery() {
   return useQuery({
     queryKey: HERO_SLIDES_KEY,
     queryFn: () => listHeroSlides(),
-    staleTime: 15_000,
+    staleTime: 5 * 60_000, // 5 min
   });
 }
 

@@ -32,7 +32,7 @@ export function useSettingsQuery() {
     queryKey: SETTINGS_QUERY_KEY,
     queryFn: () => getSettings(),
     // Configurações mudam pouco — evita refetch agressivo.
-    staleTime: 30_000,
+    staleTime: 10 * 60_000, // 10 min
   });
 }
 

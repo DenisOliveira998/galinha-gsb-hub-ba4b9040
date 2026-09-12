@@ -25,15 +25,22 @@ export const Route = createFileRoute("/")({
       getSettings(),
     ]);
     const s = settingsRes.status === "fulfilled" ? settingsRes.value : null;
+    const heroSlides = heroSlidesRes.status === "fulfilled" ? heroSlidesRes.value : [];
     return {
       posts: postsRes.status === "fulfilled" ? postsRes.value : [],
       blog: blogRes.status === "fulfilled" ? blogRes.value : [],
-      heroSlides: heroSlidesRes.status === "fulfilled" ? heroSlidesRes.value : [],
+      heroSlides,
       categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
       heroEyebrow: s?.heroEyebrow ?? "Raça tradicional brasileira",
       heroTitle: s?.heroTitle ?? 'Conheça a importância da raça <span style="color:var(--color-accent-warm)">GSB</span>',
       heroSubtitle: s?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.",
       badgeImage: s?.badgeImage ?? "/badge.png",
+    };
+  },
+  head: ({ loaderData }) => {
+    const firstSlide = loaderData?.heroSlides?.[0]?.image;
+    return {
+      links: firstSlide ? [{ rel: "preload", href: firstSlide, as: "image" }] : [],
     };
   },
   component: Home,
@@ -67,7 +74,7 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
           </div>
         )}
         <div className="relative aspect-square overflow-hidden">
-          <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+          <img src={p.images[0]} alt={p.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition group-hover:scale-105" />
         </div>
         <div className="flex flex-col p-2 text-left">
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
@@ -93,7 +100,7 @@ function BlogCard({ p, hydrated, slider }: { p: BlogPost; hydrated: boolean; sli
       >
         <div className="relative aspect-square overflow-hidden bg-muted">
           {p.coverImage && (
-            <img src={p.coverImage} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+            <img src={p.coverImage} alt={p.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition group-hover:scale-105" />
           )}
         </div>
         <div className="flex flex-col p-2 text-left">

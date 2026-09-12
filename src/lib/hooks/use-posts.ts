@@ -8,7 +8,7 @@ export function usePostsQuery() {
   return useQuery({
     queryKey: POSTS_QUERY_KEY,
     queryFn: () => listPosts(),
-    staleTime: 15_000,
+    staleTime: 5 * 60_000, // 5 min
   });
 }
 

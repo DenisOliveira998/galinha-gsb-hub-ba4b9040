@@ -36,6 +36,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             alt={s.title || "Galinha Sertanejo Balão"}
             aria-hidden={idx !== i}
             loading={idx === 0 ? "eager" : "lazy"}
+            decoding={idx === 0 ? "sync" : "async"}
+            fetchPriority={idx === 0 ? "high" : "low"}
             className={`absolute inset-0 block h-full w-full object-cover object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
           />
         ))}
