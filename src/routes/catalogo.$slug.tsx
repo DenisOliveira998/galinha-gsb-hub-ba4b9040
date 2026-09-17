@@ -119,9 +119,18 @@ function PostDetail() {
               )}
             </div>
             {post.price && (
-              <div className={`mt-4 font-display text-3xl ${post.inStock ? "text-primary" : "text-muted-foreground line-through"}`}>
-                R$ {post.price.toFixed(2)}
-              </div>
+              (!post.inStock || post.status === "SOLD")
+                ? <div className="mt-4 flex items-baseline gap-3">
+                    <span className="font-display text-3xl text-muted-foreground line-through decoration-destructive decoration-[3px]">
+                      R$ {post.price.toFixed(2)}
+                    </span>
+                    <span className="rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-destructive bg-destructive/10">
+                      Esgotado
+                    </span>
+                  </div>
+                : <div className="mt-4 font-display text-3xl text-primary">
+                    R$ {post.price.toFixed(2)}
+                  </div>
             )}
             <div className="prose prose-sm mt-6 max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: post.description ?? "" }} />
             <div className="mt-6">

@@ -124,7 +124,12 @@ function Catalog() {
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
                   <div className="mt-1.5"><StarsDisplay average={ratingsMap[p.id]?.average ?? 0} count={ratingsMap[p.id]?.count ?? 0} /></div>
                   {(p.status === "SOLD" || !p.inStock)
-                    ? <div className="mt-3 text-sm font-semibold text-muted-foreground">Indisponível</div>
+                    ? p.price
+                      ? <div className="mt-3 flex items-baseline gap-2">
+                          <span className="text-sm font-semibold text-muted-foreground line-through decoration-destructive decoration-2 md:text-base">R$ {p.price.toFixed(2)}</span>
+                          <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive bg-destructive/10">Esgotado</span>
+                        </div>
+                      : <div className="mt-3 text-sm font-semibold text-muted-foreground">Indisponível</div>
                     : p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>
                   }
                 </div>

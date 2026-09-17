@@ -80,7 +80,12 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
           <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug" dangerouslySetInnerHTML={{ __html: p.title }} />
           {(p.status === "SOLD" || !p.inStock)
-            ? <div className="mt-1 text-xs font-semibold text-muted-foreground">Indisponível</div>
+            ? p.price
+              ? <div className="mt-1 flex items-baseline gap-1.5">
+                  <span className="text-xs font-semibold text-muted-foreground line-through decoration-destructive decoration-2">R$ {p.price.toFixed(2)}</span>
+                  <span className="rounded px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-destructive bg-destructive/10">Esgotado</span>
+                </div>
+              : <div className="mt-1 text-xs font-semibold text-muted-foreground">Indisponível</div>
             : p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>
           }
         </div>
