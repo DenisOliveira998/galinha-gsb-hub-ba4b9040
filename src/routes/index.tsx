@@ -13,6 +13,7 @@ import { listBlogPosts } from "@/lib/blog";
 import { listHeroSlides } from "@/lib/hero-slides";
 import { listCategories } from "@/lib/categories";
 import { getSettings } from "@/lib/settings";
+import { getRatingSummary } from "@/lib/ratings";
 import { useSettingsQuery } from "@/lib/hooks/use-settings";
 
 export const Route = createFileRoute("/")({
@@ -26,11 +27,24 @@ export const Route = createFileRoute("/")({
     ]);
     const s = settingsRes.status === "fulfilled" ? settingsRes.value : null;
     const heroSlides = heroSlidesRes.status === "fulfilled" ? heroSlidesRes.value : [];
+    const posts = postsRes.status === "fulfilled" ? postsRes.value : [];
+
+    // Busca ratings de todos os posts em paralelo para exibir estrelas nos cards
+    const ratingsRes = await Promise.allSettled(
+      posts.map((p) => getRatingSummary({ data: { postId: p.id } })),
+    );
+    const ratingsMap: Record<string, { average: number; count: number }> = {};
+    posts.forEach((p, i) => {
+      const r = ratingsRes[i];
+      ratingsMap[p.id] = r.status === "fulfilled" ? r.value : { average: 0, count: 0 };
+    });
+
     return {
-      posts: postsRes.status === "fulfilled" ? postsRes.value : [],
+      posts,
       blog: blogRes.status === "fulfilled" ? blogRes.value : [],
       heroSlides,
       categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
+      ratingsMap,
       heroEyebrow: s?.heroEyebrow ?? "Raça tradicional brasileira",
       heroTitle: s?.heroTitle ?? 'Conheça a importância da raça <span style="color:var(--color-accent-warm)">GSB</span>',
       heroSubtitle: s?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.",
@@ -54,10 +68,10 @@ function getCategoryLabel(categories: Array<{ id: string; label: string }>, id: 
   return categories.find((c) => c.id === id)?.label ?? id;
 }
 
-type Post = { id: string; slug: string; title: string; images: string[]; price?: number | null; category: string; status: string };
+type Post = { id: string; slug: string; title: string; images: string[]; price?: number | null; category: string; status: string; inStock?: boolean };
 type BlogPost = { id: string; slug: string; title: string; coverImage: string; createdAt: string; likeCount: number; author?: { name: string; avatar: string | null } | null };
 
-function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ id: string; label: string }>; slider?: boolean }) {
+function AnuncioCard({ p, categories, rating, slider }: { p: Post; categories: Array<{ id: string; label: string }>; rating?: { average: number; count: number }; slider?: boolean }) {
   const cls = slider ? "relative w-36 shrink-0 snap-start md:w-44" : "relative";
   return (
     <div className={cls}>
@@ -79,6 +93,11 @@ function AnuncioCard({ p, categories, slider }: { p: Post; categories: Array<{ i
         <div className="flex flex-col p-2 text-left">
           <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
           <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug" dangerouslySetInnerHTML={{ __html: p.title }} />
+          {rating && rating.count > 0 && (
+            <div className="mt-0.5">
+              <StarsDisplay average={rating.average} count={rating.count} size="sm" />
+            </div>
+          )}
           {(p.status === "SOLD" || !p.inStock)
             ? p.price
               ? <div className="mt-1 flex items-baseline gap-1.5">
@@ -207,7 +226,7 @@ function DragScroller({ children, scrollAmount = 320 }: { children: React.ReactN
 }
 
 function Home() {
-  const { posts, blog, heroSlides, categories, heroEyebrow, heroTitle, heroSubtitle, badgeImage } = Route.useLoaderData();
+  const { posts, blog, heroSlides, categories, ratingsMap, heroEyebrow, heroTitle, heroSubtitle, badgeImage } = Route.useLoaderData();
   const hydrated = useHydrated();
   const { data: settings } = useSettingsQuery();
   const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 8);
@@ -344,11 +363,11 @@ function Home() {
           <div className="mt-4 md:mt-5">
             {destaques.length > 4 ? (
               <DragScroller>
-                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} slider />)}
+                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} rating={ratingsMap[p.id]} slider />)}
               </DragScroller>
             ) : (
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
-                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} />)}
+                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} rating={ratingsMap[p.id]} />)}
               </div>
             )}
           </div>

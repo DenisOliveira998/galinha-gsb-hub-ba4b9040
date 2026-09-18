@@ -6,6 +6,7 @@ import { CommentsSection } from "@/components/site/comments-section";
 import { StarsDisplay, StarsInput } from "@/components/site/star-rating";
 import { getPostBySlug, listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
+import { getRatingSummary } from "@/lib/ratings";
 import { useSettingsQuery } from "@/lib/hooks/use-settings";
 import { useRatingSummaryQuery, useMyRatingQuery, useRatePostMutation } from "@/lib/hooks/use-ratings";
 import { whatsappHref } from "@/lib/mock-store";
@@ -22,8 +23,12 @@ export const Route = createFileRoute("/catalogo/$slug")({
     ]);
     const post = postRes.status === "fulfilled" ? postRes.value : null;
     if (!post) throw notFound();
+
+    const ratingRes = await getRatingSummary({ data: { postId: post.id } }).catch(() => ({ average: 0, count: 0 }));
+
     return {
       post,
+      ratingSSR: ratingRes,
       posts: postsRes.status === "fulfilled" ? postsRes.value : [],
       categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
       isAdmin: !!(adminSessionRes.status === "fulfilled" && adminSessionRes.value),
@@ -33,18 +38,44 @@ export const Route = createFileRoute("/catalogo/$slug")({
     const post = loaderData?.post;
     if (!post) return {};
     const img = post.images?.[0] ?? "";
-    const desc = post.description?.slice(0, 160) ?? "";
+    const plainTitle = post.title.replace(/<[^>]*>/g, "").trim();
+    const desc = post.description?.replace(/<[^>]*>/g, "").slice(0, 160) ?? "";
+
+    const rating = loaderData?.ratingSSR;
+
+    // JSON-LD para rich snippets de Product + AggregateRating no Google
+    const jsonLd: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: plainTitle,
+      description: desc,
+      ...(img ? { image: [img] } : {}),
+      ...(post.price ? { offers: { "@type": "Offer", priceCurrency: "BRL", price: post.price.toFixed(2), availability: post.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } } : {}),
+      ...(rating && rating.count > 0 ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: rating.average.toFixed(1),
+          reviewCount: rating.count,
+          bestRating: "5",
+          worstRating: "1",
+        },
+      } : {}),
+    };
+
     return {
       meta: [
-        { title: `${post.title} — Galinha GSB` },
+        { title: `${plainTitle} — Galinha GSB` },
         { name: "description", content: desc },
-        { property: "og:title", content: `${post.title} — Galinha GSB` },
+        { property: "og:title", content: `${plainTitle} — Galinha GSB` },
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
         { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
-        { name: "twitter:title", content: `${post.title} — Galinha GSB` },
+        { name: "twitter:title", content: `${plainTitle} — Galinha GSB` },
         { name: "twitter:description", content: desc },
+      ],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
       ],
     };
   },
