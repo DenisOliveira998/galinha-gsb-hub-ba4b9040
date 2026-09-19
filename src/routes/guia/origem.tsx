@@ -26,12 +26,24 @@ function OrigemPage() {
         prev={null}
         next={{ to: "/guia/caracteristicas", label: "Caracteristicas e padrao morfologico" }}
       >
+        <Section title="O nome Balao e sua origem">
+          <p>
+            O termo balao, que da nome a raca, descreve a silhueta caracteristica da ave — corpo arredondado, volumoso e profundo, que lembra visualmente um balao quando observado de frente ou de perfil. Esse visual e resultado de decadas de selecao por criadores que privilegiavam aves com grande volume de carne, peito largo e plumagem solta, dando ao conjunto aquela forma esferica que distingue a GSB de qualquer outra galinha crioula brasileira.
+          </p>
+          <p>
+            O apelido era informal durante muito tempo, usado dentro das comunidades de criadores do sertao baiano. Com o crescimento do interesse pela raca fora da regiao, o nome foi incorporado ao padrao de forma mais sistematica, associando-se a designacao geografica Sertaneja para marcar a origem e o contexto de desenvolvimento da ave.
+          </p>
+        </Section>
+
         <Section title="Baixa Grande como nucleo de preservacao">
           <p>
             A permanencia dessas aves em Baixa Grande e associada as condicoes locais de clima, vegetacao, relevo e ao sistema tradicional de criacao. O material de referencia do guia cita marcos historicos da formacao do municipio — incluindo 1860, 1872 e 1885 — para contextualizar a continuidade das populacoes de aves na regiao.
           </p>
           <p>
-            Esses marcos nao significam que um padrao racial moderno ja existisse naquele periodo; ajudam, sobretudo, a situar a longa presenca de galinhas crioulas do tipo balao na comunidade.
+            Esses marcos nao significam que um padrao racial moderno ja existisse naquele periodo; ajudam, sobretudo, a situar a longa presenca de galinhas crioulas do tipo balao na comunidade. O clima semi-arido, os periodos de estiagem e a disponibilidade sazonal de recursos alimentares foram forcas de selecao natural que contribuiram para a rusticidade que caracteriza a raca ate hoje.
+          </p>
+          <p>
+            O isolamento relativo da regiao nas primeiras decadas do seculo XX foi, paradoxalmente, um fator de preservacao. Com poucos cruzamentos nao planejados com racas comerciais, o tipo balao foi se mantendo e se consolidando nas propriedades familiares que o cultivavam.
           </p>
         </Section>
 
@@ -44,6 +56,33 @@ function OrigemPage() {
           </p>
           <p>
             Assim, a GSB atual deve ser entendida como uma populacao em processo de consolidacao: tradicao regional de um lado, selecao orientada e padronizacao contemporanea de outro.
+          </p>
+        </Section>
+
+        <Section title="Diferenca em relacao a outras racas crioulas brasileiras">
+          <p>
+            O Brasil tem um patrimonio significativo de galinhas crioulas — Canela Preta, Pe Duro, Caipira, Peloco, entre outras. A GSB se diferencia dessas populacoes principalmente pelo porte: enquanto a maioria das galinhas crioulas brasileiras e de porte medio ou leve, a GSB foi selecionada para ser uma ave pesada, de condicao carnica pronunciada, com peso adulto que pode superar facilmente o das galinhas industriais de dupla aptidao.
+          </p>
+          <p>
+            Alem do porte, a silhueta globosa e a plumagem solta que forma o volume visual sao marcas que nao aparecem de forma tao pronunciada em outras racas crioulas. Esse conjunto de caracteristicas e o que torna a GSB reconhecivel mesmo para quem nao e criador especializado.
+          </p>
+        </Section>
+
+        <Section title="O processo de reconhecimento e padronizacao">
+          <p>
+            Racas crioulas brasileiras em geral carecem de padrao oficial consolidado por orgao de registro nacional. A GSB nao e excecao — o que existe sao descricoes de padrao em desenvolvimento, discutidas entre criadores e entidades ligadas a avicultura alternativa. Diferentes grupos podem adotar criterios levemente distintos para peso, proporcoes ou plumagem aceita.
+          </p>
+          <p>
+            Esse contexto nao diminui o valor ou a identidade da raca, mas exige que o criador se informe sobre qual padrao esta sendo adotado pela entidade ou exposicao com a qual pretende trabalhar. O padrao descrito neste guia reflete os criterios observados no plantel de referencia e na literatura disponivel sobre a raca, mas nao deve ser tratado como norma universal.
+          </p>
+        </Section>
+
+        <Section title="Situacao atual da raca">
+          <p>
+            Nas ultimas duas decadas, a GSB ganhou popularidade fora do sertao baiano. Criadores de diferentes estados passaram a adquirir aves e ovos ferteis para iniciar planteis proprios, e o interesse pelo tipo balao cresceu junto com o movimento de valorizacao das racas locais e da avicultura alternativa no Brasil.
+          </p>
+          <p>
+            Essa expansao traz oportunidades — mais criadores, mais selecao, mais diversidade genetica disponivel — mas tambem riscos: cruzamentos nao documentados, venda de aves incorretamente identificadas e perda de rastreabilidade do plantel. Para o criador serio, isso reforca a importancia de escolher aves com procedencia documentada e criadores que trabalhem com selecao orientada.
           </p>
         </Section>
 
