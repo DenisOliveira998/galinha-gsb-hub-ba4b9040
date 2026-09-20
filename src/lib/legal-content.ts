@@ -63,7 +63,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
       },
       {
         heading: "3. Parceiros e tecnologias de terceiros",
-        body: "O site utiliza o Google AdSense para exibição de anúncios. O Google pode usar o cookie DART e tecnologias similares para personalizar os anúncios com base nas suas visitas a este e a outros sites. O Google tem política de privacidade própria, disponível em policies.google.com/privacy. Podemos utilizar também ferramentas de análise de audiência, como o Google Analytics, que processa dados de forma agregada e anonimizada.",
+        body: "O site poderá utilizar o Google AdSense para exibição de anúncios. O Google pode usar o cookie DART e tecnologias similares para personalizar os anúncios com base nas suas visitas a este e a outros sites. O Google tem política de privacidade própria, disponível em policies.google.com/privacy. Podemos utilizar também ferramentas de análise de audiência, como o Google Analytics, que processa dados de forma agregada e anonimizada.",
       },
       {
         heading: "4. Armazenamento local no seu navegador",
@@ -101,7 +101,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
       },
       {
         heading: "3. Cookies de publicidade (Google AdSense e DoubleClick)",
-        body: "O site exibe anúncios por meio do Google AdSense. O Google utiliza o cookie DART (também chamado de cookie DoubleClick) para veicular anúncios personalizados com base nas suas visitas a este e a outros sites. Esse cookie não coleta informações pessoalmente identificáveis — age com base no histórico de navegação para exibir anúncios mais relevantes ao seu perfil.",
+        body: "O site poderá exibir anúncios por meio do Google AdSense. O Google utiliza o cookie DART (também chamado de cookie DoubleClick) para veicular anúncios personalizados com base nas suas visitas a este e a outros sites. Esse cookie não coleta informações pessoalmente identificáveis — age com base no histórico de navegação para exibir anúncios mais relevantes ao seu perfil.",
       },
       {
         heading: "4. Como gerenciar seus cookies",
@@ -145,7 +145,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
     title: "Anúncios e Google AdSense",
     description: "Como o Google AdSense funciona no site Galinha GSB e como você pode controlar os anúncios que vê.",
     intro:
-      "O site Galinha GSB (galinhagsb.com.br) utiliza o Google AdSense para exibir anúncios. Esta página explica como o AdSense funciona, quais dados ele coleta e como você pode gerenciar ou desativar a publicidade personalizada.",
+      "O site Galinha GSB (galinhagsb.com.br) poderá utilizar o Google AdSense para exibir anúncios. Esta página explica como o AdSense funciona, quais dados ele coleta e como você pode gerenciar ou desativar a publicidade personalizada.",
     sections: [
       {
         heading: "1. Como o Google AdSense funciona",

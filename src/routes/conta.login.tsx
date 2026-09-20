@@ -8,6 +8,7 @@ import { registerCustomer, loginCustomer as loginCustomerFn, syncBetterAuthUser 
 import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/conta/login")({
+  head: () => ({ meta: [{ name: "robots", content: "noindex,follow" }] }),
   component: CustomerAuth,
 });
 
