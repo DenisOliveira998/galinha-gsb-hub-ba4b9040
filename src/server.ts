@@ -44,51 +44,6 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
-async function handleSitemap(): Promise<Response> {
-  const BASE = "https://galinhagsb.com.br";
-  const today = new Date().toISOString().split("T")[0];
-  const day = (d: Date) => d.toISOString().split("T")[0];
-
-  let posts: { slug: string; updatedAt: Date }[] = [];
-  let blogs: { slug: string; updatedAt: Date }[] = [];
-
-  try {
-    const { prisma } = await import("./lib/prisma");
-    [posts, blogs] = await Promise.all([
-      prisma.post.findMany({ where: { status: "PUBLISHED" }, select: { slug: true, updatedAt: true } }),
-      prisma.blogPost.findMany({ where: { published: true }, select: { slug: true, updatedAt: true } }),
-    ]);
-  } catch {
-    // se falhar retorna sitemap estático
-  }
-
-  // Páginas fixas. As do /guia e as institucionais estavam fora do sitemap.
-  const staticRoutes = [
-    "/", "/catalogo", "/blog", "/guia",
-    "/guia/origem", "/guia/caracteristicas", "/guia/plumagem", "/guia/alimentacao",
-    "/guia/pintinhos", "/guia/reproducao", "/guia/selecao", "/guia/sanidade",
-    "/sobre", "/contato", "/afiliados", "/publicidade",
-    "/privacidade", "/termos", "/cookies",
-  ];
-  const url = (loc: string, lastmod: string) => `  <url><loc>${BASE}${loc}</loc><lastmod>${lastmod}</lastmod></url>`;
-  // lastmod real (data da última edição) em vez de "hoje" em tudo.
-  const urls = [
-    ...staticRoutes.map((r) => url(r, today)),
-    ...posts.map((p) => url(`/catalogo/${p.slug}`, day(p.updatedAt))),
-    ...blogs.map((b) => url(`/blog/${b.slug}`, day(b.updatedAt))),
-  ];
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>`;
-
-  return new Response(xml, {
-    status: 200,
-    headers: {
-      "content-type": "application/xml; charset=utf-8",
-      "cache-control": "public, max-age=3600, s-maxage=3600",
-    },
-  });
-}
-
 // Páginas que dependem de login/sessão nunca vão para o cache da CDN.
 const PRIVATE_PREFIXES = ["/admin", "/conta", "/carrinho", "/api", "/_serverFn"];
 
@@ -158,8 +113,10 @@ export default {
         return auth.handler(request);
       }
 
-      if (pathname === "/sitemap.xml") {
-        return handleSitemap();
+      // Sitemap índice + sitemaps por seção (ver src/lib/sitemap.ts)
+      if (pathname === "/sitemap.xml" || pathname.startsWith("/sitemaps/")) {
+        const { handleSitemap, SITEMAP_PATHS } = await import("./lib/sitemap");
+        if ((SITEMAP_PATHS as readonly string[]).includes(pathname)) return handleSitemap(pathname);
       }
 
       const handler = await getServerEntry();

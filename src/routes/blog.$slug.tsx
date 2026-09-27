@@ -3,18 +3,31 @@ import { SiteLayout } from "@/components/site/site-layout";
 import { AdSlot } from "@/components/site/ad-slot";
 import { BlogLikeButton } from "@/components/site/blog-like-button";
 import { UserCircle2 } from "lucide-react";
-import { getBlogPostBySlug } from "@/lib/blog";
+import { getBlogPostBySlug, listPublishedBlogSummaries } from "@/lib/blog";
+import { listPosts } from "@/lib/posts";
+import { topicFor, relatedPosts, relatedProduct } from "@/lib/related";
 import { SITE_URL, DEFAULT_OG_IMAGE, absUrl, plainText, truncate, pageTitle, demoteH1 } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
-    try {
-      const post = await getBlogPostBySlug({ data: { slug: params.slug } });
-      if (!post || !post.published) throw notFound();
-      return { post };
-    } catch (e) {
-      throw notFound();
-    }
+    const [postRes, blogsRes, productsRes] = await Promise.allSettled([
+      getBlogPostBySlug({ data: { slug: params.slug } }),
+      listPublishedBlogSummaries(),
+      listPosts(),
+    ]);
+    const post = postRes.status === "fulfilled" ? postRes.value : null;
+    if (!post || !post.published) throw notFound();
+
+    // "Leia também": links internos para outros posts, o Guia e o catálogo.
+    const blogs = blogsRes.status === "fulfilled" ? blogsRes.value : [];
+    const products = productsRes.status === "fulfilled" ? productsRes.value : [];
+    const product = relatedProduct(post.slug, products);
+    return {
+      post,
+      related: relatedPosts(post.slug, blogs, 3),
+      guia: topicFor(post.slug).guia,
+      product: product ? { slug: product.slug, title: product.title, image: product.images?.[0] ?? null } : null,
+    };
   },
   head: ({ loaderData }) => {
     const post = loaderData?.post;
@@ -77,7 +90,7 @@ function formatDate(iso: string) {
 }
 
 function BlogDetail() {
-  const { post } = Route.useLoaderData();
+  const { post, related, guia, product } = Route.useLoaderData();
   return (
     <SiteLayout>
       <div className="mx-auto grid max-w-6xl gap-6 px-3 py-6 text-left md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_240px]">
@@ -151,6 +164,7 @@ function BlogDetail() {
               ))}
             </div>
           )}
+          <ReadMore related={related} guia={guia} product={product} />
         </article>
 
         <aside className="hidden lg:block">
@@ -172,5 +186,70 @@ function BlogDetail() {
         </aside>
       </div>
     </SiteLayout>
+  );
+}
+
+type ReadMoreProps = {
+  related: Array<{ id: string; slug: string; title: string; coverImage: string | null; createdAt: string }>;
+  guia: { to: string; label: string };
+  product: { slug: string; title: string; image: string | null } | null;
+};
+
+function ReadMore({ related, guia, product }: ReadMoreProps) {
+  return (
+    <section className="mt-10 border-t border-border pt-6" aria-labelledby="leia-tambem">
+      <h2 id="leia-tambem" className="font-display text-lg md:text-xl">Leia também</h2>
+
+      {related.length > 0 && (
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {related.map((p) => (
+            <Link
+              key={p.id}
+              to="/blog/$slug"
+              params={{ slug: p.slug }}
+              className="group flex flex-col overflow-hidden rounded-xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
+            >
+              <div className="aspect-video w-full overflow-hidden bg-muted">
+                {p.coverImage && (
+                  <img src={p.coverImage} alt={plainText(p.title)} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" />
+                )}
+              </div>
+              <h3 className="line-clamp-3 p-3 font-display text-sm leading-snug">{plainText(p.title)}</h3>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Link
+          to={guia.to as any}
+          className="flex flex-col rounded-xl border border-primary/20 bg-primary/5 p-4 text-left transition hover:bg-primary/10"
+        >
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-primary/80">Guia da raça</span>
+          <span className="mt-1 font-display text-sm md:text-base">{guia.label} →</span>
+        </Link>
+        {product ? (
+          <Link
+            to="/catalogo/$slug"
+            params={{ slug: product.slug }}
+            className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 text-left transition hover:shadow-[var(--shadow-card)]"
+          >
+            {product.image && <img src={product.image} alt={plainText(product.title)} loading="lazy" className="h-14 w-14 shrink-0 rounded-lg object-cover" />}
+            <span className="flex flex-col">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">No catálogo</span>
+              <span className="font-display text-sm md:text-base">{plainText(product.title)} →</span>
+            </span>
+          </Link>
+        ) : (
+          <Link
+            to="/catalogo"
+            className="flex flex-col rounded-xl border border-border bg-card p-4 text-left transition hover:shadow-[var(--shadow-card)]"
+          >
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">No catálogo</span>
+            <span className="mt-1 font-display text-sm md:text-base">Ovos férteis, pintinhos e aves GSB →</span>
+          </Link>
+        )}
+      </div>
+    </section>
   );
 }
