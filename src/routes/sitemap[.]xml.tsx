@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { listPosts } from "@/lib/posts";
-import { listBlogPosts } from "@/lib/blog";
+import { listPublishedBlogSummaries } from "@/lib/blog";
 
 const BASE = "https://galinhagsb.com.br";
 
 export const Route = createFileRoute("/sitemap.xml")({
   loader: async () => {
-    const [posts, blogs] = await Promise.allSettled([listPosts(), listBlogPosts()]);
+    const [posts, blogs] = await Promise.allSettled([listPosts(), listPublishedBlogSummaries()]);
     const postSlugs =
       posts.status === "fulfilled"
         ? posts.value.filter((p) => p.status === "PUBLISHED").map((p) => p.slug)

@@ -9,18 +9,19 @@ import { BlogLikeButton } from "@/components/site/blog-like-button";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout, UserCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { listPosts } from "@/lib/posts";
-import { listBlogPosts } from "@/lib/blog";
+import { listPublishedBlogSummaries } from "@/lib/blog";
 import { listHeroSlides } from "@/lib/hero-slides";
 import { listCategories } from "@/lib/categories";
 import { getSettings } from "@/lib/settings";
 import { getRatingSummary } from "@/lib/ratings";
 import { useSettingsQuery } from "@/lib/hooks/use-settings";
+import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
     const [postsRes, blogRes, heroSlidesRes, categoriesRes, settingsRes] = await Promise.allSettled([
       listPosts(),
-      listBlogPosts(),
+      listPublishedBlogSummaries(),
       listHeroSlides(),
       listCategories(),
       getSettings(),
@@ -53,8 +54,26 @@ export const Route = createFileRoute("/")({
   },
   head: ({ loaderData }) => {
     const firstSlide = loaderData?.heroSlides?.[0]?.image;
+    // JSON-LD da marca e do site: ajuda o Google a mostrar nome/logo corretos.
+    const jsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Galinha GSB",
+        url: SITE_URL,
+        logo: DEFAULT_OG_IMAGE,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Galinha GSB",
+        url: SITE_URL,
+        inLanguage: "pt-BR",
+      },
+    ];
     return {
       links: firstSlide ? [{ rel: "preload", href: firstSlide, as: "image" }] : [],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
   component: Home,

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/origem")({
       { name: "description", content: "Conheca a origem da Galinha Sertaneja Balao (GSB): a historia no sertao da Bahia, o municipio de Baixa Grande e como a selecao regional consolidou a raca ao longo de decadas." },
       { property: "og:title", content: "Origem da Galinha GSB — Historia da Raca Sertaneja Balao" },
       { property: "og:description", content: "A historia da GSB no sertao da Bahia, Baixa Grande e a formacao da raca por selecao regional." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

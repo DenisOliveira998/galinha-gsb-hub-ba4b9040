@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/caracteristicas")({
       { name: "description", content: "Tudo sobre as caracteristicas da Galinha Sertaneja Balao: porte gigante, padrao morfologico detalhado, diferencas entre macho e femea e como avaliar cada parte da ave." },
       { property: "og:title", content: "Caracteristicas da Galinha GSB — Padrao Morfologico" },
       { property: "og:description", content: "Porte gigante, conformacao arredondada e padrao morfologico detalhado da Galinha Sertaneja Balao." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/sanidade")({
       { name: "description", content: "Como manter a saude do plantel de Galinha GSB Sertaneja Balao: o que observar diariamente, sinais de alerta, vacinacao, vermifugacao e boas praticas sanitarias." },
       { property: "og:title", content: "Sanidade da Galinha GSB — Saude do Plantel" },
       { property: "og:description", content: "Observacao diaria, sinais de alerta, vacinacao e vermifugacao para manter o plantel GSB saudavel." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

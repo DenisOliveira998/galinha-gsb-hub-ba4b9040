@@ -12,7 +12,7 @@ export const Route = createFileRoute("/contato")({
       { name: "description", content: "Fale com a Galinha GSB por WhatsApp, Instagram ou e-mail." },
       { property: "og:title", content: "Contato — Galinha GSB" },
       { property: "og:description", content: "Fale conosco para conhecer o plantel e comprar aves da raça GSB." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Contato — Galinha GSB" },

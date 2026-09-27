@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/plumagem")({
       { name: "description", content: "Conheca todos os padroes de plumagem da Galinha GSB Sertaneja Balao: solidas, dilucoes, pintadas, mil-flores, mottled, caboclo, perdiz e muito mais." },
       { property: "og:title", content: "Plumagens da Galinha GSB — Cores e Padroes" },
       { property: "og:description", content: "Todos os padroes de plumagem da Galinha GSB: solidas, dilucoes, pintadas e tradicionais." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

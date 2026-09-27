@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/alimentacao")({
       { name: "description", content: "Guia completo de alimentacao e manejo da Galinha GSB Sertaneja Balao: consumo de racao por fase, instalacoes adequadas ao grande porte, poleiros, ninhos, piso e sombreamento." },
       { property: "og:title", content: "Alimentacao e Manejo da Galinha GSB" },
       { property: "og:description", content: "Consumo de racao por fase, instalacoes, poleiros, ninhos e manejo adaptado ao grande porte da Galinha GSB." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

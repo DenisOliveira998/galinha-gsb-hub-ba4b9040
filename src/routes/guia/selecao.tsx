@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/selecao")({
       { name: "description", content: "Aprenda a selecionar reprodutores GSB de qualidade: criterios de conformacao, procedencia, controle de consanguinidade, registro de acasalamentos e formacao do plantel." },
       { property: "og:title", content: "Selecao de Reprodutores GSB — Formacao do Plantel" },
       { property: "og:description", content: "Criterios para selecionar reprodutores GSB, reconhecer boa procedencia e formar um plantel consistente." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

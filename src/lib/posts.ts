@@ -2,6 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
 import { requireAdmin } from "./admin-auth";
+import { cached, invalidateAfter } from "./server-cache";
+
+const POSTS_TTL = 2 * 60_000; // 2 min
 
 // ---------------------------------------------------------------------------
 // Server functions de Posts/Anúncios.
@@ -51,21 +54,25 @@ function toPostDTO(p: any) {
 
 export const getPostBySlug = createServerFn({ method: "GET" })
   .validator(z.object({ slug: z.string() }))
-  .handler(async ({ data }) => {
-    const post = await prisma.post.findUnique({
-      where: { slug: data.slug },
-      include: postInclude,
-    });
-    return post ? toPostDTO(post) : null;
-  });
+  .handler(async ({ data }) =>
+    cached(`posts:slug:${data.slug}`, POSTS_TTL, async () => {
+      const post = await prisma.post.findUnique({
+        where: { slug: data.slug },
+        include: postInclude,
+      });
+      return post ? toPostDTO(post) : null;
+    }),
+  );
 
-export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
-  const posts = await prisma.post.findMany({
-    include: postInclude,
-    orderBy: { createdAt: "desc" },
-  });
-  return posts.map(toPostDTO);
-});
+export const listPosts = createServerFn({ method: "GET" }).handler(async () =>
+  cached("posts:list", POSTS_TTL, async () => {
+    const posts = await prisma.post.findMany({
+      include: postInclude,
+      orderBy: { createdAt: "desc" },
+    });
+    return posts.map(toPostDTO);
+  }),
+);
 
 const createPostSchema = z.object({
   title: z.string().min(1),
@@ -82,28 +89,30 @@ export const createPost = createServerFn({ method: "POST" })
   .validator(createPostSchema)
   .handler(async ({ data }) => {
     await requireAdmin();
-    const slug = await uniquePostSlug(slugify(data.title));
-    const post = await prisma.post.create({
-      data: {
-        title: data.title,
-        slug,
-        categoryId: data.category,
-        description: data.description,
-        price: data.price,
-        inStock: data.inStock,
-        status: data.status,
-        images: { create: data.images.map((url, order) => ({ url, order })) },
-        faqs: {
-          create: data.faq.map((f, order) => ({
-            question: f.question,
-            answer: f.answer,
-            order,
-          })),
+    return invalidateAfter("posts:", async () => {
+      const slug = await uniquePostSlug(slugify(data.title));
+      const post = await prisma.post.create({
+        data: {
+          title: data.title,
+          slug,
+          categoryId: data.category,
+          description: data.description,
+          price: data.price,
+          inStock: data.inStock,
+          status: data.status,
+          images: { create: data.images.map((url, order) => ({ url, order })) },
+          faqs: {
+            create: data.faq.map((f, order) => ({
+              question: f.question,
+              answer: f.answer,
+              order,
+            })),
+          },
         },
-      },
-      include: postInclude,
+        include: postInclude,
+      });
+      return toPostDTO(post);
     });
-    return toPostDTO(post);
   });
 
 const updatePostSchema = z.object({
@@ -122,48 +131,52 @@ export const updatePost = createServerFn({ method: "POST" })
   .validator(updatePostSchema)
   .handler(async ({ data }) => {
     await requireAdmin();
-    const { id, images, faq, category, ...rest } = data;
+    return invalidateAfter("posts:", async () => {
+      const { id, images, faq, category, ...rest } = data;
 
-    const newSlug = rest.title ? await uniquePostSlug(slugify(rest.title), id) : undefined;
+      const newSlug = rest.title ? await uniquePostSlug(slugify(rest.title), id) : undefined;
 
-    await prisma.post.update({
-      where: { id },
-      data: {
-        ...rest,
-        ...(category ? { categoryId: category } : {}),
-        ...(newSlug ? { slug: newSlug } : {}),
-      },
+      await prisma.post.update({
+        where: { id },
+        data: {
+          ...rest,
+          ...(category ? { categoryId: category } : {}),
+          ...(newSlug ? { slug: newSlug } : {}),
+        },
+      });
+
+      if (images) {
+        await prisma.postImage.deleteMany({ where: { postId: id } });
+        await prisma.postImage.createMany({
+          data: images.map((url, order) => ({ postId: id, url, order })),
+        });
+      }
+
+      if (faq) {
+        await prisma.faq.deleteMany({ where: { postId: id } });
+        await prisma.faq.createMany({
+          data: faq.map((f, order) => ({
+            postId: id,
+            question: f.question,
+            answer: f.answer,
+            order,
+          })),
+        });
+      }
+
+      const post = await prisma.post.findUniqueOrThrow({ where: { id }, include: postInclude });
+      return toPostDTO(post);
     });
-
-    if (images) {
-      await prisma.postImage.deleteMany({ where: { postId: id } });
-      await prisma.postImage.createMany({
-        data: images.map((url, order) => ({ postId: id, url, order })),
-      });
-    }
-
-    if (faq) {
-      await prisma.faq.deleteMany({ where: { postId: id } });
-      await prisma.faq.createMany({
-        data: faq.map((f, order) => ({
-          postId: id,
-          question: f.question,
-          answer: f.answer,
-          order,
-        })),
-      });
-    }
-
-    const post = await prisma.post.findUniqueOrThrow({ where: { id }, include: postInclude });
-    return toPostDTO(post);
   });
 
 export const deletePost = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.string() }))
   .handler(async ({ data }) => {
     await requireAdmin();
-    // onDelete: Cascade no schema já remove images, faqs, comments,
-    // ratings e favorites vinculados a este post.
-    await prisma.post.delete({ where: { id: data.id } });
-    return { ok: true };
+    return invalidateAfter("posts:", async () => {
+      // onDelete: Cascade no schema já remove images, faqs, comments,
+      // ratings e favorites vinculados a este post.
+      await prisma.post.delete({ where: { id: data.id } });
+      return { ok: true };
+    });
   });

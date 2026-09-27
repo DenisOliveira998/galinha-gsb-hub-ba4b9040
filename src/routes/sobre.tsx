@@ -8,7 +8,7 @@ export const Route = createFileRoute("/sobre")({
       { name: "description", content: "Conheça Leonardo Reis, criador da raça Sertanejo Balão há mais de 10 anos. Plantel próprio com procedência garantida — ovos férteis, pintinhos, galinhas e reprodutores GSB." },
       { property: "og:title", content: "Sobre — Galinha GSB | Plantel Sertanejo Balão de Leonardo Reis" },
       { property: "og:description", content: "Conheça Leonardo Reis, criador da raça Sertanejo Balão há mais de 10 anos. Plantel próprio com procedência garantida." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Sobre — Galinha GSB" },

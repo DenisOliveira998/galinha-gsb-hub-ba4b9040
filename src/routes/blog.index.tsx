@@ -3,12 +3,12 @@ import { SiteLayout } from "@/components/site/site-layout";
 import { AdSlot } from "@/components/site/ad-slot";
 import { BlogLikeButton } from "@/components/site/blog-like-button";
 import { UserCircle2 } from "lucide-react";
-import { listBlogPosts } from "@/lib/blog";
+import { listPublishedBlogSummaries } from "@/lib/blog";
 
 export const Route = createFileRoute("/blog/")({
   loader: async () => {
     try {
-      const all = await listBlogPosts();
+      const all = await listPublishedBlogSummaries();
       return { posts: all.filter((p) => p.published) };
     } catch {
       return { posts: [] };
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/blog/")({
       { name: "description", content: "Artigos sobre criação de galinhas Sertanejo Balão (GSB), manejo, saúde e dicas para criadores." },
       { property: "og:title", content: "Blog — Galinha GSB" },
       { property: "og:description", content: "Artigos sobre criação de galinhas Sertanejo Balão (GSB), manejo, saúde e dicas para criadores." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Blog — Galinha GSB" },

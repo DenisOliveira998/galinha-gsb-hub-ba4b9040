@@ -46,28 +46,36 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 async function handleSitemap(): Promise<Response> {
   const BASE = "https://galinhagsb.com.br";
-  const now = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
+  const day = (d: Date) => d.toISOString().split("T")[0];
 
-  let postSlugs: string[] = [];
-  let blogSlugs: string[] = [];
+  let posts: { slug: string; updatedAt: Date }[] = [];
+  let blogs: { slug: string; updatedAt: Date }[] = [];
 
   try {
     const { prisma } = await import("./lib/prisma");
-    const [posts, blogs] = await Promise.all([
-      prisma.post.findMany({ where: { status: "PUBLISHED" }, select: { slug: true } }),
-      prisma.blogPost.findMany({ where: { published: true }, select: { slug: true } }),
+    [posts, blogs] = await Promise.all([
+      prisma.post.findMany({ where: { status: "PUBLISHED" }, select: { slug: true, updatedAt: true } }),
+      prisma.blogPost.findMany({ where: { published: true }, select: { slug: true, updatedAt: true } }),
     ]);
-    postSlugs = posts.map((p) => p.slug);
-    blogSlugs = blogs.map((b) => b.slug);
   } catch {
     // se falhar retorna sitemap estático
   }
 
-  const staticRoutes = ["/", "/catalogo", "/blog", "/sobre", "/contato"];
+  // Páginas fixas. As do /guia e as institucionais estavam fora do sitemap.
+  const staticRoutes = [
+    "/", "/catalogo", "/blog", "/guia",
+    "/guia/origem", "/guia/caracteristicas", "/guia/plumagem", "/guia/alimentacao",
+    "/guia/pintinhos", "/guia/reproducao", "/guia/selecao", "/guia/sanidade",
+    "/sobre", "/contato", "/afiliados", "/publicidade",
+    "/privacidade", "/termos", "/cookies",
+  ];
+  const url = (loc: string, lastmod: string) => `  <url><loc>${BASE}${loc}</loc><lastmod>${lastmod}</lastmod></url>`;
+  // lastmod real (data da última edição) em vez de "hoje" em tudo.
   const urls = [
-    ...staticRoutes.map((r) => `  <url><loc>${BASE}${r}</loc><lastmod>${now}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`),
-    ...postSlugs.map((s) => `  <url><loc>${BASE}/catalogo/${s}</loc><lastmod>${now}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
-    ...blogSlugs.map((s) => `  <url><loc>${BASE}/blog/${s}</loc><lastmod>${now}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
+    ...staticRoutes.map((r) => url(r, today)),
+    ...posts.map((p) => url(`/catalogo/${p.slug}`, day(p.updatedAt))),
+    ...blogs.map((b) => url(`/blog/${b.slug}`, day(b.updatedAt))),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>`;
@@ -79,6 +87,29 @@ async function handleSitemap(): Promise<Response> {
       "cache-control": "public, max-age=3600, s-maxage=3600",
     },
   });
+}
+
+// Páginas que dependem de login/sessão nunca vão para o cache da CDN.
+const PRIVATE_PREFIXES = ["/admin", "/conta", "/carrinho", "/api", "/_serverFn"];
+
+/**
+ * Deixa a CDN da Vercel guardar páginas públicas por 60 s (e servir a cópia
+ * antiga enquanto atualiza em segundo plano). Antes era "max-age=0" em tudo,
+ * então cada visita ia até o banco (~1–1,5 s de espera, 9 s no cold start).
+ * Só aplica a GET anônimo (sem cookie), HTML, status 200 e sem Set-Cookie,
+ * para nunca guardar uma página personalizada de um usuário logado.
+ */
+function withEdgeCache(request: Request, pathname: string, response: Response): Response {
+  if (request.method !== "GET") return response;
+  if (request.headers.get("cookie")) return response;
+  if (PRIVATE_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return response;
+  if (response.status !== 200) return response;
+  if (!(response.headers.get("content-type") ?? "").includes("text/html")) return response;
+  if (response.headers.has("set-cookie")) return response;
+  const headers = new Headers(response.headers);
+  headers.set("cache-control", "public, max-age=0, must-revalidate");
+  headers.set("cdn-cache-control", "public, s-maxage=60, stale-while-revalidate=300");
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
 export default {
@@ -133,7 +164,7 @@ export default {
 
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return withEdgeCache(request, pathname, await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

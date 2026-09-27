@@ -17,7 +17,7 @@ export const Route = createFileRoute("/guia/")({
         content:
           "Guia completo sobre a Galinha GSB Sertaneja Balao: origem, caracteristicas, reproducao, alimentacao e manejo.",
       },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Guia da Galinha GSB — Visao Geral" },

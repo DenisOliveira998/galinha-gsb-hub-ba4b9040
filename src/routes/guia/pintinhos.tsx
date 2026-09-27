@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/pintinhos")({
       { name: "description", content: "Como criar pintinhos GSB Sertaneja Balao: ambiente na primeira semana, alimentacao por fase, acompanhamento de crescimento, recria e selecao gradual." },
       { property: "og:title", content: "Pintinhos GSB — Criacao e Desenvolvimento" },
       { property: "og:description", content: "Ambiente ideal, alimentacao por fase, acompanhamento de crescimento e selecao gradual de pintinhos GSB." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

@@ -4,6 +4,7 @@ import { AdSlot } from "@/components/site/ad-slot";
 import { BlogLikeButton } from "@/components/site/blog-like-button";
 import { UserCircle2 } from "lucide-react";
 import { getBlogPostBySlug } from "@/lib/blog";
+import { SITE_URL, DEFAULT_OG_IMAGE, absUrl, plainText, truncate, pageTitle, demoteH1 } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
@@ -18,22 +19,46 @@ export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData }) => {
     const post = loaderData?.post;
     if (!post) return {};
-    const img = post.coverImage ?? "";
-    const plainTitle = post.title.replace(/<[^>]*>/g, "").trim();
-    const plainExcerpt = post.excerpt?.replace(/<[^>]*>/g, "").trim() ?? "";
-    const desc = plainExcerpt.slice(0, 160);
+    const img = post.coverImage ? absUrl(post.coverImage) : "";
+    const plainTitle = plainText(post.title);
+    const desc = truncate(plainText(post.excerpt), 155);
+    const title = pageTitle(plainTitle);
+
+    // JSON-LD de artigo: ajuda o Google (e buscadores de IA) a entender autor e data.
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: plainTitle.slice(0, 110),
+      description: desc,
+      image: [img || DEFAULT_OG_IMAGE],
+      datePublished: post.createdAt,
+      dateModified: post.updatedAt ?? post.createdAt,
+      mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+      inLanguage: "pt-BR",
+      author: post.author
+        ? { "@type": "Person", name: post.author.name }
+        : { "@type": "Organization", name: "Galinha GSB", url: SITE_URL },
+      publisher: {
+        "@type": "Organization",
+        name: "Galinha GSB",
+        logo: { "@type": "ImageObject", url: DEFAULT_OG_IMAGE },
+      },
+    };
+
     return {
       meta: [
-        { title: `${plainTitle} — Blog Galinha GSB` },
+        { title },
         { name: "description", content: desc },
-        { property: "og:title", content: `${plainTitle} — Blog Galinha GSB` },
+        { property: "og:title", content: plainTitle },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
+        { property: "article:published_time", content: post.createdAt },
         ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
         { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
-        { name: "twitter:title", content: `${plainTitle} — Blog Galinha GSB` },
+        { name: "twitter:title", content: plainTitle },
         { name: "twitter:description", content: desc },
       ],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
   component: BlogDetail,
@@ -60,7 +85,7 @@ function BlogDetail() {
           <Link to="/blog" className="text-xs text-muted-foreground hover:text-foreground md:text-sm">← Voltar ao blog</Link>
           {post.coverImage ? (
             <div className="mt-3 aspect-video overflow-hidden rounded-2xl shadow-[var(--shadow-card)] md:mt-4 md:rounded-3xl">
-              <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" />
+              <img src={post.coverImage} alt={plainText(post.title)} className="h-full w-full object-cover" />
             </div>
           ) : (
             <div className="mt-3 aspect-video overflow-hidden rounded-2xl bg-muted md:mt-4 md:rounded-3xl" />
@@ -105,13 +130,13 @@ function BlogDetail() {
             }
           />
 
-          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base blog-content" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base blog-content" dangerouslySetInnerHTML={{ __html: demoteH1(post.content) }} />
 
           {(post.blocks ?? []).length > 0 && (
             <div className="mt-6 space-y-5">
               {(post.blocks ?? []).map((b) =>
                 b.type === "text" ? (
-                  <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: b.text ?? "" }} />
+                  <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: demoteH1(b.text) }} />
                 ) : b.image ? (
                   <img key={b.id} src={b.image} alt="" loading="lazy" className="aspect-[16/9] w-full rounded-2xl object-cover" />
                 ) : null,
@@ -122,7 +147,7 @@ function BlogDetail() {
           {(post.images ?? []).length > 0 && (
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {(post.images ?? []).map((img, i) => (
-                <img key={i} src={img} alt={`${post.title} — imagem ${i + 1}`} loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover" />
+                <img key={i} src={img} alt={`${plainText(post.title)} — imagem ${i + 1}`} loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover" />
               ))}
             </div>
           )}

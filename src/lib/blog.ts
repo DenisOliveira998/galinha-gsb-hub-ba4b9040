@@ -2,6 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "./prisma";
 import { requireAdmin } from "./admin-auth";
+import { cached, invalidatePrefix } from "./server-cache";
+
+const BLOG_TTL = 2 * 60_000; // 2 min
 
 const slugify = (s: string) =>
   s
@@ -42,6 +45,7 @@ function toBlogDTO(b: any) {
     author: b.author ? { id: b.author.id, name: b.author.name, avatar: b.author.avatar ?? null, bio: b.author.bio ?? null } : null,
     likeCount: b._count?.likes ?? 0,
     createdAt: b.createdAt.toISOString(),
+    updatedAt: b.updatedAt ? b.updatedAt.toISOString() : b.createdAt.toISOString(),
     images: b.images.map((i: any) => i.url),
     blocks: b.blocks.map((bl: any) => ({
       id: bl.id,
@@ -52,23 +56,63 @@ function toBlogDTO(b: any) {
   };
 }
 
+// Lista completa (inclui rascunhos e o texto integral) — só para o painel admin.
 export const listBlogPosts = createServerFn({ method: "GET" }).handler(async () => {
-  const posts = await prisma.blogPost.findMany({
-    include: blogInclude,
-    orderBy: { createdAt: "desc" },
+  await requireAdmin();
+  return cached("blog:list", BLOG_TTL, async () => {
+    const posts = await prisma.blogPost.findMany({
+      include: blogInclude,
+      orderBy: { createdAt: "desc" },
+    });
+    return posts.map(toBlogDTO);
   });
-  return posts.map(toBlogDTO);
 });
+
+// Lista pública e leve para home/listagem do blog: só posts publicados e sem o
+// texto completo (content/blocks), que deixava o HTML da home com ~400 KB.
+export const listPublishedBlogSummaries = createServerFn({ method: "GET" }).handler(async () =>
+  cached("blog:summaries", BLOG_TTL, async () => {
+    const posts = await prisma.blogPost.findMany({
+      where: { published: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        coverImage: true,
+        published: true,
+        createdAt: true,
+        author: { select: { name: true, avatar: true } },
+        _count: { select: { likes: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return posts.map((b) => ({
+      id: b.id,
+      title: b.title,
+      slug: b.slug,
+      excerpt: b.excerpt,
+      coverImage: b.coverImage,
+      published: b.published,
+      createdAt: b.createdAt.toISOString(),
+      likeCount: b._count.likes,
+      author: b.author ? { name: b.author.name, avatar: b.author.avatar ?? null } : null,
+    }));
+  }),
+);
 
 export const getBlogPostBySlug = createServerFn({ method: "GET" })
   .validator(z.object({ slug: z.string() }))
-  .handler(async ({ data }) => {
-    const post = await prisma.blogPost.findUnique({
-      where: { slug: data.slug },
-      include: blogInclude,
-    });
-    return post ? toBlogDTO(post) : null;
-  });
+  .handler(async ({ data }) =>
+    cached(`blog:slug:${data.slug}`, BLOG_TTL, async () => {
+      const post = await prisma.blogPost.findUnique({
+        where: { slug: data.slug },
+        include: blogInclude,
+      });
+      // Rascunhos não são expostos publicamente.
+      return post && post.published ? toBlogDTO(post) : null;
+    }),
+  );
 
 const blockSchema = z.object({
   type: z.enum(["text", "image"]),
@@ -116,6 +160,7 @@ export const createBlogPost = createServerFn({ method: "POST" })
       },
       include: blogInclude,
     });
+    invalidatePrefix("blog:");
     return toBlogDTO(post);
   });
 
@@ -171,6 +216,7 @@ export const updateBlogPost = createServerFn({ method: "POST" })
       });
     }
 
+    invalidatePrefix("blog:");
     const post = await prisma.blogPost.findUniqueOrThrow({ where: { id }, include: blogInclude });
     return toBlogDTO(post);
   });
@@ -180,6 +226,7 @@ export const deleteBlogPost = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdmin();
     await prisma.blogPost.delete({ where: { id: data.id } });
+    invalidatePrefix("blog:");
     return { ok: true };
   });
 

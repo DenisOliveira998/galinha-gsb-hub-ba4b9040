@@ -12,6 +12,7 @@ import { useRatingSummaryQuery, useMyRatingQuery, useRatePostMutation } from "@/
 import { whatsappHref } from "@/lib/mock-store";
 import { getAdminSession } from "@/lib/admin-auth";
 import { authClient } from "@/lib/auth-client";
+import { SITE_URL, absUrl, plainText, truncate } from "@/lib/seo";
 
 export const Route = createFileRoute("/catalogo/$slug")({
   loader: async ({ params }) => {
@@ -37,9 +38,16 @@ export const Route = createFileRoute("/catalogo/$slug")({
   head: ({ loaderData }) => {
     const post = loaderData?.post;
     if (!post) return {};
-    const img = post.images?.[0] ?? "";
-    const plainTitle = post.title.replace(/<[^>]*>/g, "").trim();
-    const desc = post.description?.replace(/<[^>]*>/g, "").slice(0, 160) ?? "";
+    const img = post.images?.[0] ? absUrl(post.images[0]) : "";
+    const plainTitle = plainText(post.title);
+    // Descrição sem quebras de linha e cortada sem partir palavra no meio.
+    // Se a 1ª linha só repete o título ("Galinha GSB à Venda"), ela é pulada.
+    const lines = (post.description ?? "").split(/\n+/);
+    if (lines.length > 1 && plainText(lines[0]).toLowerCase().includes(plainTitle.toLowerCase())) lines.shift();
+    const desc = truncate(plainText(lines.join(" ")), 155);
+    // "Galinha GSB — Galinha GSB" repetia o nome; agora: "Galinha GSB à Venda | Galinha GSB"
+    const title = `${plainTitle} à Venda | Galinha GSB`;
+    const url = `${SITE_URL}/catalogo/${post.slug}`;
 
     const rating = loaderData?.ratingSSR;
 
@@ -49,8 +57,20 @@ export const Route = createFileRoute("/catalogo/$slug")({
       "@type": "Product",
       name: plainTitle,
       description: desc,
+      sku: post.slug,
+      url,
+      brand: { "@type": "Brand", name: "Galinha GSB" },
       ...(img ? { image: [img] } : {}),
-      ...(post.price ? { offers: { "@type": "Offer", priceCurrency: "BRL", price: post.price.toFixed(2), availability: post.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } } : {}),
+      ...(post.price ? {
+        offers: {
+          "@type": "Offer",
+          url,
+          priceCurrency: "BRL",
+          price: post.price.toFixed(2),
+          availability: post.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          seller: { "@type": "Organization", name: "Galinha GSB" },
+        },
+      } : {}),
       ...(rating && rating.count > 0 ? {
         aggregateRating: {
           "@type": "AggregateRating",
@@ -64,14 +84,14 @@ export const Route = createFileRoute("/catalogo/$slug")({
 
     return {
       meta: [
-        { title: `${plainTitle} — Galinha GSB` },
+        { title },
         { name: "description", content: desc },
-        { property: "og:title", content: `${plainTitle} — Galinha GSB` },
+        { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
         { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
-        { name: "twitter:title", content: `${plainTitle} — Galinha GSB` },
+        { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
       ],
       scripts: [
@@ -115,7 +135,7 @@ function PostDetail() {
         <Link to="/catalogo" className="text-sm text-muted-foreground hover:text-foreground">← Voltar ao catálogo</Link>
         <div className="mt-6 grid gap-10 md:grid-cols-2">
           <div className="overflow-hidden rounded-3xl shadow-[var(--shadow-card)]">
-            <img src={post.images[0]} alt={post.title} className="aspect-square w-full object-cover" />
+            <img src={post.images[0]} alt={plainText(post.title)} className="aspect-square w-full object-cover" />
           </div>
           <div>
             <div className="flex items-center gap-2">

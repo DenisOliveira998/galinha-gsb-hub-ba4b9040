@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia/reproducao")({
       { name: "description", content: "Tudo sobre reproducao da Galinha GSB Sertaneja Balao: acasalamento, coleta de ovos ferteis, armazenamento, incubacao artificial e cuidados para maximizar fertilidade e eclosaо." },
       { property: "og:title", content: "Reproducao da Galinha GSB — Ovos Ferteis e Incubacao" },
       { property: "og:description", content: "Acasalamento, coleta de ovos ferteis, incubacao artificial e cuidados para garantir boa eclosaо da Galinha GSB." },
-      { property: "og:image", content: "/logo.png" },
+      { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
   }),

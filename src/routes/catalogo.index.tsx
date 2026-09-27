@@ -21,14 +21,14 @@ export const Route = createFileRoute("/catalogo/")({
         { name: "description", content: "Veja todos os ovos férteis, galinhas e reprodutores disponíveis no plantel Galinha GSB — Sertanejo Balão." },
         { property: "og:title", content: "Catálogo — Galinha GSB" },
         { property: "og:description", content: "Ovos férteis, galinhas e reprodutores da raça Sertanejo Balão com procedência garantida." },
-        { property: "og:image", content: "/logo.png" },
+        { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
         { name: "twitter:title", content: "Catálogo — Galinha GSB" },
         { name: "twitter:description", content: "Ovos férteis, galinhas e reprodutores da raça Sertanejo Balão com procedência garantida." },
         ...(hasFilter ? [{ name: "robots", content: "noindex,follow" }] : []),
       ],
-      links: hasFilter ? [{ rel: "canonical", href: "https://galinhagsb.com.br/catalogo" }] : [],
+      // canonical (sempre /catalogo, sem filtros) vem do __root.tsx
     };
   },
   loader: async () => {
