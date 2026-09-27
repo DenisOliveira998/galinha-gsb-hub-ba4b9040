@@ -5,7 +5,7 @@ import { BlogLikeButton } from "@/components/site/blog-like-button";
 import { UserCircle2 } from "lucide-react";
 import { getBlogPostBySlug, listPublishedBlogSummaries } from "@/lib/blog";
 import { listPosts } from "@/lib/posts";
-import { topicFor, relatedPosts, relatedProduct } from "@/lib/related";
+import { topicFor, relatedPosts, relatedProduct, linkKnownTitles } from "@/lib/related";
 import { SITE_URL, DEFAULT_OG_IMAGE, absUrl, plainText, truncate, pageTitle, demoteH1 } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/blog/$slug")({
     return {
       post,
       related: relatedPosts(post.slug, blogs, 3),
+      titles: blogs.map((b) => ({ slug: b.slug, title: b.title })),
       guia: topicFor(post.slug).guia,
       product: product ? { slug: product.slug, title: product.title, image: product.images?.[0] ?? null } : null,
     };
@@ -90,7 +91,7 @@ function formatDate(iso: string) {
 }
 
 function BlogDetail() {
-  const { post, related, guia, product } = Route.useLoaderData();
+  const { post, related, guia, product, titles } = Route.useLoaderData();
   return (
     <SiteLayout>
       <div className="mx-auto grid max-w-6xl gap-6 px-3 py-6 text-left md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_240px]">
@@ -143,13 +144,13 @@ function BlogDetail() {
             }
           />
 
-          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base blog-content" dangerouslySetInnerHTML={{ __html: demoteH1(post.content) }} />
+          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base blog-content" dangerouslySetInnerHTML={{ __html: linkKnownTitles(demoteH1(post.content), titles) }} />
 
           {(post.blocks ?? []).length > 0 && (
             <div className="mt-6 space-y-5">
               {(post.blocks ?? []).map((b) =>
                 b.type === "text" ? (
-                  <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: demoteH1(b.text) }} />
+                  <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: linkKnownTitles(demoteH1(b.text), titles) }} />
                 ) : b.image ? (
                   <img key={b.id} src={b.image} alt="" loading="lazy" className="aspect-[16/9] w-full rounded-2xl object-cover" />
                 ) : null,
@@ -197,8 +198,8 @@ type ReadMoreProps = {
 
 function ReadMore({ related, guia, product }: ReadMoreProps) {
   return (
-    <section className="mt-10 border-t border-border pt-6" aria-labelledby="leia-tambem">
-      <h2 id="leia-tambem" className="font-display text-lg md:text-xl">Leia também</h2>
+    <section className="mt-10 border-t border-border pt-6" aria-labelledby="continue-lendo">
+      <h2 id="continue-lendo" className="font-display text-lg md:text-xl">Continue lendo</h2>
 
       {related.length > 0 && (
         <div className="mt-3 grid gap-3 sm:grid-cols-3">

@@ -72,3 +72,30 @@ export function relatedProduct<T extends { slug: string; status: string; inStock
   const matches = products.filter((p) => p.status === "PUBLISHED" && p.slug.includes(key));
   return matches.find((p) => p.inStock !== false) ?? matches[0];
 }
+
+const norm = (s: string) =>
+  s
+    .replace(/<[^>]*>/g, " ")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+/**
+ * Vários posts têm, no próprio texto, uma lista "Leia também" com títulos de
+ * outros posts escritos como texto puro (sem link). Aqui cada <li> cujo texto
+ * é exatamente o título de um post publicado vira link para ele, e "Confira
+ * nossos ..." vira link para o catálogo. Itens sem correspondência ficam como estão.
+ */
+export function linkKnownTitles(html: string, blogs: { slug: string; title: string }[]): string {
+  const bySlug = new Map(blogs.map((b) => [norm(b.title), b.slug]));
+  return html.replace(/<li>([\s\S]*?)<\/li>/gi, (full, inner: string) => {
+    if (/<a\s/i.test(inner)) return full;
+    const text = norm(inner);
+    const slug = bySlug.get(text);
+    if (slug) return `<li><a href="/blog/${slug}">${inner}</a></li>`;
+    if (text.startsWith("confira nossos")) return `<li><a href="/catalogo">${inner}</a></li>`;
+    return full;
+  });
+}
