@@ -5,10 +5,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 export const Route = createFileRoute("/guia/origem")({
   head: () => ({
     meta: [
-      { title: "Origem da Galinha GSB — Historia e Formacao da Raca Sertaneja Balao" },
-      { name: "description", content: "Conheca a origem da Galinha Sertaneja Balao (GSB): a historia no sertao da Bahia, o municipio de Baixa Grande e como a selecao regional consolidou a raca ao longo de decadas." },
-      { property: "og:title", content: "Origem da Galinha GSB — Historia da Raca Sertaneja Balao" },
-      { property: "og:description", content: "A historia da GSB no sertao da Bahia, Baixa Grande e a formacao da raca por selecao regional." },
+      { title: "Origem da Galinha GSB — História e Formação da Raça Sertaneja Balão" },
+      { name: "description", content: "Conheça a origem da Galinha Sertaneja Balão (GSB): a história no sertão da Bahia, o município de Baixa Grande e como a seleção regional consolidou a raça ao longo de décadas." },
+      { property: "og:title", content: "Origem da Galinha GSB — História da Raça Sertaneja Balão" },
+      { property: "og:description", content: "A história da GSB no sertão da Bahia, Baixa Grande e a formação da raça por seleção regional." },
       { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
     ],
@@ -20,74 +20,74 @@ function OrigemPage() {
   return (
     <SiteLayout>
       <GuiaArticleLayout
-        tag="Historia"
-        title="Origem e formacao historica da Galinha GSB"
-        intro="A historia da Galinha GSB esta ligada ao sertao da Bahia e, especialmente, ao municipio de Baixa Grande. Familias de criadores mantinham aves pesadas conhecidas regionalmente como galinhas balao e, por volta da decada de 1950, a selecao comecou a ganhar direcao mais definida, com preferencia por exemplares maiores, robustos e de conformacao propria."
+        tag="História"
+        title="Origem e formação histórica da Galinha GSB"
+        intro="A história da Galinha GSB está ligada ao sertão da Bahia e, especialmente, ao município de Baixa Grande. Famílias de criadores mantinham aves pesadas conhecidas regionalmente como galinhas balão e, por volta da década de 1950, a seleção começou a ganhar direção mais definida, com preferência por exemplares maiores, robustos e de conformação própria."
         prev={null}
-        next={{ to: "/guia/caracteristicas", label: "Caracteristicas e padrao morfologico" }}
+        next={{ to: "/guia/caracteristicas", label: "Características e padrão morfológico" }}
       >
-        <Section title="O nome Balao e sua origem">
+        <Section title="O nome Balão e sua origem">
           <p>
-            O termo balao, que da nome a raca, descreve a silhueta caracteristica da ave — corpo arredondado, volumoso e profundo, que lembra visualmente um balao quando observado de frente ou de perfil. Esse visual e resultado de decadas de selecao por criadores que privilegiavam aves com grande volume de carne, peito largo e plumagem solta, dando ao conjunto aquela forma esferica que distingue a GSB de qualquer outra galinha crioula brasileira.
+            O termo balão, que dá nome à raça, descreve a silhueta característica da ave — corpo arredondado, volumoso e profundo, que lembra visualmente um balão quando observado de frente ou de perfil. Esse visual é resultado de décadas de seleção por criadores que privilegiavam aves com grande volume de carne, peito largo e plumagem solta, dando ao conjunto aquela forma esférica que distingue a GSB de qualquer outra galinha crioula brasileira.
           </p>
           <p>
-            O apelido era informal durante muito tempo, usado dentro das comunidades de criadores do sertao baiano. Com o crescimento do interesse pela raca fora da regiao, o nome foi incorporado ao padrao de forma mais sistematica, associando-se a designacao geografica Sertaneja para marcar a origem e o contexto de desenvolvimento da ave.
-          </p>
-        </Section>
-
-        <Section title="Baixa Grande como nucleo de preservacao">
-          <p>
-            A permanencia dessas aves em Baixa Grande e associada as condicoes locais de clima, vegetacao, relevo e ao sistema tradicional de criacao. O material de referencia do guia cita marcos historicos da formacao do municipio — incluindo 1860, 1872 e 1885 — para contextualizar a continuidade das populacoes de aves na regiao.
-          </p>
-          <p>
-            Esses marcos nao significam que um padrao racial moderno ja existisse naquele periodo; ajudam, sobretudo, a situar a longa presenca de galinhas crioulas do tipo balao na comunidade. O clima semi-arido, os periodos de estiagem e a disponibilidade sazonal de recursos alimentares foram forcas de selecao natural que contribuiram para a rusticidade que caracteriza a raca ate hoje.
-          </p>
-          <p>
-            O isolamento relativo da regiao nas primeiras decadas do seculo XX foi, paradoxalmente, um fator de preservacao. Com poucos cruzamentos nao planejados com racas comerciais, o tipo balao foi se mantendo e se consolidando nas propriedades familiares que o cultivavam.
+            O apelido era informal durante muito tempo, usado dentro das comunidades de criadores do sertão baiano. Com o crescimento do interesse pela raça fora da região, o nome foi incorporado ao padrão de forma mais sistemática, associando-se à designação geográfica Sertaneja para marcar a origem e o contexto de desenvolvimento da ave.
           </p>
         </Section>
 
-        <Section title="Da ave regional a selecao moderna">
+        <Section title="Baixa Grande como núcleo de preservação">
           <p>
-            A Galinha Balao Tradicional e resultado de uma longa formacao de aves crioulas no Brasil: populacoes domesticas trazidas em diferentes periodos teriam se misturado, sido submetidas a selecao natural em ambientes regionais e, depois, a escolha dos proprios criadores. A combinacao entre isolamento, adaptacao local e selecao artificial foram forcas importantes na fixacao do tipo balao.
+            A permanência dessas aves em Baixa Grande é associada às condições locais de clima, vegetação, relevo e ao sistema tradicional de criação. O material de referência do guia cita marcos históricos da formação do município — incluindo 1860, 1872 e 1885 — para contextualizar a continuidade das populações de aves na região.
           </p>
           <p>
-            Com o passar das geracoes, os criadores intensificaram a selecao por peso, volume corporal, rusticidade, docilidade e aparencia. Houve tambem aumento da diversidade de plumagens e de algumas caracteristicas morfologicas ao longo das ultimas decadas.
+            Esses marcos não significam que um padrão racial moderno já existisse naquele período; ajudam, sobretudo, a situar a longa presença de galinhas crioulas do tipo balão na comunidade. O clima semi-arido, os períodos de estiagem e a disponibilidade sazonal de recursos alimentares foram forças de seleção natural que contribuíram para a rusticidade que caracteriza a raça até hoje.
           </p>
           <p>
-            Assim, a GSB atual deve ser entendida como uma populacao em processo de consolidacao: tradicao regional de um lado, selecao orientada e padronizacao contemporanea de outro.
-          </p>
-        </Section>
-
-        <Section title="Diferenca em relacao a outras racas crioulas brasileiras">
-          <p>
-            O Brasil tem um patrimonio significativo de galinhas crioulas — Canela Preta, Pe Duro, Caipira, Peloco, entre outras. A GSB se diferencia dessas populacoes principalmente pelo porte: enquanto a maioria das galinhas crioulas brasileiras e de porte medio ou leve, a GSB foi selecionada para ser uma ave pesada, de condicao carnica pronunciada, com peso adulto que pode superar facilmente o das galinhas industriais de dupla aptidao.
-          </p>
-          <p>
-            Alem do porte, a silhueta globosa e a plumagem solta que forma o volume visual sao marcas que nao aparecem de forma tao pronunciada em outras racas crioulas. Esse conjunto de caracteristicas e o que torna a GSB reconhecivel mesmo para quem nao e criador especializado.
+            O isolamento relativo da região nas primeiras décadas do século XX foi, paradoxalmente, um fator de preservação. Com poucos cruzamentos não planejados com raças comerciais, o tipo balão foi se mantendo e se consolidando nas propriedades familiares que o cultivavam.
           </p>
         </Section>
 
-        <Section title="O processo de reconhecimento e padronizacao">
+        <Section title="Da ave regional à seleção moderna">
           <p>
-            Racas crioulas brasileiras em geral carecem de padrao oficial consolidado por orgao de registro nacional. A GSB nao e excecao — o que existe sao descricoes de padrao em desenvolvimento, discutidas entre criadores e entidades ligadas a avicultura alternativa. Diferentes grupos podem adotar criterios levemente distintos para peso, proporcoes ou plumagem aceita.
+            A Galinha Balão Tradicional é resultado de uma longa formação de aves crioulas no Brasil: populações domésticas trazidas em diferentes períodos teriam se misturado, sido submetidas à seleção natural em ambientes regionais e, depois, a escolha dos próprios criadores. A combinação entre isolamento, adaptação local e seleção artificial foram forças importantes na fixação do tipo balão.
           </p>
           <p>
-            Esse contexto nao diminui o valor ou a identidade da raca, mas exige que o criador se informe sobre qual padrao esta sendo adotado pela entidade ou exposicao com a qual pretende trabalhar. O padrao descrito neste guia reflete os criterios observados no plantel de referencia e na literatura disponivel sobre a raca, mas nao deve ser tratado como norma universal.
+            Com o passar das gerações, os criadores intensificaram a seleção por peso, volume corporal, rusticidade, docilidade e aparência. Houve também aumento da diversidade de plumagens e de algumas características morfológicas ao longo das últimas décadas.
+          </p>
+          <p>
+            Assim, a GSB atual deve ser entendida como uma população em processo de consolidação: tradição regional de um lado, seleção orientada e padronização contemporânea de outro.
           </p>
         </Section>
 
-        <Section title="Situacao atual da raca">
+        <Section title="Diferença em relação a outras raças crioulas brasileiras">
           <p>
-            Nas ultimas duas decadas, a GSB ganhou popularidade fora do sertao baiano. Criadores de diferentes estados passaram a adquirir aves e ovos ferteis para iniciar planteis proprios, e o interesse pelo tipo balao cresceu junto com o movimento de valorizacao das racas locais e da avicultura alternativa no Brasil.
+            O Brasil tem um patrimônio significativo de galinhas crioulas — Canela Preta, Pé Duro, Caipira, Peloco, entre outras. A GSB se diferencia dessas populações principalmente pelo porte: enquanto a maioria das galinhas crioulas brasileiras é de porte médio ou leve, a GSB foi selecionada para ser uma ave pesada, de condição cárnica pronunciada, com peso adulto que pode superar facilmente o das galinhas industriais de dupla aptidão.
           </p>
           <p>
-            Essa expansao traz oportunidades — mais criadores, mais selecao, mais diversidade genetica disponivel — mas tambem riscos: cruzamentos nao documentados, venda de aves incorretamente identificadas e perda de rastreabilidade do plantel. Para o criador serio, isso reforca a importancia de escolher aves com procedencia documentada e criadores que trabalhem com selecao orientada.
+            Além do porte, a silhueta globosa e a plumagem solta que forma o volume visual são marcas que não aparecem de forma tão pronunciada em outras raças crioulas. Esse conjunto de características é o que torna a GSB reconhecível mesmo para quem não é criador especializado.
+          </p>
+        </Section>
+
+        <Section title="O processo de reconhecimento e padronização">
+          <p>
+            Raças crioulas brasileiras em geral carecem de padrão oficial consolidado por órgão de registro nacional. A GSB não é exceção — o que existe são descrições de padrão em desenvolvimento, discutidas entre criadores e entidades ligadas à avicultura alternativa. Diferentes grupos podem adotar critérios levemente distintos para peso, proporções ou plumagem aceita.
+          </p>
+          <p>
+            Esse contexto não diminui o valor ou a identidade da raça, mas exige que o criador se informe sobre qual padrão está sendo adotado pela entidade ou exposição com a qual pretende trabalhar. O padrão descrito neste guia reflete os critérios observados no plantel de referência e na literatura disponível sobre a raça, mas não deve ser tratado como norma universal.
+          </p>
+        </Section>
+
+        <Section title="Situação atual da raça">
+          <p>
+            Nas últimas duas décadas, a GSB ganhou popularidade fora do sertão baiano. Criadores de diferentes estados passaram a adquirir aves e ovos férteis para iniciar plantéis próprios, e o interesse pelo tipo balão cresceu junto com o movimento de valorização das raças locais e da avicultura alternativa no Brasil.
+          </p>
+          <p>
+            Essa expansão traz oportunidades — mais criadores, mais seleção, mais diversidade genética disponível — mas também riscos: cruzamentos não documentados, venda de aves incorretamente identificadas e perda de rastreabilidade do plantel. Para o criador sério, isso reforça a importância de escolher aves com procedência documentada e criadores que trabalhem com seleção orientada.
           </p>
         </Section>
 
         <Callout>
-          A GSB nao e uma raca completamente fixada por um padrao unico e universal. Diferentes entidades podem adotar criterios proprios. Ao buscar informacoes para exposicoes ou registros, sempre consulte o regulamento vigente da entidade responsavel.
+          A GSB não é uma raça completamente fixada por um padrão único e universal. Diferentes entidades podem adotar critérios próprios. Ao buscar informações para exposições ou registros, sempre consulte o regulamento vigente da entidade responsável.
         </Callout>
       </GuiaArticleLayout>
     </SiteLayout>
@@ -129,7 +129,7 @@ export function GuiaArticleLayout({
           {children}
         </div>
 
-        {/* Navegacao entre capitulos */}
+        {/* Navegação entre capítulos */}
         <nav className="mt-12 flex items-center justify-between gap-4 border-t border-border pt-8">
           {prev ? (
             <Link to={prev.to as any} className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition">
@@ -173,10 +173,10 @@ export function InfoTable({ rows }: { rows: { label: string; femea?: string; mac
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/50">
-            <th className="px-4 py-2.5 text-left font-semibold">Caracteristica</th>
+            <th className="px-4 py-2.5 text-left font-semibold">Característica</th>
             {hasGender ? (
               <>
-                <th className="px-4 py-2.5 text-left font-semibold">Femea</th>
+                <th className="px-4 py-2.5 text-left font-semibold">Fêmea</th>
                 <th className="px-4 py-2.5 text-left font-semibold">Macho</th>
               </>
             ) : (

@@ -6,7 +6,7 @@ import { UserCircle2 } from "lucide-react";
 import { getBlogPostBySlug, listPublishedBlogSummaries } from "@/lib/blog";
 import { listPosts } from "@/lib/posts";
 import { topicFor, relatedPosts, relatedProduct, linkKnownTitles } from "@/lib/related";
-import { SITE_URL, DEFAULT_OG_IMAGE, absUrl, plainText, truncate, pageTitle, demoteH1 } from "@/lib/seo";
+import { SITE_URL, DEFAULT_OG_IMAGE, absUrl, plainText, truncate, pageTitle, demoteH1, stripHeadingEmojis } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
@@ -144,13 +144,13 @@ function BlogDetail() {
             }
           />
 
-          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base blog-content" dangerouslySetInnerHTML={{ __html: linkKnownTitles(demoteH1(post.content), titles) }} />
+          <div className="prose prose-sm mt-5 max-w-none text-left text-foreground/90 md:text-base blog-content" dangerouslySetInnerHTML={{ __html: linkKnownTitles(stripHeadingEmojis(demoteH1(post.content)), titles) }} />
 
           {(post.blocks ?? []).length > 0 && (
             <div className="mt-6 space-y-5">
               {(post.blocks ?? []).map((b) =>
                 b.type === "text" ? (
-                  <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: linkKnownTitles(demoteH1(b.text), titles) }} />
+                  <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: linkKnownTitles(stripHeadingEmojis(demoteH1(b.text)), titles) }} />
                 ) : b.image ? (
                   <img key={b.id} src={b.image} alt="" loading="lazy" className="aspect-[16/9] w-full rounded-2xl object-cover" />
                 ) : null,

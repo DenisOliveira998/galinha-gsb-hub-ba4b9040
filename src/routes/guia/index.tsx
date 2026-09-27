@@ -5,26 +5,26 @@ import { SiteLayout } from "@/components/site/site-layout";
 export const Route = createFileRoute("/guia/")({
   head: () => ({
     meta: [
-      { title: "Guia da Galinha GSB — Visao Geral | Sertaneja Balao" },
+      { title: "Guia da Galinha GSB — Visão Geral | Sertaneja Balão" },
       {
         name: "description",
         content:
-          "Guia completo sobre a Galinha GSB Sertaneja Balao: origem, caracteristicas, padrao morfologico, reproducao, alimentacao, manejo e selecao de reprodutores. PDF gratuito.",
+          "Guia completo sobre a Galinha GSB Sertaneja Balão: origem, características, padrão morfológico, reprodução, alimentação, manejo e seleção de reprodutores. PDF gratuito.",
       },
-      { property: "og:title", content: "Guia da Galinha GSB — Visao Geral" },
+      { property: "og:title", content: "Guia da Galinha GSB — Visão Geral" },
       {
         property: "og:description",
         content:
-          "Guia completo sobre a Galinha GSB Sertaneja Balao: origem, caracteristicas, reproducao, alimentacao e manejo.",
+          "Guia completo sobre a Galinha GSB Sertaneja Balão: origem, características, reprodução, alimentação e manejo.",
       },
       { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Guia da Galinha GSB — Visao Geral" },
+      { name: "twitter:title", content: "Guia da Galinha GSB — Visão Geral" },
       {
         name: "twitter:description",
         content:
-          "Guia completo sobre a Galinha GSB Sertaneja Balao: origem, caracteristicas, reproducao, alimentacao e manejo.",
+          "Guia completo sobre a Galinha GSB Sertaneja Balão: origem, características, reprodução, alimentação e manejo.",
       },
     ],
   }),
@@ -44,10 +44,10 @@ function GuiaIndexPage() {
             Material educativo — Portal Galinha GSB · 2026
           </div>
           <h1 className="font-display text-3xl leading-tight md:text-4xl lg:text-5xl">
-            Guia da Galinha GSB: criacao, manejo e caracteristicas da Sertaneja Balao
+            Guia da Galinha GSB: criação, manejo e características da Sertaneja Balão
           </h1>
           <p className="mt-4 max-w-2xl text-base opacity-85 md:text-lg">
-            Um material completo produzido pelo Portal Galinha GSB com tudo o que voce precisa saber sobre a Galinha Sertaneja Balao — da origem historica a selecao de reprodutores.
+            Um material completo produzido pelo Portal Galinha GSB com tudo o que você precisa saber sobre a Galinha Sertaneja Balão — da origem histórica à seleção de reprodutores.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <a
@@ -70,15 +70,15 @@ function GuiaIndexPage() {
         </div>
       </section>
 
-      {/* Introducao */}
+      {/* Introdução */}
       <section className="mx-auto max-w-4xl px-4 py-10 md:px-8 md:py-14">
         <div className="prose prose-neutral dark:prose-invert max-w-none">
-          <h2 className="font-display text-2xl">O que voce vai encontrar neste guia</h2>
+          <h2 className="font-display text-2xl">O que você vai encontrar neste guia</h2>
           <p>
-            Este guia foi integralmente escrito, organizado e desenvolvido pela equipe editorial do Portal de Noticias Galinha GSB. O objetivo e reunir em um unico material informacoes claras, uteis e aprofundadas sobre a <strong>Galinha Sertaneja Balao (GSB)</strong> — tanto para quem esta conhecendo a raca pela primeira vez quanto para criadores que desejam aprofundar seus conhecimentos sobre selecao, reproducao, manejo e caracteristicas.
+            Este guia foi integralmente escrito, organizado e desenvolvido pela equipe editorial do Portal de Notícias Galinha GSB. O objetivo é reunir em um único material informações claras, úteis e aprofundadas sobre a <strong>Galinha Sertaneja Balão (GSB)</strong> — tanto para quem está conhecendo a raça pela primeira vez quanto para criadores que desejam aprofundar seus conhecimentos sobre seleção, reprodução, manejo e características.
           </p>
           <p>
-            O material e dividido em temas para facilitar a consulta. Clique no tema que mais te interessa ou baixe o PDF completo com todos os 15 capitulos.
+            O material é dividido em temas para facilitar a consulta. Clique no tema que mais te interessa ou baixe o PDF completo com todos os 15 capítulos.
           </p>
         </div>
       </section>
@@ -87,7 +87,7 @@ function GuiaIndexPage() {
       <section className="border-t border-border">
         <div className="mx-auto max-w-4xl px-4 py-10 md:px-8 md:py-14">
           <h2 className="font-display text-2xl md:text-3xl">Temas do guia</h2>
-          <p className="mt-2 text-muted-foreground">Selecione um tema para ler o conteudo completo.</p>
+          <p className="mt-2 text-muted-foreground">Selecione um tema para ler o conteúdo completo.</p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {TOPICS.map((t) => (
@@ -113,7 +113,7 @@ function GuiaIndexPage() {
         <div className="mx-auto max-w-4xl px-4 py-12 text-center md:px-8 md:py-14">
           <h2 className="font-display text-2xl">Prefere ler tudo de uma vez?</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            O guia completo tem 20 paginas com tabelas, checklists, glossario e todos os 15 capitulos. Disponivel em PDF gratuito.
+            O guia completo tem 20 páginas com tabelas, checklists, glossário e todos os 15 capítulos. Disponível em PDF gratuito.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <a
@@ -122,13 +122,13 @@ function GuiaIndexPage() {
               className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
             >
               <Download className="h-4 w-4" />
-              Baixar PDF Gratis
+              Baixar PDF Grátis
             </a>
             <Link
               to="/catalogo"
               className="inline-flex items-center gap-2 rounded-full border border-border px-8 py-3 text-sm font-semibold transition hover:bg-muted"
             >
-              Ver Catalogo
+              Ver Catálogo
             </Link>
           </div>
         </div>
@@ -141,57 +141,57 @@ const TOPICS = [
   {
     slug: "origem",
     to: "/guia/origem",
-    tag: "Historia",
-    title: "Origem e formacao historica",
-    summary: "A historia da GSB no sertao da Bahia, o municipio de Baixa Grande e como a selecao regional formou a raca ao longo de decadas.",
+    tag: "História",
+    title: "Origem e formação histórica",
+    summary: "A história da GSB no sertão da Bahia, o município de Baixa Grande e como a seleção regional formou a raça ao longo de décadas.",
   },
   {
-    slug: "caracteristicas",
+    slug: "características",
     to: "/guia/caracteristicas",
-    tag: "Raca",
-    title: "Caracteristicas, padrao morfologico e dimorfismo",
-    summary: "Porte gigante, temperamento docil, conformacao arredondada — como avaliar cada parte da ave e as diferencas entre macho e femea.",
+    tag: "Raça",
+    title: "Características, padrão morfológico e dimorfismo",
+    summary: "Porte gigante, temperamento dócil, conformação arredondada — como avaliar cada parte da ave e as diferenças entre macho e femea.",
   },
   {
     slug: "plumagem",
     to: "/guia/plumagem",
     tag: "Visual",
     title: "Plumagens, cores e leitura visual",
-    summary: "Padroes solidos, dilucoes, pintados e tradicionais — como identificar e avaliar cada variedade de plumagem da GSB.",
+    summary: "Padrões sólidos, diluições, pintados e tradicionais — como identificar e avaliar cada variedade de plumagem da GSB.",
   },
   {
-    slug: "selecao",
+    slug: "seleção",
     to: "/guia/selecao",
     tag: "Plantel",
-    title: "Selecao de reprodutores e formacao do plantel",
-    summary: "Como escolher os melhores reprodutores, reconhecer boa procedencia, evitar consanguinidade e registrar acasalamentos.",
+    title: "Seleção de reprodutores e formação do plantel",
+    summary: "Como escolher os melhores reprodutores, reconhecer boa procedência, evitar consanguinidade e registrar acasalamentos.",
   },
   {
-    slug: "reproducao",
+    slug: "reprodução",
     to: "/guia/reproducao",
-    tag: "Reproducao",
-    title: "Reproducao, fertilidade e incubacao",
-    summary: "Acasalamento, coleta de ovos ferteis, incubacao artificial e cuidados para garantir boa eclosaо e fertilidade do plantel.",
+    tag: "Reprodução",
+    title: "Reprodução, fertilidade e incubação",
+    summary: "Acasalamento, coleta de ovos férteis, incubação artificial e cuidados para garantir boa eclosão e fertilidade do plantel.",
   },
   {
     slug: "pintinhos",
     to: "/guia/pintinhos",
-    tag: "Criacao",
+    tag: "Criação",
     title: "Pintinhos e desenvolvimento",
-    summary: "Os primeiros dias de vida, ambiente ideal, alimentacao por fase, acompanhamento de crescimento e selecao gradual.",
+    summary: "Os primeiros dias de vida, ambiente ideal, alimentação por fase, acompanhamento de crescimento e seleção gradual.",
   },
   {
-    slug: "alimentacao",
+    slug: "alimentação",
     to: "/guia/alimentacao",
     tag: "Manejo",
-    title: "Manejo, instalacoes e alimentacao",
-    summary: "Poleiros, ninhos, piso, sombreamento, consumo de racao por fase e como adaptar as instalacoes ao grande porte da GSB.",
+    title: "Manejo, instalações e alimentação",
+    summary: "Poleiros, ninhos, piso, sombreamento, consumo de ração por fase e como adaptar as instalações ao grande porte da GSB.",
   },
   {
     slug: "sanidade",
     to: "/guia/sanidade",
-    tag: "Saude",
-    title: "Sanidade e observacao diaria",
-    summary: "O que observar todos os dias, sinais de alerta, vacinacao, vermifugacao e como manter o plantel saudavel.",
+    tag: "Saúde",
+    title: "Sanidade e observação diária",
+    summary: "O que observar todos os dias, sinais de alerta, vacinação, vermifugação e como manter o plantel saudável.",
   },
 ];

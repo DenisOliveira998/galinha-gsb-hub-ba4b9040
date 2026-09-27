@@ -15,7 +15,7 @@ import { SITE_URL } from "./seo";
 
 // Data da última mudança REAL de conteúdo das páginas fixas. Atualize ao
 // editar o texto dessas páginas — o Google ignora lastmod que muda sempre.
-const GUIA_UPDATED = "2026-09-19";
+const GUIA_UPDATED = "2026-09-27";
 const STATIC_PAGES: { path: string; lastmod: string }[] = [
   { path: "/sobre", lastmod: "2026-09-01" },
   { path: "/contato", lastmod: "2026-08-31" },

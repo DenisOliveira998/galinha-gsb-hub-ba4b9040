@@ -41,3 +41,19 @@ export function pageTitle(title: string, max = 60): string {
 export function demoteH1(html: string | null | undefined): string {
   return (html ?? "").replace(/<(\/?)h1(\s|>)/gi, "<$1h2$2");
 }
+
+/**
+ * Remove emojis dos subtítulos (h2–h6) do conteúdo dos posts ("🐣 Começando…"
+ * vira "Começando…"). Emojis em títulos passam impressão de texto genérico e
+ * poluem o sumário que o Google monta a partir dos subtítulos.
+ */
+export function stripHeadingEmojis(html: string | null | undefined): string {
+  return (html ?? "").replace(/<(h[2-6])(\b[^>]*)>([\s\S]*?)<\/\1>/gi, (_m, tag: string, attrs: string, inner: string) => {
+    const clean = inner
+      .replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{FE0F}\u{200D}\u{20E3}]/gu, "")
+      .replace(/^((?:\s|&nbsp;|<[^>]+>)*)\s+/, "$1")
+      .replace(/(>)\s+/, "$1")
+      .replace(/\s+((?:<\/[^>]+>)*)$/, "$1");
+    return `<${tag}${attrs}>${clean}</${tag}>`;
+  });
+}
