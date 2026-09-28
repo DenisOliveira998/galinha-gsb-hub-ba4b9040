@@ -357,7 +357,7 @@ function Home() {
       </section>
 
       {/* Espaço publicitário */}
-      <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
+      <section className="mx-auto mt-8 max-w-7xl px-3 empty:hidden md:mt-12 md:px-8">
         <AdSlot
           slot="homeBanner"
           label="Espaço publicitário — formato banner"
@@ -411,7 +411,7 @@ function Home() {
         </section>
       )}
 
-      <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
+      <section className="mx-auto mt-8 max-w-7xl px-3 empty:hidden md:mt-12 md:px-8">
         <AdSlot
           slot="homeRectangle"
           label="Espaço publicitário"

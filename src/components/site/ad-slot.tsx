@@ -31,6 +31,8 @@ interface AdSlotProps {
   style?: React.CSSProperties;
   /** Slot específico do post — sobrescreve o slot global quando preenchido. */
   customSlotId?: string;
+  /** Mostra o placeholder quando não há slot ativo (só para prévias no admin). */
+  showPlaceholder?: boolean;
 }
 
 export function AdSlot({
@@ -42,6 +44,7 @@ export function AdSlot({
   fullWidthResponsive = true,
   style,
   customSlotId,
+  showPlaceholder = false,
 }: AdSlotProps) {
   const client = useAdsensePublisherId();
   const globalSlotId = (useSlotId(slot) || "").trim();
@@ -63,11 +66,14 @@ export function AdSlot({
     }
   }, [active]);
 
-  // Sem publisher configurado: oculta completamente.
-  if (!hasPublisher) return null;
-
-  // Publisher configurado mas sem slot ID: mostra o placeholder.
-  if (!active) {
+  // Sem publisher ou sem slot ID: não renderiza nada para o visitante.
+  // Antes, com publisher e sem slot, aparecia o placeholder ("Espaço publicitário",
+  // "Reserve este espaço"). Caixas de anúncio vazias passam a impressão de site
+  // feito para anúncios e pesam contra na revisão do AdSense. O `placeholder`
+  // continua aceito na API, mas só é exibido quando `showPlaceholder` é true
+  // (ex.: prévia no painel admin).
+  if (!hasPublisher || !active) {
+    if (!showPlaceholder || !hasPublisher) return null;
     return (
       <div role="complementary" aria-label={label} className={className} style={style}>
         {placeholder}

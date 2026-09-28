@@ -78,7 +78,7 @@ function GuiaIndexPage() {
             Este guia foi integralmente escrito, organizado e desenvolvido pela equipe editorial do Portal de Notícias Galinha GSB. O objetivo é reunir em um único material informações claras, úteis e aprofundadas sobre a <strong>Galinha Sertaneja Balão (GSB)</strong> — tanto para quem está conhecendo a raça pela primeira vez quanto para criadores que desejam aprofundar seus conhecimentos sobre seleção, reprodução, manejo e características.
           </p>
           <p>
-            O material é dividido em temas para facilitar a consulta. Clique no tema que mais te interessa ou baixe o PDF completo com todos os 15 capítulos.
+            O material é dividido em temas para facilitar a consulta. Aqui no site estão os 8 temas principais; clique no que mais te interessa. O PDF completo reúne os 15 capítulos, incluindo guia de compra, exposições, checklist e glossário.
           </p>
         </div>
       </section>
