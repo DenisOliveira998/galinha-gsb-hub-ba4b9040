@@ -6,6 +6,7 @@ import { UserCircle2 } from "lucide-react";
 import { getBlogPostBySlug, listPublishedBlogSummaries } from "@/lib/blog";
 import { listPosts } from "@/lib/posts";
 import { topicFor, relatedPosts, relatedProduct, linkKnownTitles } from "@/lib/related";
+import { AUTHOR } from "@/lib/author";
 import { SITE_URL, DEFAULT_OG_IMAGE, absUrl, plainText, truncate, pageTitle, demoteH1, stripHeadingEmojis } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -49,9 +50,8 @@ export const Route = createFileRoute("/blog/$slug")({
       dateModified: post.updatedAt ?? post.createdAt,
       mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
       inLanguage: "pt-BR",
-      author: post.author
-        ? { "@type": "Person", name: post.author.name }
-        : { "@type": "Organization", name: "Galinha GSB", url: SITE_URL },
+      // Por ora todo o conteúdo é do Leonardo Reis (ver src/lib/author.ts).
+      author: { "@type": "Person", name: post.author?.name || AUTHOR.name, url: `${SITE_URL}${AUTHOR.path}` },
       publisher: {
         "@type": "Organization",
         name: "Galinha GSB",
@@ -112,9 +112,10 @@ function BlogDetail() {
           <div className="mt-2 text-left text-sm text-muted-foreground md:text-base prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
 
           {/* Autor */}
-          {post.author && (
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-muted/50 p-3">
-              {post.author.avatar ? (
+          {/* Autor — sempre visível e ligado à página de autor (sinal de E-E-A-T) */}
+          {(
+            <Link to={AUTHOR.path as any} className="mt-4 flex items-center gap-3 rounded-xl bg-muted/50 p-3 transition hover:bg-muted">
+              {post.author?.avatar ? (
                 <img src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full object-cover shrink-0" />
               ) : (
                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
@@ -122,10 +123,14 @@ function BlogDetail() {
                 </div>
               )}
               <div className="min-w-0">
-                <p className="text-sm font-semibold">{post.author.name}</p>
-                {post.author.bio && <div className="prose prose-xs max-w-none text-xs text-muted-foreground line-clamp-2" dangerouslySetInnerHTML={{ __html: post.author.bio }} />}
+                <p className="text-sm font-semibold">Por {post.author?.name || AUTHOR.name}</p>
+                {post.author?.bio ? (
+                  <p className="line-clamp-2 text-xs text-muted-foreground">{plainText(post.author.bio)}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">{AUTHOR.role} há mais de 10 anos</p>
+                )}
               </div>
-            </div>
+            </Link>
           )}
 
           {/* Anúncio dentro do conteúdo — visível no mobile/tablet */}

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Download, ChevronRight } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
+import { AUTHOR } from "@/lib/author";
 
 export const Route = createFileRoute("/guia/")({
   head: () => ({
@@ -75,7 +76,8 @@ function GuiaIndexPage() {
         <div className="prose prose-neutral dark:prose-invert max-w-none">
           <h2 className="font-display text-2xl">O que você vai encontrar neste guia</h2>
           <p>
-            Este guia foi integralmente escrito, organizado e desenvolvido pela equipe editorial do Portal de Notícias Galinha GSB. O objetivo é reunir em um único material informações claras, úteis e aprofundadas sobre a <strong>Galinha Sertaneja Balão (GSB)</strong> — tanto para quem está conhecendo a raça pela primeira vez quanto para criadores que desejam aprofundar seus conhecimentos sobre seleção, reprodução, manejo e características.
+            Este guia foi escrito e organizado por{" "}
+            <Link to={AUTHOR.path as any} className="font-semibold text-primary hover:underline">{AUTHOR.name}</Link>, criador da raça Sertaneja Balão há mais de 10 anos, a partir da experiência com o próprio plantel e da literatura técnica disponível. O objetivo é reunir em um único material informações claras, úteis e aprofundadas sobre a <strong>Galinha Sertaneja Balão (GSB)</strong> — tanto para quem está conhecendo a raça pela primeira vez quanto para criadores que desejam aprofundar seus conhecimentos sobre seleção, reprodução, manejo e características.
           </p>
           <p>
             O material é dividido em temas para facilitar a consulta. Aqui no site estão os 8 temas principais; clique no que mais te interessa. O PDF completo reúne os 15 capítulos, incluindo guia de compra, exposições, checklist e glossário.

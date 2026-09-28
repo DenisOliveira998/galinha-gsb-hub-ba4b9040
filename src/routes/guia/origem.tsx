@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { AUTHOR } from "@/lib/author";
 
 export const Route = createFileRoute("/guia/origem")({
   head: () => ({
@@ -121,6 +122,13 @@ export function GuiaArticleLayout({
           <div className="mb-2 text-xs font-semibold uppercase tracking-widest opacity-60">{tag}</div>
           <h1 className="font-display text-2xl leading-tight md:text-3xl lg:text-4xl">{title}</h1>
           <p className="mt-4 text-sm opacity-80 md:text-base leading-relaxed">{intro}</p>
+          <p className="mt-5 text-xs opacity-75 md:text-sm">
+            Por{" "}
+            <Link to={AUTHOR.path as any} className="font-semibold underline-offset-2 hover:underline">
+              {AUTHOR.name}
+            </Link>
+            , {AUTHOR.role.charAt(0).toLowerCase() + AUTHOR.role.slice(1)} há mais de 10 anos
+          </p>
         </div>
       </section>
 

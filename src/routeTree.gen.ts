@@ -34,6 +34,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AutorLeonardoReisRouteImport } from './routes/autor.leonardo-reis'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
@@ -181,6 +182,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AutorLeonardoReisRoute = AutorLeonardoReisRouteImport.update({
+  id: '/autor/leonardo-reis',
+  path: '/autor/leonardo-reis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -312,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
+  '/autor/leonardo-reis': typeof AutorLeonardoReisRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/conta/login': typeof ContaLoginRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/autor/leonardo-reis': typeof AutorLeonardoReisRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/conta/login': typeof ContaLoginRoute
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
+  '/autor/leonardo-reis': typeof AutorLeonardoReisRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/conta/login': typeof ContaLoginRoute
@@ -453,6 +462,7 @@ export interface FileRouteTypes {
     | '/admin/pedidos'
     | '/admin/posts'
     | '/admin/settings'
+    | '/autor/leonardo-reis'
     | '/blog/$slug'
     | '/catalogo/$slug'
     | '/conta/login'
@@ -495,6 +505,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/pedidos'
     | '/admin/settings'
+    | '/autor/leonardo-reis'
     | '/blog/$slug'
     | '/catalogo/$slug'
     | '/conta/login'
@@ -543,6 +554,7 @@ export interface FileRouteTypes {
     | '/admin/pedidos'
     | '/admin/posts'
     | '/admin/settings'
+    | '/autor/leonardo-reis'
     | '/blog/$slug'
     | '/catalogo/$slug'
     | '/conta/login'
@@ -582,6 +594,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
   TermosRoute: typeof TermosRoute
+  AutorLeonardoReisRoute: typeof AutorLeonardoReisRoute
   GuiaAlimentacaoRoute: typeof GuiaAlimentacaoRoute
   GuiaCaracteristicasRoute: typeof GuiaCaracteristicasRoute
   GuiaOrigemRoute: typeof GuiaOrigemRoute
@@ -769,6 +782,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/autor/leonardo-reis': {
+      id: '/autor/leonardo-reis'
+      path: '/autor/leonardo-reis'
+      fullPath: '/autor/leonardo-reis'
+      preLoaderRoute: typeof AutorLeonardoReisRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/': {
       id: '/blog/'
@@ -1035,6 +1055,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
   TermosRoute: TermosRoute,
+  AutorLeonardoReisRoute: AutorLeonardoReisRoute,
   GuiaAlimentacaoRoute: GuiaAlimentacaoRoute,
   GuiaCaracteristicasRoute: GuiaCaracteristicasRoute,
   GuiaOrigemRoute: GuiaOrigemRoute,

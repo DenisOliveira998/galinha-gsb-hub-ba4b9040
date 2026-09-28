@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
 
 export const Route = createFileRoute("/sobre")({
@@ -41,6 +41,10 @@ function About() {
           </p>
           <p>
             No blog e no <strong className="text-foreground">Guia da GSB</strong> publico artigos sobre manejo, alimentação, reprodução, características da raça e seleção de reprodutores. Escrevo a partir do que aprendi na prática ao longo desses anos, complementado pela literatura técnica disponível sobre avicultura de raças locais. A ideia não é substituir um veterinário ou zootecnista — é dar ao criador iniciante e ao criador experiente uma referência confiável sobre a Sertanejo Balão especificamente, uma raça que ainda tem pouco material publicado em português.
+          </p>
+          <p>
+            Todos os artigos que escrevi estão reunidos na minha{" "}
+            <Link to="/autor/leonardo-reis" className="font-semibold text-primary hover:underline">página de autor</Link>.
           </p>
           <p>
             Se você está começando com a GSB, procura reforçar o plantel com sangue selecionado ou quer entender melhor a raça antes de investir, este é o lugar certo. Entre em contato pelo WhatsApp ou por e-mail — respondo pessoalmente, sem script de atendimento, e sem pressa de fechar venda. Criador bom é aquele que vende para quem vai cuidar bem do animal.
