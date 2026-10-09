@@ -31,7 +31,7 @@ cpSync('node_modules/@prisma/client', `${fnModules}/@prisma/client`,            
 cpSync('node_modules/.prisma',        `${OUT}/functions/ssr.func/.prisma`,            { recursive: true });
 console.log('✓ Prisma client incluído na função (node_modules + raiz)');
 
-// 4. Adapter Node.js → Fetch API (ESM — .mjs, compatível com Node.js 20 Vercel)
+// 4. Adapter Node.js → Fetch API (ESM — .mjs, compatível com Node.js 22 na Vercel)
 writeFileSync(`${OUT}/functions/ssr.func/adapter.mjs`, `
 import serverModule from './server.js';
 
@@ -109,7 +109,7 @@ if (dbUrl) {
 
 // 6. Configuração da função Vercel (Node.js runtime)
 writeFileSync(`${OUT}/functions/ssr.func/.vc-config.json`, JSON.stringify({
-  runtime: 'nodejs20.x',
+  runtime: 'nodejs22.x', // Node 20 foi descontinuado na Vercel (deploy recusado)
   handler: 'adapter.mjs',
   launcherType: 'Nodejs',
   maxDuration: 30,
