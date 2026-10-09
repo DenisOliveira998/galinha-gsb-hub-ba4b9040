@@ -19,6 +19,8 @@ import { THEME_INIT_SCRIPT } from "@/hooks/use-theme";
 import { getSettings } from "@/lib/settings";
 import { brandTokens, DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
 import { SITE_URL, absUrl } from "@/lib/seo";
+import { GA_MEASUREMENT_ID, consentInitScript } from "@/lib/analytics";
+import { AnalyticsTracker } from "@/components/site/analytics-tracker";
 
 /** Gera o script inline que aplica tokens da cor da marca antes de qualquer pintura. */
 function makeBrandScript(brandColor: string): string {
@@ -137,13 +139,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap",
         },
       ],
-      scripts: adsenseId ? [
-        {
-          src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(adsenseId)}`,
-          async: true,
-          crossOrigin: "anonymous" as const,
-        },
-      ] : [],
+      scripts: [
+        // Google Analytics 4: carregado pelo script de consentimento no RootShell
+        // (ver src/lib/analytics.ts), para rodar depois do consentimento padrão.
+        ...(adsenseId
+          ? [
+              {
+                src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(adsenseId)}`,
+                async: true,
+                crossOrigin: "anonymous" as const,
+              },
+            ]
+          : []),
+      ],
     };
   },
   shellComponent: RootShell,
@@ -176,6 +184,8 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: brandScript }} />
+        {/* Consent Mode do Google: precisa rodar antes do gtag.js e do AdSense */}
+        {GA_MEASUREMENT_ID && <script dangerouslySetInnerHTML={{ __html: consentInitScript(GA_MEASUREMENT_ID) }} />}
         <HeadContent />
         {isOk && <link rel="canonical" href={canonical} />}
         {isOk && <meta property="og:url" content={canonical} />}
@@ -196,6 +206,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <BrandTheme />
       <AdsenseScript />
+      <AnalyticsTracker />
       <Outlet />
       <Toaster />
     </QueryClientProvider>

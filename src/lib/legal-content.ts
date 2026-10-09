@@ -109,7 +109,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
       },
       {
         heading: "5. Consentimento e seus direitos (LGPD)",
-        body: "Ao continuar navegando após o aviso exibido na sua primeira visita, você concorda com o uso dos cookies descritos nesta página. Você pode retirar esse consentimento a qualquer momento gerenciando os cookies no seu navegador. Para dúvidas ou solicitações relacionadas a dados pessoais, entre em contato pelo e-mail galinhabalaosertanejo@gmail.com.",
+        body: "Na sua primeira visita, o aviso de cookies permite aceitar ou recusar os cookies de análise (Google Analytics) e de publicidade (Google AdSense). Enquanto você não escolher, ou se recusar, essas ferramentas funcionam sem gravar cookies no seu navegador, apenas com sinais anônimos. Você pode mudar de ideia a qualquer momento apagando os cookies e os dados do site no seu navegador — o aviso aparecerá novamente. Para dúvidas ou solicitações relacionadas a dados pessoais, entre em contato pelo e-mail galinhabalaosertanejo@gmail.com.",
       },
     ],
   },
