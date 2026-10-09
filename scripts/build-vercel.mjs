@@ -108,6 +108,11 @@ if (dbUrl) {
 }
 
 // 6. Configuração da função Vercel (Node.js runtime)
+// O bundle do servidor (server.js + assets/*.js) é ESM. Sem "type": "module",
+// o Node 22 da Vercel carrega server.js como CommonJS e quebra no `export`
+// (FUNCTION_INVOCATION_FAILED). O Prisma tem package.json próprio (CommonJS).
+writeFileSync(`${OUT}/functions/ssr.func/package.json`, JSON.stringify({ type: 'module' }, null, 2));
+
 writeFileSync(`${OUT}/functions/ssr.func/.vc-config.json`, JSON.stringify({
   runtime: 'nodejs22.x', // Node 20 foi descontinuado na Vercel (deploy recusado)
   handler: 'adapter.mjs',
