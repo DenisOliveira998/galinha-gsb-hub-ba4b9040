@@ -10,7 +10,7 @@
 // site que usa GA. Pode vir da Vercel (VITE_GA_MEASUREMENT_ID) ou do valor abaixo.
 
 export const GA_MEASUREMENT_ID: string =
-  ((import.meta.env?.VITE_GA_MEASUREMENT_ID as string | undefined) || "").trim() || "";
+  ((import.meta.env?.VITE_GA_MEASUREMENT_ID as string | undefined) || "").trim() || "G-PP22N9N3H6";
 
 /** Chave do banner de cookies. Valor = data ISO (aceitou) ou "denied" (recusou). */
 export const CONSENT_KEY = "gsb-cookie-consent";
