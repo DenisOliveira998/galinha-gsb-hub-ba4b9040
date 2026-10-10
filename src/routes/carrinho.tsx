@@ -5,6 +5,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { buildOrderMessage, cartTotal, useShop } from "@/lib/shop-store";
 import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
+import { formatBRL } from "@/lib/format";
 
 export const Route = createFileRoute("/carrinho")({
   head: () => ({ meta: [{ title: "Carrinho — Galinha GSB" }, { name: "robots", content: "noindex" }] }),
@@ -38,7 +39,7 @@ function CartPage() {
                   <img src={item.image} alt={item.title} className="h-24 w-24 flex-none rounded-2xl object-cover" />
                   <div className="flex-1">
                     <Link to="/catalogo/$slug" params={{ slug: item.slug }} className="font-semibold hover:text-primary">{item.title}</Link>
-                    <div className="mt-1 text-sm text-primary">R$ {item.price.toFixed(2)}</div>
+                    <div className="mt-1 text-sm text-primary">{formatBRL(item.price)}</div>
                     <div className="mt-3 flex items-center gap-2">
                       <button onClick={() => updateQuantity(item.postId, item.quantity - 1)} className="grid h-8 w-8 place-items-center rounded-full border hover:bg-muted" aria-label="Diminuir"><Minus className="h-3.5 w-3.5" /></button>
                       <span className="min-w-[2rem] text-center">{item.quantity}</span>
@@ -46,15 +47,15 @@ function CartPage() {
                       <button onClick={() => removeFromCart(item.postId)} className="ml-auto inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /> Remover</button>
                     </div>
                   </div>
-                  <div className="hidden text-right font-semibold sm:block">R$ {(item.price * item.quantity).toFixed(2)}</div>
+                  <div className="hidden text-right font-semibold sm:block">{formatBRL((item.price * item.quantity))}</div>
                 </li>
               ))}
             </ul>
             <aside className="h-fit rounded-3xl bg-card p-6 shadow-[var(--shadow-card)]">
               <h2 className="font-display text-lg">Resumo</h2>
-              <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground"><span>Subtotal</span><span>R$ {total.toFixed(2)}</span></div>
+              <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground"><span>Subtotal</span><span>{formatBRL(total)}</span></div>
               <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground"><span>Frete</span><span>a combinar</span></div>
-              <div className="mt-4 flex items-center justify-between border-t pt-4 font-display text-xl"><span>Total</span><span className="text-primary">R$ {total.toFixed(2)}</span></div>
+              <div className="mt-4 flex items-center justify-between border-t pt-4 font-display text-xl"><span>Total</span><span className="text-primary">{formatBRL(total)}</span></div>
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"><MessageCircle className="h-4 w-4" /> Entrar em contato</a>
               <Link to="/catalogo" className="mt-2 block rounded-full border px-6 py-3 text-center text-sm font-semibold hover:bg-muted">Continuar comprando</Link>
             </aside>

@@ -29,6 +29,7 @@ export function SiteFooter() {
             <li><Link to="/" className="hover:opacity-100">Início</Link></li>
             <li><Link to="/catalogo" className="hover:opacity-100">Catálogo</Link></li>
             <li><Link to="/sobre" className="hover:opacity-100">Sobre</Link></li>
+            <li><Link to="/autor/leonardo-reis" className="hover:opacity-100">Autor: Leonardo Reis</Link></li>
             <li><Link to="/blog" className="hover:opacity-100">Blog</Link></li>
             <li><Link to="/guia" className="hover:opacity-100">Guia da GSB</Link></li>
             <li><Link to="/contato" className="hover:opacity-100">Contato</Link></li>
@@ -49,7 +50,7 @@ export function SiteFooter() {
             {s.instagram && <li><a href={`https://instagram.com/${s.instagram.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-100"><Instagram className="h-4 w-4" /> {s.instagram}</a></li>}
             {s.youtube && <li><a href={s.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-100"><Youtube className="h-4 w-4" /> YouTube</a></li>}
             {s.address && <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0" /><span>{s.address}</span></li>}
-            <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> {s.email}</li>
+            {s.email && <li><a href={`mailto:${s.email}`} className="flex items-center gap-2 break-all hover:opacity-100"><Mail className="h-4 w-4 shrink-0" /> {s.email}</a></li>}
           </ul>
         </div>
       </div>

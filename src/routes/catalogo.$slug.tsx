@@ -13,6 +13,7 @@ import { whatsappHref } from "@/lib/mock-store";
 import { getAdminSession } from "@/lib/admin-auth";
 import { authClient } from "@/lib/auth-client";
 import { SITE_URL, absUrl, plainText, truncate } from "@/lib/seo";
+import { formatBRL, plainTextToHtml } from "@/lib/format";
 
 export const Route = createFileRoute("/catalogo/$slug")({
   loader: async ({ params }) => {
@@ -173,17 +174,17 @@ function PostDetail() {
               (!post.inStock || post.status === "SOLD")
                 ? <div className="mt-4 flex items-baseline gap-3">
                     <span className="font-display text-3xl text-muted-foreground line-through decoration-destructive decoration-[3px]">
-                      R$ {post.price.toFixed(2)}
+                      {formatBRL(post.price)}
                     </span>
                     <span className="rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-destructive bg-destructive/10">
                       Esgotado
                     </span>
                   </div>
                 : <div className="mt-4 font-display text-3xl text-primary">
-                    R$ {post.price.toFixed(2)}
+                    {formatBRL(post.price)}
                   </div>
             )}
-            <div className="prose prose-sm mt-6 max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: post.description ?? "" }} />
+            <div className="prose prose-sm mt-6 max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: plainTextToHtml(post.description) }} />
             <div className="mt-6">
               {post.inStock && post.status !== "SOLD" ? (
                 waHref ? (
@@ -235,7 +236,7 @@ function PostDetail() {
                   <div className="flex flex-1 flex-col p-3 text-left">
                     <div className="text-[9px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
                     <div className="mt-0.5 line-clamp-2 font-display text-sm" dangerouslySetInnerHTML={{ __html: p.title }} />
-                    {p.price && <div className="mt-auto pt-2 text-sm font-semibold">R$ {p.price.toFixed(2)}</div>}
+                    {p.price && <div className="mt-auto pt-2 text-sm font-semibold">{formatBRL(p.price)}</div>}
                   </div>
                 </Link>
               ))}

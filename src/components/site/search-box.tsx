@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Search, TrendingUp, Tag } from "lucide-react";
 import { useCategoriesQuery } from "@/lib/hooks/use-categories";
 import { usePostsQuery } from "@/lib/hooks/use-posts";
+import { formatBRL } from "@/lib/format";
 
 /** Termos mais pesquisados (mock — trocar por métricas reais depois). */
 const POPULAR = [
@@ -133,7 +134,7 @@ export function SearchBox() {
                       <span className="block truncate">{p.title}</span>
                       <span className="block truncate text-xs text-muted-foreground">
                         {categories.find((c) => c.id === p.category)?.label ?? p.category}
-                        {p.price ? ` · R$ ${p.price.toFixed(2)}` : ""}
+                        {p.price ? ` · ${formatBRL(p.price)}` : ""}
                       </span>
                     </span>
                   </button>

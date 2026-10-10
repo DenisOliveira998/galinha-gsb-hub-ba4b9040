@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { buildOrderMessage, cartCount, cartTotal, useShop } from "@/lib/shop-store";
 import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
+import { formatBRL } from "@/lib/format";
 
 interface Props {
   open: boolean;
@@ -94,7 +95,7 @@ export function CartDrawer({ open, onClose }: Props) {
                       {item.title}
                     </Link>
                     <div className="mt-1 text-sm text-primary">
-                      R$ {item.price.toFixed(2)}
+                      {formatBRL(item.price)}
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                       <button
@@ -134,7 +135,7 @@ export function CartDrawer({ open, onClose }: Props) {
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Total</span>
               <span className="font-display text-2xl text-primary">
-                R$ {total.toFixed(2)}
+                {formatBRL(total)}
               </span>
             </div>
             <div className="mt-4 flex flex-col gap-2">

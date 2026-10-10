@@ -18,6 +18,7 @@ import { BrandTheme } from "@/components/site/brand-theme";
 import { AdsenseScript } from "@/components/site/ad-slot";
 import { THEME_INIT_SCRIPT } from "@/hooks/use-theme";
 import { getSettings } from "@/lib/settings";
+import { SETTINGS_QUERY_KEY } from "@/lib/hooks/use-settings";
 import { brandTokens, DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
 import { SITE_URL, absUrl } from "@/lib/seo";
 import { GA_MEASUREMENT_ID, consentInitScript } from "@/lib/analytics";
@@ -103,6 +104,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       ogImage: settings?.ogImage || "/logo.png",
       brandColor: settings?.brandColor || DEFAULT_BRAND_COLOR,
       adsensePublisherId: settings?.adsensePublisherId?.trim() || "",
+      // Configurações completas (WhatsApp, e-mail, Instagram…) para pré-carregar
+      // o cache do React Query — ver RootComponent.
+      settings,
     };
   },
   head: ({ loaderData }) => {
@@ -201,6 +205,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { settings } = Route.useLoaderData();
+
+  // Os dados de contato vêm do banco via useSettingsQuery, que só buscava no
+  // navegador: o HTML do servidor (o que o Google e o revisor do AdSense leem)
+  // saía com WhatsApp/e-mail vazios e links para wa.me/5500000000000.
+  // Semeando o cache com o que o loader já buscou, servidor e navegador
+  // renderizam igual, já com os dados reais.
+  if (settings && !queryClient.getQueryData(SETTINGS_QUERY_KEY)) {
+    queryClient.setQueryData(SETTINGS_QUERY_KEY, settings);
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

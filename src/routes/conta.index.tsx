@@ -7,6 +7,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { useShop } from "@/lib/shop-store";
 import { getCustomerProfile, updateCustomerProfile, syncBetterAuthUser, changeCustomerPassword } from "@/lib/customers";
 import { authClient } from "@/lib/auth-client";
+import { formatBRL } from "@/lib/format";
 
 // ─── Utilitários de formatação e validação ────────────────────────────────────
 
@@ -320,7 +321,7 @@ function Account() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm font-semibold text-primary">R$ {o.total.toFixed(2)}</div>
+                    <div className="text-sm font-semibold text-primary">{formatBRL(o.total)}</div>
                   </li>
                 ))}
               </ul>

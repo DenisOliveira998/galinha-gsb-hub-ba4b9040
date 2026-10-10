@@ -5,6 +5,7 @@ import { StarsDisplay } from "@/components/site/star-rating";
 import { listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
 import { getRatingSummary } from "@/lib/ratings";
+import { formatBRL } from "@/lib/format";
 
 type CatalogSearch = { q?: string; cat?: string };
 
@@ -20,12 +21,12 @@ export const Route = createFileRoute("/catalogo/")({
         { title: "Catálogo — Galinha GSB" },
         { name: "description", content: "Veja todos os ovos férteis, galinhas e reprodutores disponíveis no plantel Galinha GSB — Sertanejo Balão." },
         { property: "og:title", content: "Catálogo — Galinha GSB" },
-        { property: "og:description", content: "Ovos férteis, galinhas e reprodutores da raça Sertanejo Balão com procedência garantida." },
+        { property: "og:description", content: "Ovos férteis, galinhas e reprodutores da raça Sertanejo Balão com procedência conhecida." },
         { property: "og:image", content: "https://galinhagsb.com.br/logo.png" },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
         { name: "twitter:title", content: "Catálogo — Galinha GSB" },
-        { name: "twitter:description", content: "Ovos férteis, galinhas e reprodutores da raça Sertanejo Balão com procedência garantida." },
+        { name: "twitter:description", content: "Ovos férteis, galinhas e reprodutores da raça Sertanejo Balão com procedência conhecida." },
         ...(hasFilter ? [{ name: "robots", content: "noindex,follow" }] : []),
       ],
       // canonical (sempre /catalogo, sem filtros) vem do __root.tsx
@@ -131,11 +132,11 @@ function Catalog() {
                   {(p.status === "SOLD" || !p.inStock)
                     ? p.price
                       ? <div className="mt-3 flex items-baseline gap-2">
-                          <span className="text-sm font-semibold text-muted-foreground line-through decoration-destructive decoration-2 md:text-base">R$ {p.price.toFixed(2)}</span>
+                          <span className="text-sm font-semibold text-muted-foreground line-through decoration-destructive decoration-2 md:text-base">{formatBRL(p.price)}</span>
                           <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive bg-destructive/10">Esgotado</span>
                         </div>
                       : <div className="mt-3 text-sm font-semibold text-muted-foreground">Indisponível</div>
-                    : p.price && <div className="mt-3 text-sm font-semibold md:text-base">R$ {p.price.toFixed(2)}</div>
+                    : p.price && <div className="mt-3 text-sm font-semibold md:text-base">{formatBRL(p.price)}</div>
                   }
                 </div>
               </article>

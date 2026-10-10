@@ -16,6 +16,7 @@ import { getSettings } from "@/lib/settings";
 import { getRatingSummary } from "@/lib/ratings";
 import { useSettingsQuery } from "@/lib/hooks/use-settings";
 import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo";
+import { formatBRL } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -48,7 +49,7 @@ export const Route = createFileRoute("/")({
       ratingsMap,
       heroEyebrow: s?.heroEyebrow ?? "Raça tradicional brasileira",
       heroTitle: s?.heroTitle ?? 'Conheça a importância da raça <span style="color:var(--color-accent-warm)">GSB</span>',
-      heroSubtitle: s?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência garantida e suporte ao criador.",
+      heroSubtitle: s?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência conhecida e suporte ao criador.",
       badgeImage: s?.badgeImage ?? "/badge.png",
     };
   },
@@ -120,11 +121,11 @@ function AnuncioCard({ p, categories, rating, slider }: { p: Post; categories: A
           {(p.status === "SOLD" || !p.inStock)
             ? p.price
               ? <div className="mt-1 flex items-baseline gap-1.5">
-                  <span className="text-xs font-semibold text-muted-foreground line-through decoration-destructive decoration-2">R$ {p.price.toFixed(2)}</span>
+                  <span className="text-xs font-semibold text-muted-foreground line-through decoration-destructive decoration-2">{formatBRL(p.price)}</span>
                   <span className="rounded px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-destructive bg-destructive/10">Esgotado</span>
                 </div>
               : <div className="mt-1 text-xs font-semibold text-muted-foreground">Indisponível</div>
-            : p.price && <div className="mt-1 text-xs font-semibold text-foreground">R$ {p.price.toFixed(2)}</div>
+            : p.price && <div className="mt-1 text-xs font-semibold text-foreground">{formatBRL(p.price)}</div>
           }
         </div>
       </Link>
@@ -307,7 +308,7 @@ function Home() {
       <section className="relative mx-auto mt-5 max-w-7xl px-3 md:mt-6 md:px-8">
         <div className="-mx-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
           {[
-            { icon: ShieldCheck, title: "Procedência garantida", desc: "Linhagem pura, seleção rigorosa e histórico do plantel." },
+            { icon: ShieldCheck, title: "Procedência conhecida", desc: "Aves do plantel próprio, com seleção acompanhada ano a ano." },
             { icon: HeartHandshake, title: "Suporte ao criador", desc: "Orientação sobre manejo, nutrição e saúde das aves." },
             { icon: Truck, title: "Entrega segura", desc: "Embalagem apropriada para ovos e transporte cuidadoso de aves." },
           ].map((f) => (
@@ -432,7 +433,7 @@ function Home() {
         <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:grid-cols-5 md:gap-5">
           {[
             { icon: Feather, label: "Linhagem tradicional" },
-            { icon: Egg, label: "Alta taxa de eclosão" },
+            { icon: Egg, label: "Ovos de matrizes selecionadas" },
             { icon: Award, label: "Aves selecionadas" },
             { icon: Sprout, label: "Manejo natural" },
             { icon: HeartHandshake, label: "Atendimento próximo" },

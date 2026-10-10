@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Post } from "./mock-store";
+import { formatBRL } from "@/lib/format";
 
 // ---------------------------------------------------------------------------
 // Cliente / carrinho / pedidos — estado mockado no navegador.
@@ -189,13 +190,13 @@ export function cartCount(items: CartItem[]) {
 export function buildOrderMessage(items: CartItem[]): string {
   const total = cartTotal(items);
   const lines = items.map(
-    (i) => `• ${i.title} — ${i.quantity}x (R$ ${(i.price * i.quantity).toFixed(2)})`,
+    (i) => `• ${i.title} — ${i.quantity}x (${formatBRL((i.price * i.quantity))})`,
   );
   return [
     "Olá! Gostaria de confirmar o pedido abaixo:",
     "",
     ...lines,
     "",
-    `Total: R$ ${total.toFixed(2)}`,
+    `Total: ${formatBRL(total)}`,
   ].join("\n");
 }
