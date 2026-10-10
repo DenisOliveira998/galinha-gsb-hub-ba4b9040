@@ -1,15 +1,36 @@
-import { Link } from "@tanstack/react-router";
-import { Moon, Sun, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Menu, Moon, Sun, User, X } from "lucide-react";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useTheme } from "@/hooks/use-theme";
 import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { SearchBox } from "./search-box";
 
+const MOBILE_LINKS = [
+  { to: "/", label: "Início" },
+  { to: "/catalogo", label: "Catálogo" },
+  { to: "/blog", label: "Blog" },
+  { to: "/guia", label: "Guia da GSB" },
+  { to: "/sobre", label: "Sobre" },
+  { to: "/contato", label: "Contato" },
+];
+
 export function SiteHeader() {
   const { data: settings } = useSettingsQuery();
   const hydrated = useHydrated();
   const { theme, toggle: toggleTheme } = useTheme();
+  // Menu sanduíche (celular/tablet): abaixo de lg a <nav> do topo fica oculta
+  // e antes não havia como navegar a não ser pelo rodapé.
+  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
+  useEffect(() => setMenuOpen(false), [pathname]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   return (
     <>
@@ -64,8 +85,37 @@ export function SiteHeader() {
             >
               <User className="h-5 w-5" />
             </Link>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+              aria-expanded={menuOpen}
+              aria-controls="menu-celular"
+              className="grid h-10 w-10 place-items-center rounded-full hover:bg-primary-foreground/10 lg:hidden"
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
+
+        {menuOpen && (
+          <nav id="menu-celular" aria-label="Menu principal" className="border-t border-primary-foreground/10 lg:hidden">
+            <ul className="mx-auto max-w-7xl py-1 text-base">
+              {MOBILE_LINKS.map((l) => (
+                <li key={l.to}>
+                  <Link
+                    to={l.to as any}
+                    activeOptions={{ exact: l.to === "/" }}
+                    className="block px-5 py-3 opacity-90 hover:bg-primary-foreground/10 hover:opacity-100"
+                    activeProps={{ className: "bg-primary-foreground/10 font-semibold opacity-100" }}
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
     </>
   );
