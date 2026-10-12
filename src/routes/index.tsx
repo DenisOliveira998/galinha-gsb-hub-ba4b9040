@@ -103,7 +103,7 @@ function AnuncioCard({ p, categories, rating, slider }: { p: Post; categories: A
         {(p.status === "SOLD" || !p.inStock) && (
           <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-xl">
             <div className="absolute right-[-52px] top-[35px] w-[228px] rotate-45 bg-[#1a5c2a] py-[7px] text-center text-[15px] font-bold uppercase tracking-widest text-white shadow-md">
-              Sem Estoque
+              Esgotado
             </div>
           </div>
         )}

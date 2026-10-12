@@ -25,3 +25,24 @@ export function plainTextToHtml(text: string | null | undefined): string {
     })
     .join("");
 }
+
+/**
+ * Resumo curto de produto para cartões: tira HTML e marcadores, pula a 1ª
+ * linha quando ela é só um título ("Galo GSB Reprodutor à Venda") e linhas
+ * terminadas em ":" ("Destaques do galo:").
+ */
+export function productExcerpt(title: string, description: string | null | undefined, max = 140): string {
+  const name = title.replace(/<[^>]*>/g, "").trim().toLowerCase();
+  const lines = (description ?? "")
+    .replace(/<[^>]*>/g, "\n")
+    .split("\n")
+    .map((l) => l.replace(/^[*•-]\s+/, "").trim())
+    .filter(Boolean)
+    .filter((l) => !/:$/.test(l)); // "Destaques do galo:"
+  const looksLikeHeading = (l: string) => l.length < 60 && !/[.!?…]$/.test(l);
+  if (lines.length > 1 && (lines[0].toLowerCase().includes(name) || looksLikeHeading(lines[0]))) lines.shift();
+  const text = lines.join(" ").replace(/\s+/g, " ");
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  return `${cut.slice(0, cut.lastIndexOf(" ") > max * 0.6 ? cut.lastIndexOf(" ") : max).replace(/[\s,.;:—-]+$/, "")}…`;
+}

@@ -5,7 +5,7 @@ import { StarsDisplay } from "@/components/site/star-rating";
 import { listPosts } from "@/lib/posts";
 import { listCategories } from "@/lib/categories";
 import { getRatingSummary } from "@/lib/ratings";
-import { formatBRL } from "@/lib/format";
+import { formatBRL, productExcerpt } from "@/lib/format";
 
 type CatalogSearch = { q?: string; cat?: string };
 
@@ -127,7 +127,7 @@ function Catalog() {
                   <Link to="/catalogo/$slug" params={{ slug: p.slug }} className="mt-1.5 line-clamp-2 font-display text-base hover:text-primary md:text-lg">
                     <span dangerouslySetInnerHTML={{ __html: p.title }} />
                   </Link>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{productExcerpt(p.title, p.description)}</p>
                   <div className="mt-1.5"><StarsDisplay average={ratingsMap[p.id]?.average ?? 0} count={ratingsMap[p.id]?.count ?? 0} /></div>
                   {(p.status === "SOLD" || !p.inStock)
                     ? p.price
@@ -152,7 +152,7 @@ function SemEstoqueRibbon() {
   return (
     <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-3xl">
       <div className="absolute right-[-66px] top-[49px] w-[280px] rotate-45 bg-[#1a5c2a] py-2.5 text-center text-[17px] font-bold uppercase tracking-widest text-white shadow-md">
-        Sem Estoque
+        Esgotado
       </div>
     </div>
   );
