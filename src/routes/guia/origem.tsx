@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouterState } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { GUIA_CHAPTERS, chapterByPath } from "@/lib/guia-map";
 import { AUTHOR } from "@/lib/author";
 
 export const Route = createFileRoute("/guia/origem")({
@@ -112,6 +113,9 @@ export function GuiaArticleLayout({
   prev: { to: string; label: string } | null;
   next: { to: string; label: string } | null;
 }) {
+  // Capítulo atual no mapa Guia ↔ blog (src/lib/guia-map.ts).
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const chapter = chapterByPath(pathname);
   return (
     <>
       <section className="bg-primary-deep text-primary-foreground">
@@ -119,7 +123,9 @@ export function GuiaArticleLayout({
           <Link to="/guia" className="mb-4 inline-flex items-center gap-1 text-xs opacity-70 hover:opacity-100 transition">
             <ChevronLeft className="h-3 w-3" /> Voltar ao Guia
           </Link>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-widest opacity-60">{tag}</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-widest opacity-60">
+            {chapter ? `Capítulo ${chapter.num} de ${GUIA_CHAPTERS.length} · ${tag}` : tag}
+          </div>
           <h1 className="font-display text-2xl leading-tight md:text-3xl lg:text-4xl">{title}</h1>
           <p className="mt-4 text-sm opacity-80 md:text-base leading-relaxed">{intro}</p>
           <p className="mt-5 text-xs opacity-75 md:text-sm">
@@ -136,6 +142,35 @@ export function GuiaArticleLayout({
         <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-display prose-h2:text-xl prose-h2:mt-8 prose-p:leading-relaxed prose-p:text-[0.95rem]">
           {children}
         </div>
+
+        {/* O capítulo é a referência resumida; os posts aprofundam o mesmo tema. */}
+        {chapter && chapter.posts.length > 0 && (
+          <aside aria-labelledby="aprofunde-titulo" className="mt-12 rounded-3xl border border-border bg-muted/40 p-6 md:p-8">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary">
+              <BookOpen className="h-4 w-4" aria-hidden="true" /> Aprofunde no blog
+            </p>
+            <h2 id="aprofunde-titulo" className="mt-2 font-display text-xl md:text-2xl">
+              Artigos práticos sobre este tema
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Este capítulo resume o essencial. Os artigos abaixo detalham o assunto com exemplos, passo a passo e dúvidas comuns.
+            </p>
+            <ul className="mt-5 space-y-2">
+              {chapter.posts.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    to="/blog/$slug"
+                    params={{ slug: p.slug }}
+                    className="group flex items-center justify-between gap-3 rounded-2xl bg-card px-4 py-3 text-sm font-semibold shadow-[var(--shadow-soft)] transition hover:text-primary md:text-base"
+                  >
+                    <span>{p.title}</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 transition group-hover:translate-x-0.5" aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
 
         {/* Navegação entre capítulos */}
         <nav className="mt-12 flex items-center justify-between gap-4 border-t border-border pt-8">

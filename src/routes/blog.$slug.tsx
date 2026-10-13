@@ -231,7 +231,7 @@ function ReadMore({ related, guia, product }: ReadMoreProps) {
           to={guia.to as any}
           className="flex flex-col rounded-xl border border-primary/20 bg-primary/5 p-4 text-left transition hover:bg-primary/10"
         >
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-primary/80">Guia da raça</span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-primary/80">Faz parte do Guia da GSB</span>
           <span className="mt-1 font-display text-sm md:text-base">{guia.label} →</span>
         </Link>
         {product ? (

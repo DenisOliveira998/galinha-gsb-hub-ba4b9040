@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Download, ChevronRight } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
+import { GUIA_CHAPTERS, GUIA_FAQ_POST, chapterByPath } from "@/lib/guia-map";
 import { AUTHOR } from "@/lib/author";
 
 export const Route = createFileRoute("/guia/")({
@@ -102,11 +103,53 @@ function GuiaIndexPage() {
                   <div className="text-xs font-semibold uppercase tracking-wider text-primary">{t.tag}</div>
                   <div className="mt-1 font-display text-base font-semibold group-hover:text-primary">{t.title}</div>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{t.summary}</p>
+                  {(() => {
+                    const ch = chapterByPath(t.to);
+                    return ch && ch.posts.length > 0 ? (
+                      <p className="mt-2 text-[11px] font-semibold text-primary/80">
+                        Capítulo {ch.num} · {ch.posts.length} {ch.posts.length === 1 ? "artigo" : "artigos"} no blog
+                      </p>
+                    ) : null;
+                  })()}
                 </div>
                 <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary" />
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Hub: cada capítulo do Guia e os posts do blog que o aprofundam */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-4xl px-4 py-10 md:px-8 md:py-14">
+          <h2 className="font-display text-2xl md:text-3xl">Artigos do blog por capítulo</h2>
+          <p className="mt-2 text-muted-foreground">
+            Cada capítulo do guia resume um tema. Os artigos do blog aprofundam esses mesmos temas com exemplos práticos e respostas a dúvidas específicas.
+          </p>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2">
+            {GUIA_CHAPTERS.map((ch) => (
+              <div key={ch.to}>
+                <Link to={ch.to as any} className="font-display text-base font-semibold hover:text-primary">
+                  {ch.num}. {ch.label}
+                </Link>
+                <ul className="mt-2 space-y-1.5 border-l-2 border-border pl-4">
+                  {ch.posts.map((p) => (
+                    <li key={p.slug}>
+                      <Link to="/blog/$slug" params={{ slug: p.slug }} className="text-sm text-muted-foreground hover:text-primary hover:underline">
+                        {p.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-sm text-muted-foreground">
+            Dúvidas rápidas sobre a raça?{" "}
+            <Link to="/blog/$slug" params={{ slug: GUIA_FAQ_POST.slug }} className="font-semibold text-primary hover:underline">
+              {GUIA_FAQ_POST.title}
+            </Link>
+          </p>
         </div>
       </section>
 

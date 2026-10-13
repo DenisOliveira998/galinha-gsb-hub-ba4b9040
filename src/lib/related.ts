@@ -1,3 +1,5 @@
+import { chapterForPost } from "./guia-map";
+
 // Links internos do fim dos posts do blog ("Leia também"): posts relacionados,
 // o capítulo do Guia sobre o mesmo tema e o produto do catálogo que combina.
 // Sem isso os posts só eram alcançados pela listagem do blog e pela home.
@@ -9,7 +11,9 @@ type Topic = {
   product?: string;
 };
 
-// Ordem importa: o primeiro tema que casar define o capítulo do Guia.
+// Fallback por palavras-chave, usado só para posts que ainda não estão no
+// mapa explícito src/lib/guia-map.ts (post novo). Ordem importa: o primeiro
+// tema que casar define o capítulo do Guia.
 const TOPICS: Topic[] = [
   { keywords: ["chocar", "incubacao", "ovoscopia", "chocadeira", "eclosao"], guia: { to: "/guia/reproducao", label: "Reprodução, fertilidade e incubação" }, product: "ovos" },
   { keywords: ["ovos", "ovo", "postura"], guia: { to: "/guia/reproducao", label: "Reprodução, fertilidade e incubação" }, product: "ovos" },
@@ -39,7 +43,12 @@ const words = (slug: string) => slug.split("-").filter((w) => w.length > 2 && !S
 
 export function topicFor(slug: string): Topic {
   const ws = new Set(slug.split("-"));
-  return TOPICS.find((t) => t.keywords.some((k) => ws.has(k))) ?? DEFAULT_TOPIC;
+  const byKeyword = TOPICS.find((t) => t.keywords.some((k) => ws.has(k))) ?? DEFAULT_TOPIC;
+  // O mapa explícito Guia ↔ blog tem prioridade sobre as palavras-chave.
+  const chapter = chapterForPost(slug);
+  return chapter
+    ? { ...byKeyword, guia: { to: chapter.to, label: `Capítulo ${chapter.num} do Guia: ${chapter.label}` } }
+    : byKeyword;
 }
 
 /** Até `limit` posts parecidos: mesmo capítulo do Guia e mais palavras em comum no slug. */
