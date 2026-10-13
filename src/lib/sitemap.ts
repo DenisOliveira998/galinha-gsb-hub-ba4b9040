@@ -25,6 +25,7 @@ const STATIC_PAGES: { path: string; lastmod: string }[] = [
   { path: "/privacidade", lastmod: "2026-08-02" },
   { path: "/termos", lastmod: "2026-08-02" },
   { path: "/cookies", lastmod: "2026-08-02" },
+  { path: "/politica-editorial", lastmod: "2026-10-13" },
 ];
 const GUIA_PAGES = [
   "/guia",

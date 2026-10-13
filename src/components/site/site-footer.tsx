@@ -61,6 +61,7 @@ export function SiteFooter() {
             <li><Link to="/termos" className="hover:opacity-100 hover:underline">Termos de Uso</Link></li>
             <li><Link to="/privacidade" className="hover:opacity-100 hover:underline">Política de Privacidade</Link></li>
             <li><Link to="/cookies" className="hover:opacity-100 hover:underline">Aviso de Cookies / LGPD</Link></li>
+            <li><Link to="/politica-editorial" className="hover:opacity-100 hover:underline">Política Editorial</Link></li>
             <li><Link to="/afiliados" className="hover:opacity-100 hover:underline">Divulgação de links afiliados</Link></li>
             <li><Link to="/publicidade" className="hover:opacity-100 hover:underline">Anúncios e Google AdSense</Link></li>
           </ul>

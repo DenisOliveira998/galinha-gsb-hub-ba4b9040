@@ -18,6 +18,7 @@ import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as PoliticaEditorialRouteImport } from './routes/politica-editorial'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PublicidadeRouteImport } from './routes/publicidade'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -100,6 +101,11 @@ const ContatoRoute = ContatoRouteImport.update({
 const CookiesRoute = CookiesRouteImport.update({
   id: '/cookies',
   path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliticaEditorialRoute = PoliticaEditorialRouteImport.update({
+  id: '/politica-editorial',
+  path: '/politica-editorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -303,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/cookies': typeof CookiesRoute
+  '/politica-editorial': typeof PoliticaEditorialRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -348,6 +355,7 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/contato': typeof ContatoRoute
   '/cookies': typeof CookiesRoute
+  '/politica-editorial': typeof PoliticaEditorialRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -396,6 +404,7 @@ export interface FileRoutesById {
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
   '/cookies': typeof CookiesRoute
+  '/politica-editorial': typeof PoliticaEditorialRoute
   '/privacidade': typeof PrivacidadeRoute
   '/publicidade': typeof PublicidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -447,6 +456,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/contato'
     | '/cookies'
+    | '/politica-editorial'
     | '/privacidade'
     | '/publicidade'
     | '/sitemap.xml'
@@ -492,6 +502,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/contato'
     | '/cookies'
+    | '/politica-editorial'
     | '/privacidade'
     | '/publicidade'
     | '/sitemap.xml'
@@ -539,6 +550,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/contato'
     | '/cookies'
+    | '/politica-editorial'
     | '/privacidade'
     | '/publicidade'
     | '/sitemap.xml'
@@ -589,6 +601,7 @@ export interface RootRouteChildren {
   ContaRoute: typeof ContaRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   CookiesRoute: typeof CookiesRoute
+  PoliticaEditorialRoute: typeof PoliticaEditorialRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   PublicidadeRoute: typeof PublicidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -669,6 +682,13 @@ declare module '@tanstack/react-router' {
       path: '/cookies'
       fullPath: '/cookies'
       preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/politica-editorial': {
+      id: '/politica-editorial'
+      path: '/politica-editorial'
+      fullPath: '/politica-editorial'
+      preLoaderRoute: typeof PoliticaEditorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -1050,6 +1070,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContaRoute: ContaRouteWithChildren,
   ContatoRoute: ContatoRoute,
   CookiesRoute: CookiesRoute,
+  PoliticaEditorialRoute: PoliticaEditorialRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   PublicidadeRoute: PublicidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

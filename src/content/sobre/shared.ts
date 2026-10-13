@@ -40,15 +40,11 @@ export const links = {
   cookies: { label: "Aviso de Cookies / LGPD", href: "/cookies", verified: true },
   publicidade: { label: "Anúncios e Google AdSense", href: "/publicidade", verified: true },
   afiliados: { label: "Divulgação de links afiliados", href: "/afiliados", verified: true },
-  /**
-   * NÃO EXISTE no site (retornou 404 em 11/10/2026). Quando a política
-   * editorial for publicada, crie a rota, troque verified para true e
-   * defina editorial.status = "vigente".
-   */
+  /** Publicada em 13/10/2026 (src/routes/politica-editorial.tsx). */
   politicaEditorial: {
     label: "Política editorial",
     href: "/politica-editorial",
-    verified: false,
+    verified: true,
   },
 } satisfies Record<string, LinkItem>;
 
@@ -173,6 +169,7 @@ export const sharedTransparencyLinks: LinkItem[] = [
   links.publicidade,
   links.afiliados,
   links.cookies,
+  links.politicaEditorial,
 ];
 
 export const galleryCategoryLabels = {

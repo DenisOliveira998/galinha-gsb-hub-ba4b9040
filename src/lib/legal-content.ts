@@ -140,6 +140,52 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
     ],
   },
 
+  "politica-editorial": {
+    slug: "/politica-editorial",
+    title: "Política Editorial",
+    description:
+      "Como o Galinha GSB produz, revisa e corrige os artigos e o Guia sobre a raça Sertanejo Balão — quem escreve, fontes, números, imagens e publicidade.",
+    intro:
+      "Esta política explica como são produzidos os conteúdos do Galinha GSB (galinhagsb.com.br): os artigos do blog, o Guia da GSB e os textos do catálogo. Ela vale para tudo o que publicamos e existe para que você saiba de onde vem cada informação e como pedir uma correção.",
+    sections: [
+      {
+        heading: "1. Quem escreve",
+        body: "Os conteúdos são escritos por Leonardo Reis, criador da raça Sertanejo Balão e responsável pelo plantel e pelo site. Cada artigo é assinado, e a página de autor (galinhagsb.com.br/autor/leonardo-reis) reúne todos os textos publicados.",
+      },
+      {
+        heading: "2. Como os conteúdos são produzidos",
+        body: "Os textos partem da experiência prática com o próprio plantel e são complementados por materiais técnicos de avicultura sempre que o tema exige. Procuramos priorizar informações verificáveis e deixar claro quando algo é observação de criador, e não resultado de pesquisa. Relatos de experiência são apresentados como relatos — não como recomendação técnica universal.",
+      },
+      {
+        heading: "3. Números, estimativas e fontes",
+        body: "Índices como produção de ovos, fertilidade, eclosão, peso e custos variam muito de um plantel para outro. Quando um texto trouxer números, eles devem vir com contexto: se são estimativas, médias citadas por criadores, dados de uma fonte técnica ou medições feitas no plantel. Estamos revisando os artigos mais antigos para que cumpram esta regra.",
+      },
+      {
+        heading: "4. Saúde animal e orientação profissional",
+        body: "O conteúdo do site é informativo e não substitui a avaliação de um médico-veterinário ou zootecnista. Em casos de doença, vacinação, uso de medicamentos ou qualquer sinal de alerta no plantel, procure um profissional. Os textos sobre sanidade indicam isso sempre que o assunto exige.",
+      },
+      {
+        heading: "5. Revisão e atualização",
+        body: "Os artigos são revisados quando surgem informações relevantes ou mais atuais. Mudanças importantes de conteúdo — como a troca de um número ou de uma recomendação — passam a constar no próprio texto atualizado.",
+      },
+      {
+        heading: "6. Como pedir uma correção",
+        body: "Encontrou um erro, uma informação desatualizada ou algo que precisa de fonte? Avise pela página de contato (galinhagsb.com.br/contato) ou pelo e-mail galinhabalaosertanejo@gmail.com, indicando o endereço da página e o trecho. Os pedidos são analisados e, quando procedentes, o conteúdo é corrigido.",
+      },
+      {
+        heading: "7. Imagens",
+        body: "Fotos apresentadas como registro do plantel devem ser reais. Algumas imagens do site são ilustrativas — produzidas com ferramentas digitais, inclusive de inteligência artificial — e servem apenas para ilustrar o tema do texto; elas não são apresentadas como fotografias das aves do criatório.",
+      },
+      {
+        heading: "8. Publicidade, links afiliados e conteúdo comercial",
+        body: "O site se mantém com anúncios do Google AdSense, com links afiliados e com a venda de ovos férteis e aves do próprio plantel. Anunciantes não escolhem nem revisam os conteúdos. Links afiliados e conteúdos comerciais são identificados como tal — veja as páginas de Publicidade e de Divulgação de Links Afiliados. O catálogo apresenta apenas animais do próprio plantel.",
+      },
+      {
+        heading: "9. Alterações nesta política",
+        body: "Esta política pode ser atualizada para refletir mudanças na forma de produzir os conteúdos. A versão em vigor é sempre a publicada nesta página. Última atualização: 13 de outubro de 2026.",
+      },
+    ],
+  },
   publicidade: {
     slug: "/publicidade",
     title: "Anúncios e Google AdSense",

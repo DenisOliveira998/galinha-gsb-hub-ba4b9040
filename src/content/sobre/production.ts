@@ -256,9 +256,9 @@ export const productionContent: SobreContent = {
     title: "Informação responsável, conhecimento acessível",
     intro: [
       "Os artigos e o Guia da GSB são escritos por um responsável identificado, a partir da experiência com o próprio plantel e de consulta à literatura técnica sobre avicultura de raças locais.",
-      "Os compromissos abaixo descrevem como queremos produzir, revisar e manter esses conteúdos. Eles formam uma proposta de política editorial, que será publicada em página própria depois de validada.",
+      "Os compromissos abaixo resumem como os conteúdos são produzidos, revisados e corrigidos. A versão completa está na política editorial do site.",
     ],
-    status: "proposta",
+    status: "vigente",
     policyLink: links.politicaEditorial,
     commitments: sharedEditorialCommitments,
     blogLink: { ...links.blog, label: "Acessar o blog" },
