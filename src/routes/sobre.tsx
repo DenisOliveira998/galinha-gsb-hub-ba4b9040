@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SiteLayout } from "@/components/site/site-layout";
 import { SobrePage } from "@/components/sobre/SobrePage";
 import { SOBRE_REVIEW, sobreContent } from "@/content/sobre";
 import { buildSobreJsonLd, buildSobreMeta } from "@/content/sobre/seo";
@@ -21,5 +22,11 @@ export const Route = createFileRoute("/sobre")({
 });
 
 function SobreRoute() {
-  return <SobrePage content={sobreContent} review={SOBRE_REVIEW} />;
+  // Neste projeto cabeçalho, rodapé e banner de cookies vêm do SiteLayout de
+  // cada página (não do __root.tsx) — sem ele a página saía sem menu nem rodapé.
+  return (
+    <SiteLayout>
+      <SobrePage content={sobreContent} review={SOBRE_REVIEW} />
+    </SiteLayout>
+  );
 }
