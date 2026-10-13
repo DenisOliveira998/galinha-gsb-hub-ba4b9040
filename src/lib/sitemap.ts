@@ -17,7 +17,7 @@ import { SITE_URL } from "./seo";
 // editar o texto dessas páginas — o Google ignora lastmod que muda sempre.
 const GUIA_UPDATED = "2026-09-27";
 const STATIC_PAGES: { path: string; lastmod: string }[] = [
-  { path: "/sobre", lastmod: "2026-09-28" },
+  { path: "/sobre", lastmod: "2026-10-13" },
   { path: "/autor/leonardo-reis", lastmod: "2026-09-28" },
   { path: "/contato", lastmod: "2026-08-31" },
   { path: "/afiliados", lastmod: "2026-08-02" },
