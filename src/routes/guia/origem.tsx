@@ -118,17 +118,21 @@ export function GuiaArticleLayout({
   const chapter = chapterByPath(pathname);
   return (
     <>
-      <section className="bg-primary-deep text-primary-foreground">
-        <div className="mx-auto max-w-3xl px-4 py-10 md:px-8 md:py-14">
-          <Link to="/guia" className="mb-4 inline-flex items-center gap-1 text-xs opacity-70 hover:opacity-100 transition">
-            <ChevronLeft className="h-3 w-3" /> Voltar ao Guia
+      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 [background:radial-gradient(55%_80%_at_85%_25%,color-mix(in_oklab,var(--primary-glow)_24%,transparent),transparent_70%)]"
+        />
+        <div className="relative mx-auto max-w-3xl px-4 py-10 md:px-8 md:py-16">
+          <Link to="/guia" className="mb-6 inline-flex items-center gap-1 text-sm text-primary-foreground/75 transition hover:text-primary-foreground">
+            <ChevronLeft className="h-4 w-4" /> Guia da GSB
           </Link>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-widest opacity-60">
-            {chapter ? `Capítulo ${chapter.num} de ${GUIA_CHAPTERS.length} · ${tag}` : tag}
-          </div>
-          <h1 className="font-display text-2xl leading-tight md:text-3xl lg:text-4xl">{title}</h1>
-          <p className="mt-4 text-sm opacity-80 md:text-base leading-relaxed">{intro}</p>
-          <p className="mt-5 text-xs opacity-75 md:text-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent-warm">
+            {chapter ? `Capítulo ${chapter.num} de ${GUIA_CHAPTERS.length} — ${tag}` : tag}
+          </p>
+          <h1 className="mt-3 font-display text-3xl font-semibold leading-[1.08] tracking-tight md:text-5xl">{title}</h1>
+          <p className="mt-4 text-base leading-relaxed text-primary-foreground/85 md:text-lg">{intro}</p>
+          <p className="mt-6 text-sm text-primary-foreground/75">
             Por{" "}
             <Link to={AUTHOR.path as any} className="font-semibold underline-offset-2 hover:underline">
               {AUTHOR.name}

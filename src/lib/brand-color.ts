@@ -3,7 +3,7 @@
  * da marca. Usado pelo seletor de cor do admin (Configurações -> Aparência).
  */
 
-export const DEFAULT_BRAND_COLOR = "#3F6B52";
+export const DEFAULT_BRAND_COLOR = "#173D28";
 
 export function normalizeHex(input: string): string | null {
   let v = (input || "").trim().replace(/^#/, "");

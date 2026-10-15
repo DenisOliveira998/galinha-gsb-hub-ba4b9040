@@ -103,6 +103,18 @@ export const GUIA_FAQ_POST = {
   title: "Perguntas frequentes sobre a Galinha GSB",
 };
 
+/** Nome curto do tema de cada capítulo, usado como etiqueta dos posts. */
+export const TEMA_CURTO: Record<number, string> = {
+  1: "Origem",
+  2: "Características",
+  3: "Plumagem",
+  4: "Seleção",
+  5: "Reprodução",
+  6: "Pintinhos",
+  7: "Manejo",
+  8: "Saúde",
+};
+
 export const chapterByPath = (path: string) => GUIA_CHAPTERS.find((c) => c.to === path);
 
 export const chapterForPost = (slug: string) => GUIA_CHAPTERS.find((c) => c.posts.some((p) => p.slug === slug));

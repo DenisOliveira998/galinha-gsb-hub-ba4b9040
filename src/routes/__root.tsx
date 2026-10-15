@@ -14,47 +14,38 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { BrandTheme } from "@/components/site/brand-theme";
 import { AdsenseScript } from "@/components/site/ad-slot";
 import { THEME_INIT_SCRIPT } from "@/hooks/use-theme";
 import { getSettings } from "@/lib/settings";
 import { SETTINGS_QUERY_KEY } from "@/lib/hooks/use-settings";
-import { brandTokens, DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
+import { DEFAULT_BRAND_COLOR } from "@/lib/brand-color";
 import { SITE_URL, absUrl } from "@/lib/seo";
 import { GA_MEASUREMENT_ID, consentInitScript } from "@/lib/analytics";
 import { AnalyticsTracker } from "@/components/site/analytics-tracker";
-
-/** Gera o script inline que aplica tokens da cor da marca antes de qualquer pintura. */
-function makeBrandScript(brandColor: string): string {
-  const tokens = brandTokens(brandColor);
-  return `(function(){var s=document.documentElement.style;${
-    Object.entries(tokens)
-      .map(([k, v]) => `s.setProperty(${JSON.stringify(k)},${JSON.stringify(v)})`)
-      .join(";")
-  }})()`;
-}
+import { SiteLayout } from "@/components/site/site-layout";
+import { PageHero, btn } from "@/components/site/page-kit";
 
 const DEFAULT_DESCRIPTION = "Portal Galinha GSB, especializado na Galinha Sertaneja Balão. Encontre notícias, conteúdos sobre criação e manejo, além de ovos férteis, pintinhos, galinhas e reprodutores GSB.";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Página não encontrada</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          A página que você procura não existe ou foi movida.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Voltar ao início
-          </Link>
-        </div>
-      </div>
-    </div>
+    <SiteLayout>
+      <PageHero
+        eyebrow="Erro 404"
+        title="Página não encontrada"
+        intro="O endereço pode ter mudado ou a página foi removida. Use os atalhos abaixo para continuar."
+      >
+        <Link to="/" className={`${btn.accent} focus-visible:ring-accent-warm`}>
+          Voltar ao início
+        </Link>
+        <Link to="/guia" className={btn.outlineOnDark}>
+          Guia da GSB
+        </Link>
+        <Link to="/catalogo" className={btn.outlineOnDark}>
+          Catálogo
+        </Link>
+      </PageHero>
+    </SiteLayout>
   );
 }
 
@@ -112,7 +103,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ loaderData }) => {
     const desc = loaderData?.siteDescription || DEFAULT_DESCRIPTION;
     const ogImg = absUrl(loaderData?.ogImage || "/logo.png");
-    const brandScript = makeBrandScript(loaderData?.brandColor || DEFAULT_BRAND_COLOR);
     const adsenseId = loaderData?.adsensePublisherId || "";
     return {
       meta: [
@@ -167,12 +157,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   // useRouterState é isomórfico e disponível no shellComponent.
-  // No SSR o loader já rodou, então matches[0].loaderData já tem brandColor.
+  // A paleta do site é fixa em styles.css (verde-mata + mostarda, out/2026);
+  // a "Cor principal" do admin não sobrescreve mais os tokens do site público.
   const state = useRouterState();
-  const loaderData = state.matches[0]?.loaderData as { brandColor?: string } | undefined;
-  // Script da cor da marca ANTES de <HeadContent> (que contém o <link stylesheet>)
-  // → garante que os tokens CSS são aplicados antes do CSS padrão pintar a tela.
-  const brandScript = makeBrandScript(loaderData?.brandColor ?? DEFAULT_BRAND_COLOR);
 
   // Canonical + og:url sempre no domínio principal (.com.br), sem query string,
   // para o Google não tratar .com, .vercel.app ou ?filtros como páginas duplicadas.
@@ -188,7 +175,6 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: brandScript }} />
         {/* Consent Mode do Google: precisa rodar antes do gtag.js e do AdSense */}
         {GA_MEASUREMENT_ID && <script dangerouslySetInnerHTML={{ __html: consentInitScript(GA_MEASUREMENT_ID) }} />}
         <HeadContent />
@@ -219,7 +205,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <BrandTheme />
       <AdsenseScript />
       <AnalyticsTracker />
       <Outlet />

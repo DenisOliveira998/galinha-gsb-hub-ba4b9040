@@ -135,8 +135,8 @@ function Settings() {
           <div>
             <h3 className="font-display text-lg">Aparência</h3>
             <p className="text-xs text-muted-foreground">
-              A cor escolhida substitui o verde da marca em todo o site: cabeçalho, hero, botões
-              principais, destaques e rodapé.
+              O site público usa uma paleta fixa (verde-mata e mostarda). Esta cor fica salva,
+              mas não altera mais o visual do site.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4">

@@ -7,6 +7,8 @@ import { getBlogPostBySlug, listPublishedBlogSummaries } from "@/lib/blog";
 import { listPosts } from "@/lib/posts";
 import { topicFor, relatedPosts, relatedProduct, linkKnownTitles } from "@/lib/related";
 import { AUTHOR } from "@/lib/author";
+import { TEMA_CURTO, chapterForPost } from "@/lib/guia-map";
+import { CONTAINER, CtaBand, EYEBROW } from "@/components/site/page-kit";
 import { SITE_URL, DEFAULT_OG_IMAGE, absUrl, plainText, truncate, pageTitle, demoteH1, stripHeadingEmojis } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -92,46 +94,56 @@ function formatDate(iso: string) {
 
 function BlogDetail() {
   const { post, related, guia, product, titles } = Route.useLoaderData();
+  const tema = TEMA_CURTO[chapterForPost(post.slug)?.num ?? 0] ?? "Blog";
   return (
     <SiteLayout>
-      <div className="mx-auto grid max-w-6xl gap-6 px-3 py-6 text-left md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_240px]">
-        <article className="min-w-0 text-left">
-          <Link to="/blog" className="text-xs text-muted-foreground hover:text-foreground md:text-sm">← Voltar ao blog</Link>
+      {/* ── Topo do artigo ──────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 [background:radial-gradient(55%_80%_at_85%_20%,color-mix(in_oklab,var(--primary-glow)_24%,transparent),transparent_70%)]"
+        />
+        <div className={`relative ${CONTAINER} pb-24 pt-8 md:pb-32 md:pt-12`}>
+          <Link to="/blog" className="text-sm text-primary-foreground/75 hover:text-primary-foreground">
+            ← Blog
+          </Link>
+          <div className="mt-6 max-w-3xl">
+            <p className={`${EYEBROW} text-accent-warm`}>
+              {tema}
+              <span className="ml-2 text-primary-foreground/60">{formatDate(post.createdAt)}</span>
+            </p>
+            <h1 className="mt-3 font-display text-3xl font-semibold leading-[1.1] tracking-tight md:text-5xl">{plainText(post.title)}</h1>
+            {post.excerpt && <p className="mt-4 text-base leading-relaxed text-primary-foreground/85 md:text-lg">{plainText(post.excerpt)}</p>}
+            {/* Autor — sempre visível e ligado à página de autor (sinal de E-E-A-T) */}
+            <Link to={AUTHOR.path as any} className="mt-6 inline-flex items-center gap-3 rounded-full pr-4 transition hover:bg-primary-foreground/10">
+              {post.author?.avatar ? (
+                <img src={post.author.avatar} alt={post.author.name} className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-primary-foreground/20" />
+              ) : (
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary-foreground/10">
+                  <UserCircle2 className="h-5 w-5" />
+                </span>
+              )}
+              <span className="text-left">
+                <span className="block text-sm font-semibold">Por {post.author?.name || AUTHOR.name}</span>
+                <span className="block text-xs text-primary-foreground/70">{AUTHOR.role} há mais de 10 anos</span>
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 pb-6 text-left md:px-8 lg:grid-cols-[minmax(0,1fr)_240px]">
+        <article className="-mt-16 min-w-0 text-left md:-mt-24">
           {post.coverImage ? (
-            <div className="mt-3 aspect-video overflow-hidden rounded-2xl shadow-[var(--shadow-card)] md:mt-4 md:rounded-3xl">
+            <div className="aspect-video overflow-hidden rounded-2xl bg-muted shadow-[var(--shadow-card)] md:rounded-3xl">
               <img src={post.coverImage} alt={plainText(post.title)} className="h-full w-full object-cover" />
             </div>
           ) : (
-            <div className="mt-3 aspect-video overflow-hidden rounded-2xl bg-muted md:mt-4 md:rounded-3xl" />
+            <div className="aspect-video overflow-hidden rounded-2xl bg-muted md:rounded-3xl" />
           )}
-          <div className="mt-4 flex items-center justify-between gap-4">
-            <div className="text-[11px] text-muted-foreground md:text-xs">{formatDate(post.createdAt)}</div>
+          <div className="mt-4 flex justify-end">
             <BlogLikeButton postId={post.id} initialCount={post.likeCount ?? 0} />
           </div>
-          <h1 className="mt-1 text-left font-display text-xl md:text-2xl" dangerouslySetInnerHTML={{ __html: post.title }} />
-          <div className="mt-2 text-left text-sm text-muted-foreground md:text-base prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
-
-          {/* Autor */}
-          {/* Autor — sempre visível e ligado à página de autor (sinal de E-E-A-T) */}
-          {(
-            <Link to={AUTHOR.path as any} className="mt-4 flex items-center gap-3 rounded-xl bg-muted/50 p-3 transition hover:bg-muted">
-              {post.author?.avatar ? (
-                <img src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full object-cover shrink-0" />
-              ) : (
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                  <UserCircle2 className="h-5 w-5" />
-                </div>
-              )}
-              <div className="min-w-0">
-                <p className="text-sm font-semibold">Por {post.author?.name || AUTHOR.name}</p>
-                {post.author?.bio ? (
-                  <p className="line-clamp-2 text-xs text-muted-foreground">{plainText(post.author.bio)}</p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">{AUTHOR.role} há mais de 10 anos</p>
-                )}
-              </div>
-            </Link>
-          )}
 
           {/* Anúncio dentro do conteúdo — visível no mobile/tablet */}
           <AdSlot
@@ -173,7 +185,7 @@ function BlogDetail() {
           <ReadMore related={related} guia={guia} product={product} />
         </article>
 
-        <aside className="hidden lg:block">
+        <aside className="hidden pt-10 lg:block">
           <AdSlot
             slot="blog"
             label="Espaço publicitário — formato vertical"
@@ -191,6 +203,7 @@ function BlogDetail() {
           />
         </aside>
       </div>
+      <CtaBand title="Ficou com alguma dúvida?" text="Pergunte direto ao criador pelo WhatsApp." message={`Olá! Li o artigo "${plainText(post.title)}" e tenho uma dúvida.`} />
     </SiteLayout>
   );
 }

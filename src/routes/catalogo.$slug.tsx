@@ -1,6 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { HelpCircle } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
 import { CommentsSection } from "@/components/site/comments-section";
 import { StarsDisplay, StarsInput } from "@/components/site/star-rating";
@@ -12,6 +11,7 @@ import { useRatingSummaryQuery, useMyRatingQuery, useRatePostMutation } from "@/
 import { whatsappHref } from "@/lib/mock-store";
 import { getAdminSession } from "@/lib/admin-auth";
 import { authClient } from "@/lib/auth-client";
+import { CONTAINER, CtaBand, EYEBROW, ProductCard, SectionHeader, btn, textLink } from "@/components/site/page-kit";
 import { SITE_URL, absUrl, plainText, truncate } from "@/lib/seo";
 import { formatBRL, plainTextToHtml } from "@/lib/format";
 
@@ -128,31 +128,92 @@ function PostDetail() {
     .filter((p) => p.id !== post.id && p.status !== "DRAFT")
     .slice(0, 6);
 
-  const waHref = settings ? whatsappHref(settings, `Olá! Tenho interesse em: ${post.title}`) : null;
+  const nome = plainText(post.title);
+  const esgotado = !post.inStock || post.status === "SOLD";
+  const waHref = settings
+    ? whatsappHref(
+        settings,
+        esgotado ? `Olá! Gostaria de ser avisado quando houver reposição de: ${nome}` : `Olá! Gostaria de reservar: ${nome}`,
+      )
+    : null;
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-6xl px-4 py-12 md:px-8">
-        <Link to="/catalogo" className="text-sm text-muted-foreground hover:text-foreground">← Voltar ao catálogo</Link>
-        <div className="mt-6 grid gap-10 md:grid-cols-2">
-          <div className="overflow-hidden rounded-3xl shadow-[var(--shadow-card)]">
-            <img src={post.images[0]} alt={plainText(post.title)} className="aspect-square w-full object-cover" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="text-xs font-semibold uppercase tracking-wider text-primary">{catLabel(post.category)}</div>
-              {!post.inStock && (
-                <span className="rounded-full bg-destructive px-2.5 py-0.5 text-[11px] font-semibold text-destructive-foreground">Esgotado</span>
+      {/* ── Topo do produto ─────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 [background:radial-gradient(50%_70%_at_28%_45%,color-mix(in_oklab,var(--primary-glow)_28%,transparent),transparent_70%)]"
+        />
+        <div className={`relative ${CONTAINER} py-8 md:py-12`}>
+          <Link to="/catalogo" className="text-sm text-primary-foreground/75 hover:text-primary-foreground">
+            ← Catálogo
+          </Link>
+          <div className="mt-6 grid items-center gap-8 md:grid-cols-2 md:gap-12">
+            <img
+              src={post.images[0]}
+              alt={nome}
+              width={1024}
+              height={1024}
+              fetchPriority="high"
+              className={`mx-auto aspect-square w-full max-w-md object-contain drop-shadow-[0_24px_40px_rgba(0,0,0,0.35)] ${esgotado ? "opacity-80" : ""}`}
+            />
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className={`${EYEBROW} text-accent-warm`}>{catLabel(post.category)}</p>
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                    esgotado ? "bg-destructive text-destructive-foreground" : "bg-primary-foreground/15 text-primary-foreground"
+                  }`}
+                >
+                  {esgotado ? "Esgotado" : "Disponível"}
+                </span>
+              </div>
+              <h1 className="mt-3 font-display text-4xl font-semibold leading-[1.06] tracking-tight md:text-5xl">{nome}</h1>
+              {post.price ? (
+                <p className={`mt-5 font-display text-3xl tabular-nums md:text-4xl ${esgotado ? "text-primary-foreground/60 line-through" : "text-accent-warm"}`}>
+                  {formatBRL(post.price)}
+                </p>
+              ) : null}
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-primary-foreground/80">
+                {esgotado
+                  ? "Este item está esgotado no momento. Peça pelo WhatsApp para ser avisado quando houver reposição."
+                  : "A reserva é feita direto com o criador pelo WhatsApp, que confirma disponibilidade, envio ou retirada."}
+              </p>
+              {waHref && (
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className={`${btn.accent} focus-visible:ring-accent-warm`}>
+                    {esgotado ? "Avisar quando voltar" : "Reservar no WhatsApp"}
+                  </a>
+                  <Link to="/guia" className={btn.outlineOnDark}>
+                    Conhecer a raça
+                  </Link>
+                </div>
               )}
             </div>
-            <h1 className="mt-2 font-display text-3xl md:text-4xl" dangerouslySetInnerHTML={{ __html: post.title }} />
-            <div className="mt-2 flex flex-col gap-1.5">
+          </div>
+        </div>
+      </section>
+
+      {/* ── Descrição, avaliações e perguntas ───────────────── */}
+      <div className={`${CONTAINER} py-12 md:py-16`}>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:gap-14">
+          <div>
+            <SectionHeader eyebrow="Sobre este item" title="Descrição" />
+            <div
+              className="prose prose-sm mt-5 max-w-none text-muted-foreground md:prose-base"
+              dangerouslySetInnerHTML={{ __html: plainTextToHtml(post.description) }}
+            />
+          </div>
+          <aside className="h-fit rounded-2xl border border-border bg-card p-5 md:p-6">
+            <h2 className="font-display text-xl">Avaliações</h2>
+            <div className="mt-3">
               <StarsDisplay average={summary?.average ?? 0} count={summary?.count ?? 0} size="md" />
+            </div>
+            <div className="mt-3 text-sm">
               {loggedIn ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
-                    {myRating ? "Sua avaliação:" : "Avalie este anúncio:"}
-                  </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-muted-foreground">{myRating ? "Sua avaliação:" : "Avalie este item:"}</span>
                   <StarsInput
                     value={myRating ?? 0}
                     onRate={(v) => {
@@ -162,60 +223,25 @@ function PostDetail() {
                   />
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground">
                   <Link to="/conta/login" className="font-semibold text-primary hover:underline">
-                    Faça login
+                    Entre na sua conta
                   </Link>{" "}
-                  para avaliar este anúncio.
+                  para avaliar.
                 </p>
               )}
             </div>
-            {post.price && (
-              (!post.inStock || post.status === "SOLD")
-                ? <div className="mt-4 flex items-baseline gap-3">
-                    <span className="font-display text-3xl text-muted-foreground line-through decoration-destructive decoration-[3px]">
-                      {formatBRL(post.price)}
-                    </span>
-                    <span className="rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-destructive bg-destructive/10">
-                      Esgotado
-                    </span>
-                  </div>
-                : <div className="mt-4 font-display text-3xl text-primary">
-                    {formatBRL(post.price)}
-                  </div>
-            )}
-            <div className="prose prose-sm mt-6 max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: plainTextToHtml(post.description) }} />
-            <div className="mt-6">
-              {post.inStock && post.status !== "SOLD" ? (
-                waHref ? (
-                  <a
-                    href={waHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105"
-                  >
-                    Falar no WhatsApp
-                  </a>
-                ) : null
-              ) : (
-                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-muted px-6 py-3 text-sm font-semibold text-muted-foreground">
-                  Indisponível
-                </span>
-              )}
-            </div>
-          </div>
+          </aside>
         </div>
 
         {faq.length > 0 && (
-          <section className="mt-12 rounded-3xl bg-card p-5 text-left shadow-[var(--shadow-soft)] md:p-7">
-            <h2 className="flex items-center gap-2 font-display text-xl">
-              <HelpCircle className="h-5 w-5 text-primary" /> Perguntas e respostas
-            </h2>
-            <ul className="mt-4 space-y-3">
+          <section className="mt-14">
+            <SectionHeader eyebrow="Dúvidas" title="Perguntas e respostas" />
+            <ul className="mt-6 divide-y divide-border border-y border-border">
               {faq.map((f) => (
-                <li key={f.id} className="rounded-2xl bg-muted/60 p-4">
-                  <p className="text-sm font-semibold">{f.question}</p>
-                  <div className="prose prose-sm mt-1 max-w-none text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.answer ?? "" }} />
+                <li key={f.id} className="py-5">
+                  <p className="font-display text-lg">{f.question}</p>
+                  <div className="prose prose-sm mt-2 max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.answer ?? "" }} />
                 </li>
               ))}
             </ul>
@@ -225,25 +251,28 @@ function PostDetail() {
         <CommentsSection postId={post.id} isAdmin={isAdmin} />
 
         {related.length > 0 && (
-          <section className="mt-12">
-            <h2 className="font-display text-xl md:text-2xl">Você também pode gostar</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {related.map((p) => (
-                <Link key={p.id} to="/catalogo/$slug" params={{ slug: p.slug }} className="group flex h-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]">
-                  <div className="aspect-square overflow-hidden">
-                    <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  </div>
-                  <div className="flex flex-1 flex-col p-3 text-left">
-                    <div className="text-[9px] font-semibold uppercase tracking-wider text-primary">{catLabel(p.category)}</div>
-                    <div className="mt-0.5 line-clamp-2 font-display text-sm" dangerouslySetInnerHTML={{ __html: p.title }} />
-                    {p.price && <div className="mt-auto pt-2 text-sm font-semibold">{formatBRL(p.price)}</div>}
-                  </div>
+          <section className="mt-14">
+            <SectionHeader
+              eyebrow="Catálogo"
+              title="Mais do plantel"
+              action={
+                <Link to="/catalogo" className={textLink}>
+                  Ver catálogo completo
                 </Link>
+              }
+            />
+            <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+              {related.slice(0, 4).map((p) => (
+                <li key={p.id}>
+                  <ProductCard p={p} category={catLabel(p.category)} />
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
         )}
       </div>
+
+      <CtaBand message={`Olá! Vim pela página de ${nome} e tenho uma dúvida.`} />
     </SiteLayout>
   );
 }

@@ -5,6 +5,7 @@ import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { Instagram, Mail, MapPin, MessageCircle, Youtube } from "lucide-react";
 import { useState } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { CONTAINER, PageHero, SectionHeader, btn } from "@/components/site/page-kit";
 
 export const Route = createFileRoute("/contato")({
   head: () => ({
@@ -67,29 +68,41 @@ function Contact() {
   const inputCls = "mt-1 w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring";
   const labelCls = "text-xs font-medium uppercase tracking-wider text-muted-foreground";
 
+  const canal = "flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition hover:border-primary/30 hover:bg-muted/40";
+  const iconeCanal = "grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary";
+
   return (
     <SiteLayout>
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:px-8">
+      <PageHero
+        eyebrow="Contato"
+        title="Fale com o criador"
+        intro="Dúvidas sobre a raça, reserva de ovos e pintinhos, envio ou retirada: quem responde é o próprio Leonardo Reis, sem atendimento automático."
+      >
+        <a href={whatsappHref(s as SiteSettings, "Olá! Vim pelo site e gostaria de mais informações.")} target="_blank" rel="noopener noreferrer" className={`${btn.accent} focus-visible:ring-accent-warm`}>
+          Chamar no WhatsApp
+        </a>
+      </PageHero>
+
+      <section className={`${CONTAINER} grid gap-10 py-12 md:grid-cols-2 md:py-16 [&>*]:min-w-0`}>
         <div>
-          <h1 className="font-display text-4xl md:text-5xl">Fale conosco</h1>
-          <p className="mt-4 text-muted-foreground">Estamos à disposição para conversar sobre o plantel, tirar dúvidas sobre manejo e ajudar você a escolher os melhores exemplares.</p>
-          <div className="mt-8 space-y-4">
-            <a href={whatsappHref(s, "Olá! Vim pelo site e gostaria de mais informações.")} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)] transition hover:bg-muted"><MessageCircle className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">WhatsApp</div><div className="font-semibold">{s.whatsapp}</div></div></a>
-            {s.instagram && <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)] transition hover:bg-muted"><Instagram className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">Instagram</div><div className="font-semibold">{s.instagram}</div></div></a>}
-            {s.youtube && <a href={s.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)] transition hover:bg-muted"><Youtube className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">YouTube</div><div className="font-semibold">{s.youtube.replace(/^https?:\/\/(www\.)?youtube\.com\//,"youtube.com/")}</div></div></a>}
-            {s.address && <div className="flex items-start gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)]"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><div><div className="text-xs text-muted-foreground">Endereço</div><div className="font-semibold">{s.address}</div></div></div>}
-            {s.email && <a href={`mailto:${s.email}`} className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-soft)] transition hover:bg-muted"><Mail className="h-5 w-5 text-primary" /><div><div className="text-xs text-muted-foreground">E-mail</div><div className="font-semibold break-all">{s.email}</div></div></a>}
+          <SectionHeader eyebrow="Canais oficiais" title="Onde nos encontrar" />
+          <div className="mt-6 space-y-3">
+            <a href={whatsappHref(s, "Olá! Vim pelo site e gostaria de mais informações.")} target="_blank" rel="noopener noreferrer" className={canal}><span className={iconeCanal}><MessageCircle className="h-5 w-5" /></span><div><div className="text-xs text-muted-foreground">WhatsApp</div><div className="font-semibold">{s.whatsapp}</div></div></a>
+            {s.instagram && <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className={canal}><span className={iconeCanal}><Instagram className="h-5 w-5" /></span><div className="min-w-0"><div className="text-xs text-muted-foreground">Instagram</div><div className="break-all font-semibold">{s.instagram}</div></div></a>}
+            {s.youtube && <a href={s.youtube} target="_blank" rel="noopener noreferrer" className={canal}><span className={iconeCanal}><Youtube className="h-5 w-5" /></span><div className="min-w-0"><div className="text-xs text-muted-foreground">YouTube</div><div className="break-all font-semibold">{s.youtube.replace(/^https?:\/\/(www\.)?youtube\.com\//,"youtube.com/")}</div></div></a>}
+            {s.email && <a href={`mailto:${s.email}`} className={canal}><span className={iconeCanal}><Mail className="h-5 w-5" /></span><div className="min-w-0"><div className="text-xs text-muted-foreground">E-mail</div><div className="break-all font-semibold">{s.email}</div></div></a>}
+            {s.address && <div className={canal}><span className={iconeCanal}><MapPin className="h-5 w-5" /></span><div className="min-w-0"><div className="text-xs text-muted-foreground">Endereço</div><div className="font-semibold">{s.address}</div></div></div>}
           </div>
         </div>
         {sent ? (
-          <div className="flex flex-col items-center justify-center rounded-3xl bg-card p-8 shadow-[var(--shadow-card)] text-center">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-8 text-center">
             <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary text-2xl">✓</div>
             <h2 className="mt-4 font-display text-2xl">Sua mensagem está pronta</h2>
             <p className="mt-2 text-sm text-muted-foreground">Abrimos o WhatsApp com o texto preenchido — é só tocar em enviar por lá. Se nada abriu, use o botão de WhatsApp ao lado ou escreva para {s.email || "o nosso e-mail"}.</p>
             <button onClick={() => { setSent(false); setName(""); setEmail(""); setPhone(""); setMessage(""); }} className="mt-6 rounded-full border px-6 py-2 text-sm font-semibold hover:bg-muted">Enviar outra mensagem</button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="rounded-3xl bg-card p-8 shadow-[var(--shadow-card)]">
+          <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-6 md:p-8">
             <h2 id="formulario" className="font-display text-2xl">Envie uma mensagem</h2>
             <p className="mt-1 text-sm text-muted-foreground">Ao enviar, sua mensagem abre pronta no WhatsApp do criador.</p>
             <div className="mt-6 space-y-4">
@@ -110,7 +123,7 @@ function Contact() {
                 <textarea value={message} onChange={(e) => setMessage(e.target.value)} required rows={4} placeholder="Escreva sua mensagem..." className={inputCls} />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
-              <button type="submit" className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)]">Enviar pelo WhatsApp</button>
+              <button type="submit" className={`${btn.accent} w-full`}>Enviar pelo WhatsApp</button>
             </div>
           </form>
         )}

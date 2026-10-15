@@ -4,6 +4,7 @@ import { SiteLayout } from "@/components/site/site-layout";
 import { listPublishedBlogSummaries } from "@/lib/blog";
 import { SITE_URL, DEFAULT_OG_IMAGE, plainText } from "@/lib/seo";
 import { AUTHOR } from "@/lib/author";
+import { CtaBand } from "@/components/site/page-kit";
 
 // Página de autor: mostra ao Google (e ao revisor do AdSense) quem escreve o
 // conteúdo, com a experiência real do criador e a lista dos artigos dele.
@@ -92,8 +93,8 @@ function AuthorPage() {
             </div>
           )}
           <div>
-            <span className="text-xs font-semibold uppercase tracking-widest opacity-70">Autor</span>
-            <h1 className="mt-1 font-display text-3xl md:text-4xl">{AUTHOR.name}</h1>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent-warm">Autor</span>
+            <h1 className="mt-2 font-display text-4xl font-semibold leading-[1.06] tracking-tight md:text-5xl">{AUTHOR.name}</h1>
             <p className="mt-2 max-w-2xl text-sm opacity-85 md:text-base">{AUTHOR.role} há mais de 10 anos · autor do blog e do Guia da GSB</p>
           </div>
         </div>
@@ -156,6 +157,7 @@ function AuthorPage() {
           </ul>
         </section>
       )}
+      <CtaBand title="Quer falar com o Leonardo?" text="Dúvidas sobre a raça, sobre um artigo ou sobre o plantel — ele responde pessoalmente." message="Olá, Leonardo! Vim pela sua página de autor no site." />
     </SiteLayout>
   );
 }

@@ -1,451 +1,307 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
-import { useRef } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { HeartHandshake, ShieldCheck, Truck } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
-import { HeroCarousel } from "@/components/site/hero-carousel";
-import { StarsDisplay } from "@/components/site/star-rating";
 import { AdSlot } from "@/components/site/ad-slot";
-import { BlogLikeButton } from "@/components/site/blog-like-button";
+import { CicloCriacao } from "@/components/site/ciclo-criacao";
+import { CtaBand, ProductCard } from "@/components/site/page-kit";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { ShieldCheck, HeartHandshake, Truck, Feather, Egg, Award, Sprout, UserCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { listPosts } from "@/lib/posts";
 import { listPublishedBlogSummaries } from "@/lib/blog";
-import { listHeroSlides } from "@/lib/hero-slides";
 import { listCategories } from "@/lib/categories";
-import { getSettings } from "@/lib/settings";
 import { getRatingSummary } from "@/lib/ratings";
-import { useSettingsQuery } from "@/lib/hooks/use-settings";
-import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo";
-import { formatBRL } from "@/lib/format";
+import { SITE_URL, DEFAULT_OG_IMAGE, plainText } from "@/lib/seo";
+import { AUTHOR } from "@/lib/author";
+import { TEMA_CURTO, chapterForPost } from "@/lib/guia-map";
+
+// Home (redesenho de out/2026, aplicado a pedido do usuário): topo com o galo
+// do plantel, catálogo com filtros e ação por WhatsApp, diferenciais, blog,
+// "Do ovo à galinha adulta" (fases ligadas ao Guia) e chamada final.
+// Regras mantidas: dados reais do banco, cores da marca e nenhuma promessa
+// que o site não cumpra — "Reservar"/"Avise-me" abrem o WhatsApp com a
+// mensagem pronta, que é como a reserva funciona de fato.
+
+type HomeData = {
+  posts: Awaited<ReturnType<typeof listPosts>>;
+  blog: Awaited<ReturnType<typeof listPublishedBlogSummaries>>;
+  categories: Awaited<ReturnType<typeof listCategories>>;
+  ratingsMap: Record<string, { average: number; count: number }>;
+};
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    const [postsRes, blogRes, heroSlidesRes, categoriesRes, settingsRes] = await Promise.allSettled([
+  loader: async (): Promise<HomeData> => {
+    const [postsRes, blogRes, categoriesRes] = await Promise.allSettled([
       listPosts(),
       listPublishedBlogSummaries(),
-      listHeroSlides(),
       listCategories(),
-      getSettings(),
     ]);
-    const s = settingsRes.status === "fulfilled" ? settingsRes.value : null;
-    const heroSlides = heroSlidesRes.status === "fulfilled" ? heroSlidesRes.value : [];
     const posts = postsRes.status === "fulfilled" ? postsRes.value : [];
-
-    // Busca ratings de todos os posts em paralelo para exibir estrelas nos cards
-    const ratingsRes = await Promise.allSettled(
-      posts.map((p) => getRatingSummary({ data: { postId: p.id } })),
-    );
-    const ratingsMap: Record<string, { average: number; count: number }> = {};
+    const ratingsRes = await Promise.allSettled(posts.map((p) => getRatingSummary({ data: { postId: p.id } })));
+    const ratingsMap: HomeData["ratingsMap"] = {};
     posts.forEach((p, i) => {
       const r = ratingsRes[i];
       ratingsMap[p.id] = r.status === "fulfilled" ? r.value : { average: 0, count: 0 };
     });
-
     return {
       posts,
       blog: blogRes.status === "fulfilled" ? blogRes.value : [],
-      heroSlides,
       categories: categoriesRes.status === "fulfilled" ? categoriesRes.value : [],
       ratingsMap,
-      heroEyebrow: s?.heroEyebrow ?? "Raça tradicional brasileira",
-      heroTitle: s?.heroTitle ?? 'Conheça a importância da raça <span style="color:var(--color-accent-warm)">GSB</span>',
-      heroSubtitle: s?.heroSubtitle ?? "Ovos férteis, galinhas e reprodutores da linhagem Sertanejo Balão — criados com dedicação, procedência conhecida e suporte ao criador.",
-      badgeImage: s?.badgeImage ?? "/badge.png",
     };
   },
   head: ({ loaderData }) => {
-    const firstSlide = loaderData?.heroSlides?.[0]?.image;
-    // JSON-LD da marca e do site: ajuda o Google a mostrar nome/logo corretos.
-    const jsonLd = [
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "Galinha GSB",
-        url: SITE_URL,
-        logo: DEFAULT_OG_IMAGE,
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "Galinha GSB",
-        url: SITE_URL,
-        inLanguage: "pt-BR",
-      },
-    ];
+    const galo = loaderData?.posts.find((p) => p.slug.includes("galo"))?.images[0];
     return {
-      links: firstSlide ? [{ rel: "preload", href: firstSlide, as: "image" }] : [],
-      scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
+      links: galo ? [{ rel: "preload", href: galo, as: "image" }] : [],
+      // JSON-LD da marca e do site: ajuda o Google a mostrar nome/logo corretos.
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify([
+            { "@context": "https://schema.org", "@type": "Organization", name: "Galinha GSB", url: SITE_URL, logo: DEFAULT_OG_IMAGE },
+            { "@context": "https://schema.org", "@type": "WebSite", name: "Galinha GSB", url: SITE_URL, inLanguage: "pt-BR" },
+          ]),
+        },
+      ],
     };
   },
   component: Home,
 });
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("pt-BR");
-}
+/* ------------------------------------------------------------------ */
+/* Conteúdo fixo                                                       */
+/* ------------------------------------------------------------------ */
 
-function getCategoryLabel(categories: Array<{ id: string; label: string }>, id: string) {
-  return categories.find((c) => c.id === id)?.label ?? id;
-}
+const DIFERENCIAIS = [
+  { icon: ShieldCheck, title: "Procedência conhecida", text: "Aves do plantel próprio, com seleção acompanhada ano a ano." },
+  { icon: HeartHandshake, title: "Suporte ao criador", text: "Orientação sobre manejo, nutrição e saúde das aves." },
+  { icon: Truck, title: "Entrega cuidadosa", text: "Embalagem apropriada para ovos e transporte cuidadoso de aves." },
+];
 
-type Post = { id: string; slug: string; title: string; images: string[]; price?: number | null; category: string; status: string; inStock?: boolean };
-type BlogPost = { id: string; slug: string; title: string; coverImage: string; createdAt: string; likeCount: number; author?: { name: string; avatar: string | null } | null };
+/** Atalhos de tema do blog → capítulo do Guia correspondente. */
+const TEMAS = [
+  { label: "Alimentação", to: "/guia/alimentacao" },
+  { label: "Reprodução", to: "/guia/reproducao" },
+  { label: "Pintinhos", to: "/guia/pintinhos" },
+  { label: "Saúde e vacinas", to: "/guia/sanidade" },
+  { label: "Seleção", to: "/guia/selecao" },
+];
 
-function AnuncioCard({ p, categories, rating, slider }: { p: Post; categories: Array<{ id: string; label: string }>; rating?: { average: number; count: number }; slider?: boolean }) {
-  const cls = slider ? "relative w-36 shrink-0 snap-start md:w-44" : "relative";
-  return (
-    <div className={cls}>
-      <Link
-        to="/catalogo/$slug"
-        params={{ slug: p.slug }}
-        className="group relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
-      >
-        {(p.status === "SOLD" || !p.inStock) && (
-          <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-xl">
-            <div className="absolute right-[-52px] top-[35px] w-[228px] rotate-45 bg-[#1a5c2a] py-[7px] text-center text-[15px] font-bold uppercase tracking-widest text-white shadow-md">
-              Esgotado
-            </div>
-          </div>
-        )}
-        <div className="relative aspect-square overflow-hidden">
-          <img src={p.images[0]} alt={p.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition group-hover:scale-105" />
-        </div>
-        <div className="flex flex-col p-2 text-left">
-          <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-primary">{getCategoryLabel(categories, p.category)}</div>
-          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug" dangerouslySetInnerHTML={{ __html: p.title }} />
-          {rating && rating.count > 0 && (
-            <div className="mt-0.5">
-              <StarsDisplay average={rating.average} count={rating.count} size="sm" />
-            </div>
-          )}
-          {(p.status === "SOLD" || !p.inStock)
-            ? p.price
-              ? <div className="mt-1 flex items-baseline gap-1.5">
-                  <span className="text-xs font-semibold text-muted-foreground line-through decoration-destructive decoration-2">{formatBRL(p.price)}</span>
-                  <span className="rounded px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-destructive bg-destructive/10">Esgotado</span>
-                </div>
-              : <div className="mt-1 text-xs font-semibold text-muted-foreground">Indisponível</div>
-            : p.price && <div className="mt-1 text-xs font-semibold text-foreground">{formatBRL(p.price)}</div>
-          }
-        </div>
-      </Link>
-    </div>
-  );
-}
+const eyebrow = "text-[11px] font-semibold uppercase tracking-[0.16em]";
 
-function BlogCard({ p, hydrated, slider }: { p: BlogPost; hydrated: boolean; slider?: boolean }) {
-  const cls = slider ? "relative w-36 shrink-0 snap-start md:w-44" : "relative";
-  return (
-    <div className={cls}>
-      <Link
-        to="/blog/$slug"
-        params={{ slug: p.slug }}
-        className="group relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)]"
-      >
-        <div className="relative aspect-square overflow-hidden bg-muted">
-          {p.coverImage && (
-            <img src={p.coverImage} alt={p.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition group-hover:scale-105" />
-          )}
-        </div>
-        <div className="flex flex-col p-2 text-left">
-          <div className="line-clamp-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{hydrated ? formatDate(p.createdAt) : ""}</div>
-          <h3 className="mt-0.5 line-clamp-2 font-display text-xs leading-snug" dangerouslySetInnerHTML={{ __html: p.title }} />
-          <div className="mt-1 flex items-center justify-between">
-            {p.author ? (
-              <div className="flex min-w-0 items-center gap-1">
-                {p.author.avatar ? (
-                  <img src={p.author.avatar} alt={p.author.name} className="h-3.5 w-3.5 shrink-0 rounded-full object-cover" />
-                ) : (
-                  <UserCircle2 className="h-3 w-3 shrink-0 text-muted-foreground" />
-                )}
-                <span className="truncate text-[10px] text-muted-foreground">{p.author.name}</span>
-              </div>
-            ) : (
-              <span className="text-[10px] font-semibold text-primary">Ler →</span>
-            )}
-            <BlogLikeButton postId={p.id} initialCount={p.likeCount} />
-          </div>
-        </div>
-      </Link>
-    </div>
-  );
-}
-
-/** Slider horizontal com setas e arrastar com mouse */
-function DragScroller({ children, scrollAmount = 320 }: { children: React.ReactNode; scrollAmount?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
-  const isDragging = useRef(false);
-  const moved = useRef(false);
-
-  const scroll = (dir: number) => {
-    ref.current?.scrollBy({ left: dir * scrollAmount, behavior: "smooth" });
-  };
-
-  return (
-    <div className="relative">
-      {/* Seta esquerda */}
-      <button
-        type="button"
-        onClick={() => scroll(-1)}
-        className="absolute -left-3 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border bg-card text-foreground shadow-[var(--shadow-card)] transition hover:bg-muted md:-left-5"
-        aria-label="Anterior"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
-
-      <div
-        ref={ref}
-        className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-0.5 pb-2 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden select-none"
-        style={{ cursor: "grab" }}
-        onMouseDown={(e) => {
-          isDragging.current = true;
-          moved.current = false;
-          startX.current = e.pageX - (ref.current?.offsetLeft ?? 0);
-          scrollLeft.current = ref.current?.scrollLeft ?? 0;
-          if (ref.current) ref.current.style.cursor = "grabbing";
-        }}
-        onMouseMove={(e) => {
-          if (!isDragging.current) return;
-          e.preventDefault();
-          moved.current = true;
-          const x = e.pageX - (ref.current?.offsetLeft ?? 0);
-          if (ref.current) ref.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.2;
-        }}
-        onMouseUp={() => {
-          isDragging.current = false;
-          if (ref.current) ref.current.style.cursor = "grab";
-        }}
-        onMouseLeave={() => {
-          isDragging.current = false;
-          if (ref.current) ref.current.style.cursor = "grab";
-        }}
-        onClickCapture={(e) => {
-          if (moved.current) {
-            e.preventDefault();
-            e.stopPropagation();
-            moved.current = false;
-          }
-        }}
-      >
-        {children}
-      </div>
-
-      {/* Seta direita */}
-      <button
-        type="button"
-        onClick={() => scroll(1)}
-        className="absolute -right-3 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border bg-card text-foreground shadow-[var(--shadow-card)] transition hover:bg-muted md:-right-5"
-        aria-label="Próximo"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </button>
-    </div>
-  );
-}
+/* ------------------------------------------------------------------ */
+/* Página                                                              */
+/* ------------------------------------------------------------------ */
 
 function Home() {
-  const { posts, blog, heroSlides, categories, ratingsMap, heroEyebrow, heroTitle, heroSubtitle, badgeImage } = Route.useLoaderData();
+  const { posts, blog, categories } = Route.useLoaderData();
   const hydrated = useHydrated();
-  const { data: settings } = useSettingsQuery();
-  const destaques = posts.filter((p) => p.status === "PUBLISHED").slice(0, 8);
-  const ultimosPosts = blog.filter((p) => p.published).slice(0, 10); // 2 linhas × 5 colunas
+  const [cat, setCat] = useState<string>("ALL");
+
+  const produtos = posts.filter((p) => p.status === "PUBLISHED");
+  const visiveis = cat === "ALL" ? produtos : produtos.filter((p) => p.category === cat);
+  const galo = produtos.find((p) => p.slug.includes("galo")) ?? produtos[0];
+  const [destaque, ...outros] = blog.filter((p) => p.published).slice(0, 4);
+  const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? "";
+  const dataCurta = (iso: string) =>
+    hydrated ? new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "") : "";
+  const temaDoPost = (slug: string) => TEMA_CURTO[chapterForPost(slug)?.num ?? 0] ?? "Blog";
 
   return (
     <SiteLayout>
-      {/* HERO */}
-      <section className="relative bg-brand-green text-brand-green-foreground">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30 [background-image:radial-gradient(circle_at_20%_20%,var(--color-primary-glow),transparent_40%),radial-gradient(circle_at_80%_60%,var(--color-accent),transparent_45%)]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background/80" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-5 px-4 pb-24 pt-7 md:grid-cols-2 md:gap-8 md:px-8 md:pb-28 md:pt-10">
-          <div>
-            <span className="inline-flex rounded-full bg-primary-glow/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-primary-glow/40 md:text-xs">
-              {settings?.heroEyebrow ?? heroEyebrow}
-            </span>
-            <h1
-              className="mt-3 font-display text-2xl leading-tight md:mt-4 md:text-4xl"
-              dangerouslySetInnerHTML={{
-                __html: settings?.heroTitle ?? heroTitle,
-              }}
-            />
-            <p className="mt-2.5 max-w-xl text-sm opacity-85 md:mt-3 md:text-base">
-              {settings?.heroSubtitle ?? heroSubtitle}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 md:mt-6 md:gap-3">
-              <Link
-                to="/catalogo"
-                className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-[var(--shadow-soft)] transition hover:brightness-105 md:px-6"
-              >
-                Ver catálogo
-              </Link>
-              <Link
-                to="/sobre"
-                className="rounded-full border border-primary-foreground/25 bg-primary-foreground/5 px-5 py-2.5 text-sm font-semibold transition hover:bg-primary-foreground/10 md:px-6"
-              >
-                Sobre a raça
-              </Link>
-            </div>
-          </div>
-          <div className="relative">
-            <HeroCarousel slides={heroSlides} />
-            <div className="absolute bottom-0 -left-4 md:-left-6 w-44 md:w-56 translate-y-1/2 z-10">
-              <img src={settings?.badgeImage ?? badgeImage} alt="Distintivo do plantel" className="h-full w-full object-contain drop-shadow-xl" />
-            </div>
-          </div>
-        </div>
-        <svg
+      {/* ── Topo ─────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
+        <div
           aria-hidden="true"
-          viewBox="0 0 1440 90"
-          preserveAspectRatio="none"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-10 w-full text-background md:h-14"
-        >
-          <path fill="currentColor" d="M0,50 C240,95 480,10 720,38 C960,66 1200,96 1440,52 L1440,90 L0,90 Z" />
-        </svg>
-      </section>
-
-      {/* 3 diferenciais */}
-      <section className="relative mx-auto mt-5 max-w-7xl px-3 md:mt-6 md:px-8">
-        <div className="-mx-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
-          {[
-            { icon: ShieldCheck, title: "Procedência conhecida", desc: "Aves do plantel próprio, com seleção acompanhada ano a ano." },
-            { icon: HeartHandshake, title: "Suporte ao criador", desc: "Orientação sobre manejo, nutrição e saúde das aves." },
-            { icon: Truck, title: "Entrega segura", desc: "Embalagem apropriada para ovos e transporte cuidadoso de aves." },
-          ].map((f) => (
-            <div key={f.title} className="w-[72%] shrink-0 snap-start rounded-2xl bg-card p-3.5 text-left shadow-[var(--shadow-soft)] md:w-auto md:rounded-3xl md:p-5">
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary md:h-11 md:w-11 md:rounded-2xl">
-                <f.icon className="h-4.5 w-4.5 md:h-5 md:w-5" />
-              </div>
-              <h3 className="mt-2.5 line-clamp-1 font-display text-sm font-semibold md:mt-3 md:text-base">{f.title}</h3>
-              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Categorias em destaque */}
-      <section className="mx-auto mt-8 max-w-7xl px-3 md:mt-12 md:px-8">
-        <div className="flex items-end justify-between">
+          className="pointer-events-none absolute inset-0 [background:radial-gradient(60%_70%_at_75%_40%,color-mix(in_oklab,var(--primary-glow)_28%,transparent),transparent_70%)]"
+        />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 pb-14 pt-12 md:grid-cols-[1.1fr_1fr] md:px-8 md:pb-20 md:pt-16">
           <div>
-            <h2 className="font-display text-xl md:text-2xl">Nosso catálogo</h2>
-            <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">Escolha a categoria e conheça as aves disponíveis.</p>
-          </div>
-          <Link to="/catalogo" className="hidden text-sm font-semibold text-primary hover:underline md:inline">Ver todos →</Link>
-        </div>
-        <div className="-mx-3 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-5 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
-          {categories.map((c, i) => {
-            const bg = ["bg-primary text-primary-foreground", "bg-accent text-accent-foreground", "bg-accent-warm text-accent-warm-foreground", "bg-primary-deep text-primary-foreground"][i % 4];
-            const coverUrl = c.images[0]?.url ?? c.image ?? "";
-            return (
-              <Link
-                key={c.id}
-                to="/catalogo"
-                search={{ cat: c.id }}
-                className={`group relative h-[120px] w-[60%] shrink-0 snap-start overflow-hidden rounded-2xl p-3.5 text-left shadow-[var(--shadow-card)] md:h-[150px] md:w-auto md:rounded-3xl md:p-5 ${bg}`}
+            <p className={`${eyebrow} text-accent-warm`}>Raça brasileira de grande porte</p>
+            <h1 className="mt-4 font-display text-[2.6rem] font-semibold leading-[1.04] tracking-tight md:text-6xl">
+              Galinha GSB, a <span className="text-accent-warm">Sertaneja Balão</span>
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-primary-foreground/85">
+              Ovos férteis, pintinhos, galinhas e reprodutores do plantel do {AUTHOR.name}, com orientação de criação, manejo e
+              alimentação para quem está começando ou ampliando o galinheiro.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#plantel"
+                className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-accent-foreground shadow-[var(--shadow-soft)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-warm focus-visible:ring-offset-2 focus-visible:ring-offset-primary-deep"
               >
-                {coverUrl && (
-                  <img src={coverUrl} alt={c.label} className="absolute inset-0 h-full w-full object-cover opacity-25 transition group-hover:scale-105" />
-                )}
-                <div className="relative flex h-full flex-col">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">Categoria</div>
-                  <div className="mt-1 line-clamp-2 font-display text-base md:text-xl">{c.label}</div>
-                  <div className="mt-auto text-xs opacity-90">Explorar →</div>
-                </div>
+                Ver aves disponíveis
+              </a>
+              <Link
+                to="/guia"
+                className="inline-flex min-h-11 items-center rounded-full border border-primary-foreground/35 px-6 py-2.5 text-sm font-semibold transition hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-warm"
+              >
+                Conhecer a raça
               </Link>
-            );
-          })}
-        </div>
-      </section>
+            </div>
+          </div>
 
-      {/* Espaço publicitário */}
-      <section className="mx-auto mt-8 max-w-7xl px-3 empty:hidden md:mt-12 md:px-8">
-        <AdSlot
-          slot="homeBanner"
-          label="Espaço publicitário — formato banner"
-          placeholder={
-            <div className="flex min-h-[80px] items-center justify-center rounded-2xl border-2 border-dashed border-accent/50 bg-accent/5 px-4 py-5 text-center md:min-h-[110px] md:rounded-3xl">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-accent">Espaço publicitário · Banner horizontal</div>
-                <p className="mt-1 text-xs text-muted-foreground">Formato retangular largo disponível para parceiros.</p>
+          {galo && (
+            <div className="relative mx-auto w-full max-w-sm md:max-w-md">
+              {/* Brilho suave e desfocado atrás do galo */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 z-0 aspect-square w-[105%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--primary-glow)_85%,var(--accent-warm))_0%,color-mix(in_oklab,var(--primary-glow)_70%,transparent)_30%,color-mix(in_oklab,var(--primary-glow)_30%,transparent)_52%,transparent_70%)] blur-3xl"
+              />
+              <img
+                src={galo.images[0]}
+                alt={`${plainText(galo.title)}, ave do plantel`}
+                width={1024}
+                height={1024}
+                fetchPriority="high"
+                className="relative z-0 h-auto w-full drop-shadow-[0_24px_40px_rgba(0,0,0,0.35)]"
+              />
+              <div className="absolute bottom-[22%] left-0 z-10 -rotate-6 rounded-2xl bg-accent-warm px-4 py-2.5 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-left-6">
+                <p className="font-display text-lg font-semibold leading-none">até 8 kg</p>
+                <p className="mt-1 text-[11px] leading-none opacity-80">peso de um galo adulto</p>
               </div>
             </div>
-          }
-        />
+          )}
+        </div>
+
       </section>
 
-      {/* Últimos anúncios */}
-      {destaques.length > 0 && (
-        <section className="mx-auto mt-8 max-w-7xl px-6 md:mt-12 md:px-12">
-          <div className="flex items-end justify-between">
-            <h2 className="font-display text-xl md:text-2xl">Últimos anúncios</h2>
-            <Link to="/catalogo" className="text-sm font-semibold text-primary hover:underline">Ver todos →</Link>
+      {/* ── Catálogo ─────────────────────────────────────────── */}
+      {produtos.length > 0 && (
+        <section id="plantel" aria-labelledby="plantel-titulo" className="mx-auto max-w-6xl scroll-mt-24 px-4 pt-14 md:px-8 md:pt-20">
+          <p className={`${eyebrow} text-primary`}>Catálogo</p>
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-xl">
+              <h2 id="plantel-titulo" className="font-display text-3xl leading-tight md:text-4xl">
+                Disponíveis no plantel
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Itens esgotados continuam aqui: peça pelo WhatsApp para ser avisado quando houver reposição.
+              </p>
+            </div>
+            <Link to="/catalogo" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+              Ver catálogo completo
+            </Link>
           </div>
-          <div className="mt-4 md:mt-5">
-            {destaques.length > 4 ? (
-              <DragScroller>
-                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} rating={ratingsMap[p.id]} slider />)}
-              </DragScroller>
-            ) : (
-              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
-                {destaques.map((p) => <AnuncioCard key={p.id} p={p} categories={categories} rating={ratingsMap[p.id]} />)}
-              </div>
-            )}
-          </div>
+
+          {categories.length > 1 && (
+            <div role="group" aria-label="Filtrar por categoria" className="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0">
+              {[{ id: "ALL", label: "Todos" }, ...categories].map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  aria-pressed={cat === c.id}
+                  onClick={() => setCat(c.id)}
+                  className={`min-h-9 shrink-0 rounded-full px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    cat === c.id ? "bg-primary-deep text-primary-foreground" : "border border-border bg-card hover:bg-muted"
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+            {visiveis.map((p) => (
+              <li key={p.id}>
+                <ProductCard p={p} category={catLabel(p.category)} />
+              </li>
+            ))}
+          </ul>
+
+          {/* diferenciais */}
+          <ul className="mt-10 grid border-y border-border md:grid-cols-3">
+            {DIFERENCIAIS.map(({ icon: Icon, title, text }, i) => (
+              <li key={title} className={`flex gap-3 py-5 md:px-6 ${i > 0 ? "border-t border-border md:border-l md:border-t-0" : "md:pl-0"}`}>
+                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                <div>
+                  <h3 className="font-display text-base">{title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
-      {/* Blog */}
-      {ultimosPosts.length > 0 && (
-        <section className="mx-auto mt-8 max-w-7xl px-6 md:mt-12 md:px-12">
-          <div className="flex items-end justify-between">
+      {/* Anúncio (só aparece com slot ativo no AdSense) */}
+      <section className="mx-auto mt-10 max-w-6xl px-4 empty:hidden md:px-8">
+        <AdSlot slot="homeBanner" label="Espaço publicitário — formato banner" placeholder={null} />
+      </section>
+
+      {/* ── Blog ─────────────────────────────────────────────── */}
+      {destaque && (
+        <section aria-labelledby="blog-titulo" className="mx-auto max-w-6xl px-4 pt-14 md:px-8 md:pt-20">
+          <p className={`${eyebrow} text-primary`}>Blog</p>
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="font-display text-xl md:text-2xl">Do nosso blog</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">Dicas de manejo e novidades do plantel.</p>
+              <h2 id="blog-titulo" className="font-display text-3xl leading-tight md:text-4xl">
+                Artigos do criador
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">Manejo, reprodução e saúde, escritos por {AUTHOR.name}, criador da raça.</p>
             </div>
-            <Link to="/blog" className="text-sm font-semibold text-primary hover:underline">Ver todos →</Link>
+            <Link to="/blog" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+              Todos os artigos
+            </Link>
           </div>
-          <div className="mt-4 md:mt-5">
-            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-5">
-              {ultimosPosts.map((p) => <BlogCard key={p.id} p={p} hydrated={hydrated} />)}
+
+          <div className="mt-8 grid gap-8 md:grid-cols-[1.25fr_1fr] md:gap-10">
+            <Link to="/blog/$slug" params={{ slug: destaque.slug }} className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <div className="aspect-[16/9] overflow-hidden rounded-2xl bg-muted">
+                {destaque.coverImage && (
+                  <img src={destaque.coverImage} alt={plainText(destaque.title)} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" />
+                )}
+              </div>
+              <p className={`${eyebrow} mt-4 text-primary`}>
+                {temaDoPost(destaque.slug)}
+                {hydrated && <span className="ml-2 text-muted-foreground">{dataCurta(destaque.createdAt)}</span>}
+              </p>
+              <h3 className="mt-2 font-display text-2xl leading-snug group-hover:text-primary md:text-3xl">{plainText(destaque.title)}</h3>
+              {destaque.excerpt && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{plainText(destaque.excerpt)}</p>}
+            </Link>
+
+            <div>
+              <ul className="divide-y divide-border">
+                {outros.map((p) => (
+                  <li key={p.id}>
+                    <Link to="/blog/$slug" params={{ slug: p.slug }} className="group flex gap-4 py-4 first:pt-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                      {p.coverImage && <img src={p.coverImage} alt="" loading="lazy" decoding="async" className="h-20 w-24 shrink-0 rounded-xl object-cover" />}
+                      <span className="min-w-0">
+                        <span className={`${eyebrow} block text-primary`}>
+                          {temaDoPost(p.slug)}
+                          {hydrated && <span className="ml-2 text-muted-foreground">{dataCurta(p.createdAt)}</span>}
+                        </span>
+                        <span className="mt-1 block font-display text-base leading-snug group-hover:text-primary">{plainText(p.title)}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-5">
+                {TEMAS.map((t) => (
+                  <Link
+                    key={t.to}
+                    to={t.to as "/"}
+                    className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold transition hover:bg-primary/10 hover:text-primary"
+                  >
+                    {t.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      <section className="mx-auto mt-8 max-w-7xl px-3 empty:hidden md:mt-12 md:px-8">
-        <AdSlot
-          slot="homeRectangle"
-          label="Espaço publicitário"
-          placeholder={
-            <div className="grid min-h-[100px] place-items-center rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-6 text-center md:min-h-[140px] md:rounded-3xl">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/70">Espaço publicitário</div>
-                <p className="mt-1.5 text-xs text-muted-foreground md:text-sm">Anuncie aqui — fale conosco para reservar este espaço.</p>
-              </div>
-            </div>
-          }
-        />
-      </section>
+      {/* ── Do ovo à galinha adulta (fases ligadas ao Guia) ──── */}
+      <CicloCriacao className="mx-auto max-w-6xl px-4 pt-14 md:px-8 md:pt-20" />
 
-      {/* Por que escolher a GSB */}
-      <section className="mx-auto mt-8 max-w-7xl px-3 pb-10 md:mt-12 md:px-8 md:pb-14">
-        <h2 className="font-display text-xl md:text-2xl">Por que escolher a Galinha GSB</h2>
-        <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:grid-cols-5 md:gap-5">
-          {[
-            { icon: Feather, label: "Linhagem tradicional" },
-            { icon: Egg, label: "Ovos de matrizes selecionadas" },
-            { icon: Award, label: "Aves selecionadas" },
-            { icon: Sprout, label: "Manejo natural" },
-            { icon: HeartHandshake, label: "Atendimento próximo" },
-          ].map((s) => (
-            <div key={s.label} className="flex flex-col items-center text-center">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary md:h-14 md:w-14 md:rounded-2xl">
-                <s.icon className="h-5 w-5 md:h-6 md:w-6" />
-              </div>
-              <div className="mt-2 text-[11px] font-medium md:text-sm">{s.label}</div>
-            </div>
-          ))}
-        </div>
+      {/* ── Chamada final ───────────────────────────────────── */}
+      <CtaBand message="Olá! Vim pelo site e gostaria de reservar ovos ou pintinhos." />
+
+      <section className="mx-auto max-w-6xl px-4 pb-12 empty:hidden md:px-8">
+        <AdSlot slot="homeRectangle" label="Espaço publicitário" placeholder={null} />
       </section>
     </SiteLayout>
   );

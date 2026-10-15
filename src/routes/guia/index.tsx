@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Download, ChevronRight } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
+import { PageHero, btn } from "@/components/site/page-kit";
+import { CicloCriacao } from "@/components/site/ciclo-criacao";
 import { GUIA_CHAPTERS, GUIA_FAQ_POST, chapterByPath } from "@/lib/guia-map";
 import { AUTHOR } from "@/lib/author";
 
@@ -39,41 +41,22 @@ function GuiaIndexPage() {
   return (
     <SiteLayout>
       {/* Hero */}
-      <section className="bg-primary-deep text-primary-foreground">
-        <div className="mx-auto max-w-4xl px-4 py-12 md:px-8 md:py-16">
-          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest opacity-70">
-            <BookOpen className="h-4 w-4" />
-            Material educativo — Portal Galinha GSB · 2026
-          </div>
-          <h1 className="font-display text-3xl leading-tight md:text-4xl lg:text-5xl">
-            Guia da Galinha GSB: criação, manejo e características da Sertaneja Balão
-          </h1>
-          <p className="mt-4 max-w-2xl text-base opacity-85 md:text-lg">
-            Um material completo produzido pelo Portal Galinha GSB com tudo o que você precisa saber sobre a Galinha Sertaneja Balão — da origem histórica à seleção de reprodutores.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <a
-              href={PDF_URL}
-              download="guia-completo-galinha-gsb-sertaneja-balao.pdf"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary shadow transition hover:bg-white/90"
-            >
-              <Download className="h-4 w-4" />
-              Baixar Guia em PDF — Gratuito
-            </a>
-            <a
-              href={PDF_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-sm font-semibold opacity-80 transition hover:opacity-100"
-            >
-              Ler no navegador
-            </a>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Guia da GSB"
+        title="Guia da Galinha Sertaneja Balão"
+        intro="Criação, manejo e características da raça em 8 temas — da origem histórica à seleção de reprodutores, escritos por quem cria a GSB."
+      >
+        <a href={PDF_URL} download="guia-completo-galinha-gsb-sertaneja-balao.pdf" className={`${btn.accent} gap-2 focus-visible:ring-accent-warm`}>
+          <Download className="h-4 w-4" />
+          Baixar o guia em PDF
+        </a>
+        <a href={PDF_URL} target="_blank" rel="noopener noreferrer" className={btn.outlineOnDark}>
+          Ler no navegador
+        </a>
+      </PageHero>
 
       {/* Introdução */}
-      <section className="mx-auto max-w-4xl px-4 py-10 md:px-8 md:py-14">
+      <section className="mx-auto max-w-6xl px-4 py-10 md:px-8 md:py-14">
         <div className="prose prose-neutral dark:prose-invert max-w-none">
           <h2 className="font-display text-2xl">O que você vai encontrar neste guia</h2>
           <p>
@@ -86,9 +69,12 @@ function GuiaIndexPage() {
         </div>
       </section>
 
+      {/* Do ovo à galinha adulta — fases da criação ligadas aos capítulos */}
+      <CicloCriacao className="mx-auto max-w-6xl px-4 pb-4 md:px-8" />
+
       {/* Cards de temas */}
       <section className="border-t border-border">
-        <div className="mx-auto max-w-4xl px-4 py-10 md:px-8 md:py-14">
+        <div className="mx-auto max-w-6xl px-4 py-10 md:px-8 md:py-14">
           <h2 className="font-display text-2xl md:text-3xl">Temas do guia</h2>
           <p className="mt-2 text-muted-foreground">Selecione um tema para ler o conteúdo completo.</p>
 
@@ -97,7 +83,7 @@ function GuiaIndexPage() {
               <Link
                 key={t.slug}
                 to={t.to as any}
-                className="group flex items-start gap-4 rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-card)] hover:ring-1 hover:ring-primary/20"
+                className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition hover:border-primary/30 hover:bg-muted/40"
               >
                 <div className="flex-1">
                   <div className="text-xs font-semibold uppercase tracking-wider text-primary">{t.tag}</div>
@@ -121,7 +107,7 @@ function GuiaIndexPage() {
 
       {/* Hub: cada capítulo do Guia e os posts do blog que o aprofundam */}
       <section className="border-t border-border">
-        <div className="mx-auto max-w-4xl px-4 py-10 md:px-8 md:py-14">
+        <div className="mx-auto max-w-6xl px-4 py-10 md:px-8 md:py-14">
           <h2 className="font-display text-2xl md:text-3xl">Artigos do blog por capítulo</h2>
           <p className="mt-2 text-muted-foreground">
             Cada capítulo do guia resume um tema. Os artigos do blog aprofundam esses mesmos temas com exemplos práticos e respostas a dúvidas específicas.
@@ -155,7 +141,7 @@ function GuiaIndexPage() {
 
       {/* CTA final */}
       <section className="bg-muted/50 border-t border-border">
-        <div className="mx-auto max-w-4xl px-4 py-12 text-center md:px-8 md:py-14">
+        <div className="mx-auto max-w-6xl px-4 py-12 text-center md:px-8 md:py-14">
           <h2 className="font-display text-2xl">Prefere ler tudo de uma vez?</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
             O guia completo tem 20 páginas com tabelas, checklists, glossário e todos os 15 capítulos. Disponível em PDF gratuito.

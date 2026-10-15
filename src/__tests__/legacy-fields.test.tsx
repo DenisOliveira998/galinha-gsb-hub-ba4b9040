@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { render } from "@testing-library/react";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -49,22 +48,6 @@ describe("campos legados removidos (heroImage)", () => {
     // Campos válidos do usuário sobrevivem e os novos ganham default.
     expect(settings.whatsapp).toBe("(11) 90000-0000");
     expect(settings.brandColor).toMatch(/^#/);
-  });
-
-  it("BrandTheme não quebra o render quando as configurações estão incompletas", async () => {
-    vi.resetModules();
-    const { useStore } = await import("@/lib/mock-store");
-    useStore.setState({ settings: {} as never });
-    const { BrandTheme } = await import("@/components/site/brand-theme");
-
-    expect(() =>
-      render(
-        <div>
-          <BrandTheme />
-          <span>conteúdo do site</span>
-        </div>,
-      ),
-    ).not.toThrow();
   });
 });
 
