@@ -29,7 +29,7 @@ export function CookieBanner() {
   };
 
   return (
-    <div className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-3xl rounded-2xl bg-card p-4 shadow-[var(--shadow-card)] ring-1 ring-border">
+    <div className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-3xl rounded-2xl bg-card p-4 text-card-foreground shadow-[var(--shadow-card)] ring-1 ring-border">
       <div className="flex flex-wrap items-center gap-3 text-left">
         <Cookie className="h-5 w-5 shrink-0 text-primary" />
         <p className="min-w-[14rem] flex-1 text-xs text-muted-foreground md:text-sm">
@@ -39,8 +39,8 @@ export function CookieBanner() {
           <Link to="/privacidade" className="font-semibold text-primary hover:underline">Política de Privacidade</Link>.
         </p>
         <div className="flex gap-2">
-          <Link to="/cookies" className="rounded-full border px-4 py-2 text-xs font-semibold hover:bg-muted">Saiba mais</Link>
-          <button type="button" onClick={() => choose(false)} className="rounded-full border px-4 py-2 text-xs font-semibold hover:bg-muted">
+          <Link to="/cookies" className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted">Saiba mais</Link>
+          <button type="button" onClick={() => choose(false)} className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted">
             Recusar
           </button>
           <button type="button" onClick={() => choose(true)} className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground">

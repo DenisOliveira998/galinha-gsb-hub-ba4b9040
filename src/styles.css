@@ -128,8 +128,9 @@
   --card-foreground: oklch(0.94 0.015 115);
   --popover: oklch(0.245 0.035 157);
   --popover-foreground: oklch(0.94 0.015 115);
-  --primary: oklch(0.72 0.08 148);
-  --primary-foreground: oklch(0.953 0.015 119.1);
+  /* 0.6: legível como link no fundo escuro e com texto claro em botão */
+  --primary: oklch(0.6 0.09 150);
+  --primary-foreground: oklch(0.97 0.012 119);
   --primary-glow: oklch(0.56 0.08 142);
   --primary-deep: oklch(0.28 0.05 157);
   --secondary: oklch(0.28 0.035 157);
@@ -144,11 +145,11 @@
   --destructive-foreground: oklch(0.98 0.01 110);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.72 0.08 148);
+  --ring: oklch(0.6 0.09 150);
   --shadow-soft: 0 4px 20px -6px oklch(0 0 0 / 0.5);
   --shadow-card: 0 10px 30px -12px oklch(0 0 0 / 0.6);
   --chart-1: oklch(0.763 0.139 77);
-  --chart-2: oklch(0.72 0.08 148);
+  --chart-2: oklch(0.6 0.09 150);
   --chart-3: oklch(0.56 0.08 142);
   --chart-4: oklch(0.816 0.125 81.2);
   --chart-5: oklch(0.62 0.2 27);
@@ -212,4 +213,34 @@
 .prose img {
   border-radius: .75rem;
   max-width: 100%;
+}
+
+/* Anúncio sem preenchimento (site ainda não aprovado ou sem anúncio para a
+   página): esconde o espaço inteiro em vez de deixar um buraco vazio. */
+ins.adsbygoogle[data-ad-status="unfilled"],
+[role="complementary"]:has(> ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none !important;
+}
+
+/* Texto dos artigos (plugin typography) usa as cores do tema do site, então
+   acompanha claro/escuro sozinho — antes os subtítulos dos posts saíam
+   quase pretos no modo escuro. "html .prose" vence .prose-invert/.prose-neutral. */
+html .prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--muted-foreground);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-kbd: var(--foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--muted);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
 }

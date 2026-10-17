@@ -78,10 +78,10 @@ function Blog() {
         {!destaque ? (
           <p className="mt-10 rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">Nenhum artigo publicado ainda.</p>
         ) : (
-          <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_220px]">
+          <div className="mt-8">
             <div>
               <Link to="/blog/$slug" params={{ slug: destaque.slug }} className="group grid gap-6 md:grid-cols-[1.3fr_1fr] md:items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                <div className="aspect-[16/10] overflow-hidden rounded-2xl bg-muted">
+                <div className="aspect-video overflow-hidden rounded-2xl bg-muted">
                   {destaque.coverImage && (
                     <img src={destaque.coverImage} alt={plainText(destaque.title)} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" />
                   )}
@@ -93,12 +93,14 @@ function Blog() {
                 </div>
               </Link>
 
+              <AdSlot slot="blog" label="Espaço publicitário" className="mt-12" placeholder={null} />
+
               {resto.length > 0 && (
                 <ul className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
                   {resto.map((p) => (
                     <li key={p.id}>
                       <Link to="/blog/$slug" params={{ slug: p.slug }} className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                        <div className="aspect-[16/10] overflow-hidden rounded-2xl bg-muted">
+                        <div className="aspect-video overflow-hidden rounded-2xl bg-muted">
                           {p.coverImage && (
                             <img src={p.coverImage} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                           )}
@@ -129,17 +131,6 @@ function Blog() {
               )}
             </div>
 
-            <aside className="hidden lg:block">
-              <AdSlot
-                slot="blog"
-                label="Espaço publicitário — formato vertical"
-                className="sticky top-24"
-                format="vertical"
-                fullWidthResponsive={false}
-                style={{ minHeight: 600 }}
-                placeholder={null}
-              />
-            </aside>
           </div>
         )}
       </section>

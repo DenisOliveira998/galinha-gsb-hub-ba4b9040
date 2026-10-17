@@ -101,7 +101,7 @@ function Home() {
   const produtos = posts.filter((p) => p.status === "PUBLISHED");
   const visiveis = cat === "ALL" ? produtos : produtos.filter((p) => p.category === cat);
   const galo = produtos.find((p) => p.slug.includes("galo")) ?? produtos[0];
-  const [destaque, ...outros] = blog.filter((p) => p.published).slice(0, 4);
+  const [destaque, ...outros] = blog.filter((p) => p.published).slice(0, 5);
   const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? "";
   const dataCurta = (iso: string) =>
     hydrated ? new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "") : "";
@@ -266,7 +266,7 @@ function Home() {
                 {outros.map((p) => (
                   <li key={p.id}>
                     <Link to="/blog/$slug" params={{ slug: p.slug }} className="group flex gap-4 py-4 first:pt-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                      {p.coverImage && <img src={p.coverImage} alt="" loading="lazy" decoding="async" className="h-20 w-24 shrink-0 rounded-xl object-cover" />}
+                      {p.coverImage && <img src={p.coverImage} alt="" loading="lazy" decoding="async" className="aspect-video w-28 shrink-0 self-start rounded-xl bg-muted object-cover" />}
                       <span className="min-w-0">
                         <span className={`${eyebrow} block text-primary`}>
                           {temaDoPost(p.slug)}
