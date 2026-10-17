@@ -103,23 +103,23 @@ function BlogDetail() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 [background:radial-gradient(55%_80%_at_85%_20%,color-mix(in_oklab,var(--primary-glow)_24%,transparent),transparent_70%)]"
         />
-        <div className={`relative ${CONTAINER} pb-24 pt-8 md:pb-32 md:pt-12`}>
+        <div className={`relative ${CONTAINER} pb-14 pt-6 md:pb-16 md:pt-8`}>
           <Link to="/blog" className="text-sm text-primary-foreground/75 hover:text-primary-foreground">
             ← Blog
           </Link>
-          <div className="mt-6 max-w-3xl">
+          <div className="mt-4 max-w-3xl">
             <p className={`${EYEBROW} text-accent-warm`}>
               {tema}
               <span className="ml-2 text-primary-foreground/60">{formatDate(post.createdAt)}</span>
             </p>
-            <h1 className="mt-3 font-display text-3xl font-semibold leading-[1.1] tracking-tight md:text-5xl">{plainText(post.title)}</h1>
-            {post.excerpt && <p className="mt-4 text-base leading-relaxed text-primary-foreground/85 md:text-lg">{plainText(post.excerpt)}</p>}
+            <h1 className="mt-2 font-display text-2xl font-semibold leading-[1.15] tracking-tight md:text-4xl">{plainText(post.title)}</h1>
+            {post.excerpt && <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-primary-foreground/85 md:text-base">{plainText(post.excerpt)}</p>}
             {/* Autor — sempre visível e ligado à página de autor (sinal de E-E-A-T) */}
-            <Link to={AUTHOR.path as any} className="mt-6 inline-flex items-center gap-3 rounded-full pr-4 transition hover:bg-primary-foreground/10">
+            <Link to={AUTHOR.path as any} className="mt-4 inline-flex items-center gap-2.5 rounded-full pr-4 transition hover:bg-primary-foreground/10">
               {post.author?.avatar ? (
-                <img src={post.author.avatar} alt={post.author.name} className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-primary-foreground/20" />
+                <img src={post.author.avatar} alt={post.author.name} className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-primary-foreground/20" />
               ) : (
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary-foreground/10">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-foreground/10">
                   <UserCircle2 className="h-5 w-5" />
                 </span>
               )}
@@ -133,7 +133,7 @@ function BlogDetail() {
       </section>
 
       <div className="mx-auto grid max-w-6xl gap-8 px-4 pb-6 text-left md:px-8 lg:grid-cols-[minmax(0,1fr)_240px]">
-        <article className="-mt-16 min-w-0 text-left md:-mt-24">
+        <article className="relative z-10 -mt-8 min-w-0 text-left md:-mt-10">
           {post.coverImage ? (
             <div className="aspect-video overflow-hidden rounded-2xl bg-muted shadow-[var(--shadow-card)] md:rounded-3xl">
               <img src={post.coverImage} alt={plainText(post.title)} className="h-full w-full object-contain" />
