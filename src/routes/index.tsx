@@ -122,8 +122,8 @@ function Home() {
               Galinha GSB, a <span className="text-accent-warm">Sertaneja Balão</span>
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-primary-foreground/85">
-              Ovos férteis, pintinhos, galinhas e reprodutores do plantel do {AUTHOR.name}, com orientação de criação, manejo e
-              alimentação para quem está começando ou ampliando o galinheiro.
+              Portal Galinha GSB, especializado na Galinha Sertaneja Balão. Encontre notícias, conteúdos sobre criação e
+              manejo, além de ovos férteis, pintinhos, galinhas e reprodutores GSB.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
