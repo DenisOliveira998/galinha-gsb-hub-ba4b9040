@@ -136,7 +136,7 @@ function BlogDetail() {
         <article className="-mt-16 min-w-0 text-left md:-mt-24">
           {post.coverImage ? (
             <div className="aspect-video overflow-hidden rounded-2xl bg-muted shadow-[var(--shadow-card)] md:rounded-3xl">
-              <img src={post.coverImage} alt={plainText(post.title)} className="h-full w-full object-cover" />
+              <img src={post.coverImage} alt={plainText(post.title)} className="h-full w-full object-contain" />
             </div>
           ) : (
             <div className="aspect-video overflow-hidden rounded-2xl bg-muted md:rounded-3xl" />
@@ -169,7 +169,9 @@ function BlogDetail() {
                 b.type === "text" ? (
                   <div key={b.id} className="prose prose-sm max-w-none text-left text-foreground/90 md:text-base" dangerouslySetInnerHTML={{ __html: linkKnownTitles(stripHeadingEmojis(demoteH1(b.text)), titles) }} />
                 ) : b.image ? (
-                  <img key={b.id} src={b.image} alt="" loading="lazy" className="aspect-[16/9] w-full rounded-2xl object-cover" />
+                  <div key={b.id} className="overflow-hidden rounded-2xl bg-muted">
+                    <img src={b.image} alt="" loading="lazy" className="mx-auto block h-auto max-h-[80vh] w-auto max-w-full object-contain" />
+                  </div>
                 ) : null,
               )}
             </div>
@@ -178,7 +180,9 @@ function BlogDetail() {
           {(post.images ?? []).length > 0 && (
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {(post.images ?? []).map((img, i) => (
-                <img key={i} src={img} alt={`${plainText(post.title)} — imagem ${i + 1}`} loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover" />
+                <div key={i} className="aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
+                  <img src={img} alt={`${plainText(post.title)} — imagem ${i + 1}`} loading="lazy" className="h-full w-full object-contain" />
+                </div>
               ))}
             </div>
           )}

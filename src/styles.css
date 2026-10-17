@@ -213,6 +213,7 @@
 .prose img {
   border-radius: .75rem;
   max-width: 100%;
+  height: auto;
 }
 
 /* Anúncio sem preenchimento (site ainda não aprovado ou sem anúncio para a
