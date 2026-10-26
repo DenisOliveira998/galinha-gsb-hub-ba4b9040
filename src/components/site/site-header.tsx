@@ -7,6 +7,16 @@ import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { SearchBox } from "./search-box";
 
+/** Ordem do menu do topo (computador). */
+const NAV_LINKS = [
+  { to: "/", label: "Início" },
+  { to: "/catalogo", label: "Catálogo" },
+  { to: "/sobre", label: "Sobre" },
+  { to: "/blog", label: "Blog" },
+  { to: "/guia", label: "Guia da GSB" },
+  { to: "/contato", label: "Contato" },
+];
+
 const MOBILE_LINKS = [
   { to: "/", label: "Início" },
   { to: "/catalogo", label: "Catálogo" },
@@ -25,6 +35,16 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = useRouterState({ select: (st) => st.location.pathname });
   useEffect(() => setMenuOpen(false), [pathname]);
+  // Na home o cabeçalho fica transparente por cima da foto do hero (como na
+  // landing) e ganha o fundo verde ao rolar a página ou abrir o menu.
+  const [rolou, setRolou] = useState(false);
+  useEffect(() => {
+    const f = () => setRolou(window.scrollY > 40);
+    f();
+    window.addEventListener("scroll", f, { passive: true });
+    return () => window.removeEventListener("scroll", f);
+  }, []);
+  const transparente = pathname === "/" && !rolou && !menuOpen;
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
@@ -34,7 +54,11 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-brand-green text-brand-green-foreground shadow-[var(--shadow-soft)]">
+      <header
+        className={`sticky top-0 z-40 text-brand-green-foreground transition-[background-color,box-shadow] duration-300 ${
+          transparente ? "bg-transparent" : "bg-brand-green shadow-[var(--shadow-soft)]"
+        }`}
+      >
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4 md:px-8">
           <Link to="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Galinha GSB" className="h-12 w-12 object-contain drop-shadow" />
@@ -46,13 +70,20 @@ export function SiteHeader() {
 
           <SearchBox />
 
-          <nav className="hidden items-center gap-5 text-sm lg:flex">
-            <Link to="/" className="opacity-80 hover:opacity-100" activeOptions={{ exact: true }} activeProps={{ className: "opacity-100 font-semibold" }}>Início</Link>
-            <Link to="/catalogo" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Catálogo</Link>
-            <Link to="/sobre" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Sobre</Link>
-            <Link to="/blog" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Blog</Link>
-            <Link to="/guia" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Guia da GSB</Link>
-            <Link to="/contato" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Contato</Link>
+          <nav
+            aria-label="Seções do site"
+            className="hidden items-center gap-0.5 rounded-full bg-primary-foreground/10 p-1 text-sm ring-1 ring-inset ring-primary-foreground/20 lg:flex"
+          >
+            {NAV_LINKS.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to as any}
+                activeOptions={{ exact: l.to === "/" }}
+                className="whitespace-nowrap rounded-full px-3 py-2 font-semibold transition-colors hover:bg-primary-foreground/15 data-[status=active]:bg-accent data-[status=active]:text-accent-foreground xl:px-4"
+              >
+                {l.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="ml-auto flex items-center gap-1">

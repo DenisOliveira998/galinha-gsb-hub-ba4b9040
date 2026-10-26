@@ -70,7 +70,7 @@ export function SearchBox() {
   const empty = term && !catMatches.length && !postMatches.length && !popular.length;
 
   return (
-    <div ref={boxRef} className="relative ml-2 flex-1 max-w-md">
+    <div ref={boxRef} className="relative ml-2 flex-1 max-w-md lg:max-xl:hidden">
       <form
         role="search"
         onSubmit={(e) => {

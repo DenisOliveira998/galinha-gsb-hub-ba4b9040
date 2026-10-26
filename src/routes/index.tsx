@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { HeartHandshake, ShieldCheck, Truck } from "lucide-react";
 import { SiteLayout } from "@/components/site/site-layout";
 import { AdSlot } from "@/components/site/ad-slot";
 import { CicloCriacao } from "@/components/site/ciclo-criacao";
+import { Contador } from "@/components/site/contador";
+import { HeroPenas } from "@/components/site/hero-penas";
 import { CtaBand, ProductCard } from "@/components/site/page-kit";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { listPosts } from "@/lib/posts";
@@ -14,8 +16,8 @@ import { SITE_URL, DEFAULT_OG_IMAGE, plainText } from "@/lib/seo";
 import { AUTHOR } from "@/lib/author";
 import { TEMA_CURTO, chapterForPost } from "@/lib/guia-map";
 
-// Home (redesenho de out/2026, aplicado a pedido do usuário): topo com o galo
-// do plantel, catálogo com filtros e ação por WhatsApp, diferenciais, blog,
+// Home (redesenho de out/2026, aplicado a pedido do usuário): hero dinâmico
+// vindo da landing (foto do plantel, penas e números), catálogo com filtros e ação por WhatsApp, diferenciais, blog,
 // "Do ovo à galinha adulta" (fases ligadas ao Guia) e chamada final.
 // Regras mantidas: dados reais do banco, cores da marca e nenhuma promessa
 // que o site não cumpra — "Reservar"/"Avise-me" abrem o WhatsApp com a
@@ -49,10 +51,10 @@ export const Route = createFileRoute("/")({
       ratingsMap,
     };
   },
-  head: ({ loaderData }) => {
-    const galo = loaderData?.posts.find((p) => p.slug.includes("galo"))?.images[0];
+  head: () => {
     return {
-      links: galo ? [{ rel: "preload", href: galo, as: "image" }] : [],
+      // Foto do hero (maior elemento da primeira tela): baixa antes do CSS.
+      links: [{ rel: "preload", href: "/img/hero-plantel.webp", as: "image", fetchPriority: "high" }],
       // JSON-LD da marca e do site: ajuda o Google a mostrar nome/logo corretos.
       scripts: [
         {
@@ -89,6 +91,34 @@ const TEMAS = [
 
 const eyebrow = "text-[11px] font-semibold uppercase tracking-[0.16em]";
 
+/** Números do hero — os mesmos já publicados no site (blog de postura, Sobre e Guia). */
+const NUMEROS: { rotulo: string; valor?: number; antes?: string; depois?: string; fixo?: string }[] = [
+  { rotulo: "peso de um galo adulto", valor: 8, antes: "até ", depois: " kg" },
+  { rotulo: "ovos por fêmea ao ano", fixo: "160–260" },
+  { rotulo: "anos de criação da raça", valor: 10, antes: "+" },
+  { rotulo: "de seleção até o reprodutor", valor: 3, depois: " rodadas" },
+];
+
+/** Título que surge palavra por palavra (desfoque → nítido), só com CSS. */
+function Palavras({ texto, destaque = false, inicio = 0 }: { texto: string; destaque?: boolean; inicio?: number }) {
+  const Tag = destaque ? "em" : "span";
+  return (
+    <>
+      {texto.split(" ").map((p, i) => (
+        <Fragment key={i}>
+          {i > 0 && " "}
+          <Tag
+            className={`palavra${destaque ? " font-medium italic text-accent-warm" : ""}`}
+            style={{ animationDelay: `${(0.25 + (inicio + i) * 0.16) * 2.2}s` }}
+          >
+            {p}
+          </Tag>
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Página                                                              */
 /* ------------------------------------------------------------------ */
@@ -100,7 +130,6 @@ function Home() {
 
   const produtos = posts.filter((p) => p.status === "PUBLISHED");
   const visiveis = cat === "ALL" ? produtos : produtos.filter((p) => p.category === cat);
-  const galo = produtos.find((p) => p.slug.includes("galo")) ?? produtos[0];
   const [destaque, ...outros] = blog.filter((p) => p.published).slice(0, 5);
   const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? "";
   const dataCurta = (iso: string) =>
@@ -109,61 +138,50 @@ function Home() {
 
   return (
     <SiteLayout>
-      {/* ── Topo ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-primary-deep text-primary-foreground">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 [background:radial-gradient(60%_70%_at_75%_40%,color-mix(in_oklab,var(--primary-glow)_28%,transparent),transparent_70%)]"
-        />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 pb-14 pt-12 md:grid-cols-[1.1fr_1fr] md:px-8 md:pb-20 md:pt-16">
-          <div>
-            <p className={`${eyebrow} text-accent-warm`}>Raça brasileira de grande porte</p>
-            <h1 className="mt-4 font-display text-[2.6rem] font-semibold leading-[1.04] tracking-tight md:text-6xl">
-              Galinha GSB, a <span className="text-accent-warm">Sertaneja Balão</span>
-            </h1>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-primary-foreground/85">
-              Portal Galinha GSB, especializado na Galinha Sertaneja Balão. Encontre notícias, conteúdos sobre criação e
-              manejo, além de ovos férteis, pintinhos, galinhas e reprodutores GSB.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#plantel"
-                className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-accent-foreground shadow-[var(--shadow-soft)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-warm focus-visible:ring-offset-2 focus-visible:ring-offset-primary-deep"
-              >
-                Ver aves disponíveis
-              </a>
-              <Link
-                to="/guia"
-                className="inline-flex min-h-11 items-center rounded-full border border-primary-foreground/35 px-6 py-2.5 text-sm font-semibold transition hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-warm"
-              >
-                Conhecer a raça
-              </Link>
-            </div>
+      {/* ── Topo (hero dinâmico da landing, out/2026) ────────────
+          Foto do plantel com zoom lento, penas e poeira de luz caindo,
+          título surgindo palavra por palavra e números que contam.
+          Fica por baixo do cabeçalho transparente (-mt-20 = altura dele). */}
+      <section className="relative isolate -mt-20 grid min-h-[100svh] items-end overflow-hidden bg-[#0e2418] text-white">
+        <div className="hero-gsb-foto" role="img" aria-label="Três aves GSB do plantel no terreiro" />
+        <div className="hero-gsb-veu" aria-hidden="true" />
+        <HeroPenas />
+        <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-12 pt-32 md:gap-7 md:px-8 md:pb-14 md:pt-40">
+          <p className={`${eyebrow} text-accent-warm`}>Raça brasileira de grande porte · Baixa Grande, BA</p>
+          <h1 className="max-w-[13ch] font-display text-[clamp(2.75rem,8.2vw,7rem)] font-semibold leading-[1.02] tracking-[-0.025em]">
+            <Palavras texto="A gigante do sertão," />{" "}
+            <Palavras texto="criada de perto." destaque inicio={4} />
+          </h1>
+          <p className="max-w-2xl text-base leading-relaxed text-white/85 md:text-lg">
+            Portal Galinha GSB, especializado na Galinha Sertaneja Balão. Encontre notícias, conteúdos sobre criação e
+            manejo, além de ovos férteis, pintinhos, galinhas e reprodutores GSB.
+          </p>
+          <div className="flex flex-wrap gap-3.5">
+            <a
+              href="#plantel"
+              className="inline-flex min-h-12 items-center rounded-full bg-accent px-7 py-3 text-sm font-semibold text-accent-foreground shadow-[var(--shadow-soft)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-warm focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e2418] md:text-base"
+            >
+              Ver aves disponíveis
+            </a>
+            <Link
+              to="/guia"
+              className="inline-flex min-h-12 items-center rounded-full border border-white/40 px-7 py-3 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-warm md:text-base"
+            >
+              Conhecer a raça
+            </Link>
           </div>
-
-          {galo && (
-            <div className="relative mx-auto w-full max-w-sm md:max-w-md">
-              {/* Brilho suave e desfocado atrás do galo */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 z-0 aspect-square w-[105%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--primary-glow)_85%,var(--accent-warm))_0%,color-mix(in_oklab,var(--primary-glow)_70%,transparent)_30%,color-mix(in_oklab,var(--primary-glow)_30%,transparent)_52%,transparent_70%)] blur-3xl"
-              />
-              <img
-                src={galo.images[0]}
-                alt={`${plainText(galo.title)}, ave do plantel`}
-                width={1024}
-                height={1024}
-                fetchPriority="high"
-                className="relative z-0 h-auto w-full drop-shadow-[0_24px_40px_rgba(0,0,0,0.35)]"
-              />
-              <div className="absolute bottom-[22%] left-0 z-10 -rotate-6 rounded-2xl bg-accent-warm px-4 py-2.5 text-accent-warm-foreground shadow-[var(--shadow-card)] md:-left-6">
-                <p className="font-display text-lg font-semibold leading-none">até 8 kg</p>
-                <p className="mt-1 text-[11px] leading-none opacity-80">peso de um galo adulto</p>
+          <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-[22px] bg-white/15 ring-1 ring-inset ring-white/20 backdrop-blur-md md:mt-6 md:grid-cols-4">
+            {NUMEROS.map((n) => (
+              <div key={n.rotulo} className="flex flex-col-reverse bg-[rgba(14,36,24,0.35)] px-4 py-4 md:px-6 md:py-5">
+                <dt className="text-[13px] leading-snug text-white/80 md:text-[13.5px]">{n.rotulo}</dt>
+                <dd className="font-display text-[clamp(1.6rem,3.4vw,2.6rem)] leading-[1.1] text-accent-warm">
+                  {n.fixo ?? <Contador valor={n.valor!} antes={n.antes} depois={n.depois} />}
+                </dd>
               </div>
-            </div>
-          )}
+            ))}
+          </dl>
         </div>
-
+        <span className="hero-gsb-rolar" aria-hidden="true">role devagar</span>
       </section>
 
       {/* ── Catálogo ─────────────────────────────────────────── */}
