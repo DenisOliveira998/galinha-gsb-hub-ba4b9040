@@ -245,3 +245,12 @@ html .prose {
   --tw-prose-th-borders: var(--border);
   --tw-prose-td-borders: var(--border);
 }
+
+/* Botão flutuante do WhatsApp sobe enquanto o aviso de cookies está aberto
+   (o aviso ocupa a largura toda em telas estreitas). */
+@media (max-width: 639px) {
+  html[data-cookie="aberto"] .zap-flutuante { bottom: 230px; }
+}
+@media (min-width: 640px) and (max-width: 959px) {
+  html[data-cookie="aberto"] .zap-flutuante { bottom: 130px; }
+}

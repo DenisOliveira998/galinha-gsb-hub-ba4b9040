@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { whatsappHref } from "@/lib/mock-store";
 import { useSettingsQuery, EMPTY_SETTINGS } from "@/lib/hooks/use-settings";
 import { SearchBox } from "./search-box";
+import { BarraSecoes } from "./barra-secoes";
 
 const MOBILE_LINKS = [
   { to: "/", label: "Início" },
@@ -34,6 +35,7 @@ export function SiteHeader() {
 
   return (
     <>
+      <BarraSecoes />
       <header className="sticky top-0 z-40 bg-brand-green text-brand-green-foreground shadow-[var(--shadow-soft)]">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4 md:px-8">
           <Link to="/" className="flex items-center gap-2">
