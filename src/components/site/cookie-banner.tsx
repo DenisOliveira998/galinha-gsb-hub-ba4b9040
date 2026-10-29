@@ -14,17 +14,6 @@ export function CookieBanner() {
     }
   }, []);
 
-  // Marca no <html> que o aviso está aberto: o botão flutuante do WhatsApp
-  // sobe para não cobrir os botões do aviso no celular.
-  useEffect(() => {
-    const r = document.documentElement;
-    if (show) r.dataset.cookie = "aberto";
-    else delete r.dataset.cookie;
-    return () => {
-      delete r.dataset.cookie;
-    };
-  }, [show]);
-
   if (!show) return null;
 
   // Aceitar → data ISO (compatível com o valor antigo); Recusar → "denied".
