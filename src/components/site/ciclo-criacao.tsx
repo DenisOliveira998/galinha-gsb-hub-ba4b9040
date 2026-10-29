@@ -37,9 +37,9 @@ const CICLO = [
   },
 ];
 
-export function CicloCriacao({ className = "" }: { className?: string }) {
+export function CicloCriacao({ className = "", id }: { className?: string; id?: string }) {
   return (
-    <section aria-labelledby="ciclo-titulo" className={className}>
+    <section id={id} aria-labelledby="ciclo-titulo" className={className}>
       <div className="max-w-2xl">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Guia da GSB</p>
         <h2 id="ciclo-titulo" className="mt-2 font-display text-3xl leading-tight md:text-4xl">

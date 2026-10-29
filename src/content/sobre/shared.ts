@@ -76,7 +76,8 @@ export const sharedEditorialCommitments: string[] = [
 export const sharedBreed: SobreContent["breed"] = {
   title: "Nossa dedicação à Galinha Sertaneja Balão",
   paragraphs: [
-    "A Sertaneja Balão faz parte do conjunto de galinhas formadas pela seleção feita por criadores brasileiros ao longo de gerações. O material reunido no Guia da GSB associa sua formação à criação regional no sertão da Bahia — mas, como acontece com muitas raças locais, boa parte dessa história vem de relatos de criadores e ainda tem pouca documentação formal.",
+    "A Sertaneja Balão faz parte do conjunto de galinhas formadas pela seleção feita por criadores brasileiros ao longo de gerações. O Guia da GSB associa sua formação às aves crioulas criadas em Baixa Grande, no sertão da Bahia, onde criadores passaram a escolher, geração após geração, as aves com mais peso, volume, rusticidade e docilidade.",
+    "O resultado é a silhueta que deu nome à raça: peito largo, plumagem solta e uma forma arredondada, como um balão. O apelido nasceu informal entre os criadores do sertão e só depois, com o interesse de fora da região, se firmou como nome da raça. Como acontece com muitas raças locais, boa parte dessa história vem de relatos de criadores e ainda tem pouca documentação formal.",
     "Por isso tratamos a raça com interesse e cuidado: apresentamos o que é descrito por criadores e pela literatura disponível, separamos observação de afirmação técnica e evitamos transformar hipóteses sobre origem, genética ou desempenho em verdades absolutas.",
   ],
   highlights: [

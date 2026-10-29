@@ -13,7 +13,7 @@ const MOBILE_LINKS = [
   { to: "/catalogo", label: "Catálogo" },
   { to: "/blog", label: "Blog" },
   { to: "/guia", label: "Guia da GSB" },
-  { to: "/sobre", label: "Sobre" },
+  { to: "/sobre", label: "Institucional" },
   { to: "/contato", label: "Contato" },
 ];
 
@@ -51,7 +51,7 @@ export function SiteHeader() {
           <nav className="hidden items-center gap-5 text-sm lg:flex">
             <Link to="/" className="opacity-80 hover:opacity-100" activeOptions={{ exact: true }} activeProps={{ className: "opacity-100 font-semibold" }}>Início</Link>
             <Link to="/catalogo" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Catálogo</Link>
-            <Link to="/sobre" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Sobre</Link>
+            <Link to="/sobre" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Institucional</Link>
             <Link to="/blog" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Blog</Link>
             <Link to="/guia" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Guia da GSB</Link>
             <Link to="/contato" className="opacity-80 hover:opacity-100" activeProps={{ className: "opacity-100 font-semibold" }}>Contato</Link>

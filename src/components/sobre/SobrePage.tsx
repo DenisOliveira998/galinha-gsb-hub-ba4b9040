@@ -9,6 +9,8 @@ import { SobreFaq } from "./SobreFaq";
 import { SobreGallery, getGalleryItems } from "./SobreGallery";
 import { SobreHero } from "./SobreHero";
 import { SobreHub } from "./SobreHub";
+import { SobreComoComprar, SobreFatosRaca } from "./SobreInstitucional";
+import { CicloCriacao } from "@/components/site/ciclo-criacao";
 import { SobrePractices } from "./SobrePractices";
 import { SobrePurpose } from "./SobrePurpose";
 import { SobreResponsible } from "./SobreResponsible";
@@ -20,9 +22,12 @@ const sectionNav = [
   { href: "#historia", label: "História" },
   { href: "#quem-somos", label: "Quem somos" },
   { href: "#proposito", label: "Propósito" },
-  { href: "#como-trabalhamos", label: "Como trabalhamos" },
-  { href: "#compromisso-editorial", label: "Editorial" },
   { href: "#a-raca", label: "A raça" },
+  { href: "#raca-em-fatos", label: "A raça em fatos" },
+  { href: "#como-trabalhamos", label: "Como trabalhamos" },
+  { href: "#do-ovo-a-adulta", label: "Do ovo à adulta" },
+  { href: "#como-comprar", label: "Como comprar" },
+  { href: "#compromisso-editorial", label: "Editorial" },
   { href: "#conteudos", label: "Conteúdos" },
   { href: "#galeria", label: "Galeria" },
   { href: "#transparencia", label: "Transparência" },
@@ -108,9 +113,14 @@ export function SobrePage({ content, review }: { content: SobreContent; review: 
         <SobreStory story={content.story} />
         <SobreResponsible responsible={content.responsible} />
         <SobrePurpose purpose={content.purpose} />
-        <SobrePractices practices={content.practices} />
-        <SobreEditorial editorial={content.editorial} />
+        {/* Institucional (out/2026): quem somos → a raça → como cuidamos →
+            como comprar → como escrevemos → onde aprofundar. */}
         <SobreBreed breed={content.breed} logo={content.organization.logo} />
+        <SobreFatosRaca />
+        <SobrePractices practices={content.practices} />
+        <CicloCriacao id="do-ovo-a-adulta" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-16 md:px-8 md:py-24" />
+        <SobreComoComprar />
+        <SobreEditorial editorial={content.editorial} />
         <SobreHub hub={content.hub} />
         <SobreGallery gallery={content.gallery} />
         <SobreTransparency transparency={content.transparency} />

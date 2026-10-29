@@ -28,7 +28,7 @@ export function SobreHero({ hero, logo }: { hero: SobreContent["hero"]; logo: st
               <ChevronRight className="h-3.5 w-3.5" />
             </li>
             <li aria-current="page" className="font-semibold text-primary-foreground">
-              Sobre Nós
+              Institucional
             </li>
           </ol>
         </nav>

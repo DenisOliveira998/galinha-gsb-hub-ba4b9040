@@ -39,7 +39,7 @@ export function SiteFooter() {
         </div>
         <FooterColuna titulo="Institucional">
           <li><Link to="/" className={linkCls}>Início</Link></li>
-          <li><Link to="/sobre" className={linkCls}>Sobre</Link></li>
+          <li><Link to="/sobre" className={linkCls}>Quem somos e a raça</Link></li>
           <li><Link to="/catalogo" className={linkCls}>Catálogo</Link></li>
           <li><Link to="/contato" className={linkCls}>Contato</Link></li>
         </FooterColuna>

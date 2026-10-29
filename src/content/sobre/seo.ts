@@ -49,7 +49,7 @@ export function buildSobreJsonLd(content: SobreContent): Record<string, unknown>
         "@id": `${seo.canonical}#breadcrumb`,
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Início", item: `${SITE_URL}/` },
-          { "@type": "ListItem", position: 2, name: "Sobre Nós", item: seo.canonical },
+          { "@type": "ListItem", position: 2, name: "Institucional", item: seo.canonical },
         ],
       },
     ],

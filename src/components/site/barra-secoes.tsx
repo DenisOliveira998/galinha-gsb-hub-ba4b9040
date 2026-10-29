@@ -18,7 +18,7 @@ export function secaoDoCaminho(pathname: string): Secao {
 }
 
 const ABAS: { id: Secao; to: string; curto: string; longo: string }[] = [
-  { id: "institucional", to: "/", curto: "Institucional", longo: "Institucional" },
+  { id: "institucional", to: "/sobre", curto: "Institucional", longo: "Institucional" },
   { id: "conteudo", to: "/blog", curto: "Blog e Guia", longo: "Blog e Guia" },
   { id: "legal", to: "/privacidade", curto: "LGPD", longo: "LGPD e Privacidade" },
 ];

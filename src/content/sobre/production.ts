@@ -94,9 +94,9 @@ export const productionContent: SobreContent = {
   mode: "production",
 
   seo: {
-    title: "Sobre Nós | Conheça o Projeto Galinha GSB",
+    title: "Institucional | Galinha GSB: quem cria, a raça e como trabalhamos",
     description:
-      "Conheça o Galinha GSB, nosso propósito e nosso compromisso em compartilhar informações sobre criação, manejo e valorização da Galinha Sertaneja Balão.",
+      "Quem está por trás do Galinha GSB, o que se sabe sobre a raça Sertaneja Balão — origem, porte, temperamento e postura —, como o plantel é cuidado e como comprar ovos e aves.",
     canonical: `${SITE_URL}/sobre`,
     ogImage: `${SITE_URL}/logo.png`,
     noindex: false,
@@ -113,8 +113,8 @@ export const productionContent: SobreContent = {
   },
 
   hero: {
-    eyebrow: "Sobre nós",
-    title: "Conheça a história por trás do Galinha GSB",
+    eyebrow: "Institucional",
+    title: "Quem cria, a raça e como trabalhamos",
     subtitle:
       "Um projeto dedicado ao conhecimento, à criação responsável e à valorização da Galinha Sertaneja Balão.",
     intro:
@@ -352,6 +352,30 @@ export const productionContent: SobreContent = {
       answer:
         "Os artigos novos aparecem primeiro no blog. Você também pode acompanhar o projeto pelo Instagram e pelo canal no YouTube.",
       link: { ...links.blog, label: "Ir para o blog" },
+    },
+    {
+      question: "Quanto pesa uma Galinha GSB adulta?",
+      answer:
+        "Em exemplares bem desenvolvidos, a faixa de referência fica em torno de 6 a 8 kg nos machos e 4 a 6 kg nas fêmeas. Linhagem, idade, alimentação e manejo fazem esse número variar.",
+      link: { label: "Ler a comparação com Índio Gigante e Brahma", href: "/blog/sertaneja-balao-x-indio-gigante-x-brahma-qual-e-realmente-a-maior-galinha-do-brasil", verified: true },
+    },
+    {
+      question: "A Galinha Sertaneja Balão é mansa?",
+      answer:
+        "Criadores costumam descrevê-la como dócil, ativa e fácil de manejar. O temperamento também depende da convivência: aves manejadas com calma desde cedo tendem a ser mais tranquilas.",
+      link: { label: "Ler sobre o temperamento da GSB", href: "/blog/galinha-sertaneja-balao-e-mansa-descubra-o-temperamento-da-gsb", verified: true },
+    },
+    {
+      question: "Quantos ovos a GSB põe por ano?",
+      answer:
+        "Em boas condições de manejo, uma fêmea adulta e saudável põe em média entre 160 e 260 ovos por ano. A postura começa por volta de 5 a 6 meses de idade.",
+      link: { label: "Ler sobre a produção de ovos", href: "/blog/quantos-ovos-a-galinha-gsb-poe-por-ano-producao-media-e-como-aumentar", verified: true },
+    },
+    {
+      question: "Como funciona a compra de ovos férteis e aves?",
+      answer:
+        "Você escolhe no catálogo e fala com o criador pelo WhatsApp. Disponibilidade, pagamento e entrega ou retirada são combinados na conversa — o transporte de aves vivas e ovos férteis segue regras sanitárias.",
+      link: { ...links.catalogo, label: "Ver o catálogo" },
     },
     {
       question: "Onde encontro informações sobre a raça Sertaneja Balão?",
